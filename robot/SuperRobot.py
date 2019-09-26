@@ -37,13 +37,13 @@ class SuperRobot:
         self.__robot.ALMotion.openHand("LHand")
 
     def closeLeftHand(self):
-        self.__robot.ALMotion.openHand("LHand")
+        self.__robot.ALMotion.closeHand("LHand")
 
     def openRightHand(self):
         self.__robot.ALMotion.openHand("RHand")
 
     def closeRightHand(self):
-        self.__robot.ALMotion.openHand("RHand")
+        self.__robot.ALMotion.closeHand("RHand")
 
     def moveHeadUp(self, deg):
         self.__moveHeadIntern(-deg, 1)
