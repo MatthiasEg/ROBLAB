@@ -5,7 +5,6 @@ class PepperConfiguration(object):
     Username = None
     Password = None
 
-
     def __init__(self, name, ip="", port= 0):
         self.Name = name
         self.Username = "nao"

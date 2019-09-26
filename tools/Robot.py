@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from PepperConfiguration import PepperConfiguration
-from naoqi import qi
+
+# from naoqi import qi
 from naoqi_proxy_python_classes.ALAnimatedSpeech import ALAnimatedSpeech
 from naoqi_proxy_python_classes.ALAudioDevice import ALAudioDevice
 from naoqi_proxy_python_classes.ALAudioPlayer import ALAudioPlayer
@@ -84,6 +85,7 @@ from naoqi_proxy_python_classes.ALWavingDetection import ALWavingDetection
 from naoqi_proxy_python_classes.ALWorldRepresentation import ALWorldRepresentation
 from naoqi_proxy_python_classes.DCM import DCM
 
+
 # Class that helps on calling naoqi different modules and methods
 # by joining them all in the same place
 # This has been half generated, half cleaned up by hand
@@ -94,7 +96,6 @@ class Robot(object):
     """
     Your PyNAOQI mate class.
     """
-   
 
     def __init__(self, configuration):
         self.configuration = configuration
@@ -185,6 +186,7 @@ class Robot(object):
         self.ALStore = ALStore(self.session)
         self.ALVisionToolbox = ALVisionToolbox(self.session)
         self.DCM = DCM(self.session)
+
 
 if __name__ == '__main__':
     m = Mate("138.25.61.99", 9559)
