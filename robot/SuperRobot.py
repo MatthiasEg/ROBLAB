@@ -1,3 +1,5 @@
+import time
+
 from tools.Robot import Robot
 from tools.PepperConfiguration import PepperConfiguration
 
@@ -10,3 +12,9 @@ class SuperRobot:
 
     def say(self, text):
         self.__robot.ALAnimatedSpeech.say(text)
+
+    def openLeftHand(self):
+        self.__robot.ALMotion.openHand("LHand")
+
+    def openRightHand(self):
+        self.__robot.ALMotion.openHand("RHand")
