@@ -1,6 +1,7 @@
 import time
 
 from tools.Robot import Robot
+
 from tools.PepperConfiguration import PepperConfiguration
 
 
@@ -16,5 +17,14 @@ class SuperRobot:
     def openLeftHand(self):
         self.__robot.ALMotion.openHand("LHand")
 
+    def closeLeftHand(self):
+        self.__robot.ALMotion.openHand("LHand")
+
     def openRightHand(self):
         self.__robot.ALMotion.openHand("RHand")
+
+    def closeRightHand(self):
+        self.__robot.ALMotion.openHand("RHand")
+
+
+
