@@ -10,7 +10,7 @@ class PepperConfiguration(object):
         self.Username = "nao"
         self.Port = 9559
         if name == "Amber":
-            self.Ip = "amber.local"
+            self.Ip = "192.168.1.101"
             self.Password = "i1-p2e3p"
         elif name == "Porter":
             self.Ip = "porter.local"
