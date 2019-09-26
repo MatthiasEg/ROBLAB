@@ -9,4 +9,4 @@ class SuperRobot:
         self.__robot = Robot(config)
 
     def say(self, text):
-        self.__robot.ALAnimatedSpeech.say("asfdasf")
+        self.__robot.ALAnimatedSpeech.say(text)
