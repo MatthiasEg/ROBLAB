@@ -1,10 +1,9 @@
 import math
-import time
 
-from tools.Robot import Robot
 from enum import Enum
 
 from tools.PepperConfiguration import PepperConfiguration
+from tools.Robot import Robot
 
 
 class Actuators(Enum):
@@ -59,3 +58,20 @@ class SuperRobot:
 
     def __moveHeadIntern(self, deg, index):
         self.__robot.ALMotion.changeAngles(self.headJointNames[index], math.radians(deg), self.fractionMaxSpeed)
+
+    def enableCollisionProtection(self, enabled):
+        self.__robot.ALMotion.setExternalCollisionProtectionEnabled("All", enabled)
+        self.__robot.ALMotion.setCollisionProtectionEnabled("Arms", enabled)
+        self.__robot.ALMotion.setExternalCollisionProtectionEnabled("Arms", enabled)
+        self.__robot.ALMotion.setExternalCollisionProtectionEnabled("LArm", enabled)
+        self.__robot.ALMotion.setExternalCollisionProtectionEnabled("RArm", enabled)
+
+        print('enabled collision protection: {}'.format(enabled))
+
+    def startMoving(self):
+        # self.__robot.ALNavigation.navigateTo(-.5, -.5)
+        self.__robot.ALNavigation.moveAlong(["Composed", ["Holonomic", ["Line", [1.0, 0.0]], 0.0, 5.0],
+                                             ["Holonomic", ["Line", [-1.0, 0.0]], 0.0, 5.0]])
+        # self.__robot.ALMotion.move(0.1, 0.1, 0)
+        # time.sleep(5)
+        # self.__robot.ALMotion.stopMove()
