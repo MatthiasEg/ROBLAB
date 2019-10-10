@@ -10,6 +10,7 @@ class Actuators(Enum):
     HIPS = 4
     ALL = 5
 
+
 class BodyMovementWrapper:
 
     def __init__(self, robot):
