@@ -12,6 +12,9 @@ position_movement_wrapper = PositionMovementWrapper(robot)
 sensing_wrapper = SensingWrapper(robot)
 speech_wrapper = SpeechWrapper(robot)
 
+body_movement_wrapper.close_left_hand()
+
+
 # try:
 #     while True:
 #         time.sleep(1)

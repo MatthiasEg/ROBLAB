@@ -19,29 +19,29 @@ class BodyMovementWrapper:
         # Using 10% of maximum joint speed
         self.fractionMaxSpeed = 0.1
 
-    def openLeftHand(self):
+    def open_left_hand(self):
         self.__robot.ALMotion.openHand("LHand")
 
-    def closeLeftHand(self):
+    def close_left_hand(self):
         self.__robot.ALMotion.closeHand("LHand")
 
-    def openRightHand(self):
+    def open_right_hand(self):
         self.__robot.ALMotion.openHand("RHand")
 
-    def closeRightHand(self):
+    def close_right_hand(self):
         self.__robot.ALMotion.closeHand("RHand")
 
-    def moveHeadUp(self, deg):
-        self.__moveHeadIntern(-deg, 1)
+    def move_head_up(self, deg):
+        self.move_head_intern(-deg, 1)
 
-    def moveHeadDown(self, deg):
-        self.__moveHeadIntern(deg, 1)
+    def move_head_down(self, deg):
+        self.move_head_intern(deg, 1)
 
-    def moveHeadRight(self, deg):
-        self.__moveHeadIntern(deg, 0)
+    def move_head_rght(self, deg):
+        self.move_head_intern(deg, 0)
 
-    def moveHeadLeft(self, deg):
-        self.__moveHeadIntern(-deg, 0)
+    def move_head_left(self, deg):
+        self.move_head_intern(-deg, 0)
 
-    def __moveHeadIntern(self, deg, index):
+    def move_head_intern(self, deg, index):
         self.__robot.ALMotion.changeAngles(self.headJointNames[index], math.radians(deg), self.fractionMaxSpeed)
