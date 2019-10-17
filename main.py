@@ -6,7 +6,7 @@ from tools.PepperConfiguration import PepperConfiguration
 from tools.Robot import Robot
 
 
-def main()
+def main():
     config = PepperConfiguration("Porter")
     robot = Robot(config)
     body_movement_wrapper = BodyMovementWrapper(robot)
