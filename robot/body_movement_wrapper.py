@@ -1,6 +1,9 @@
 import math
+from tools.Robot import Robot
 
 from enum import Enum
+
+from tools import Robot
 
 
 class Actuators(Enum):

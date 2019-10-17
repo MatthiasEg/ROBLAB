@@ -93,6 +93,7 @@ from naoqi_proxy_python_classes.DCM import DCM
 # Author: Sammy Pfeiffer <Sammy.Pfeiffer at student.uts.edu>
 # and updated by Florian Herzog
 
+
 class Robot(object):
     """
     Your PyNAOQI mate class.
