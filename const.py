@@ -1,5 +1,5 @@
 from tools.PepperConfiguration import PepperConfiguration
 from tools.Robot import Robot
 
-config = PepperConfiguration("Amber")
+config = PepperConfiguration("virtual")
 robot = Robot(config)

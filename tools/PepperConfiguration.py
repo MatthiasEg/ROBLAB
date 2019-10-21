@@ -20,6 +20,9 @@ class PepperConfiguration(object):
             self.Password = "i3-p2e3p"
         elif name == "local":
             self.Ip = "127.0.0.1"
+        elif name == "virtual":
+            self.Ip = "127.0.0.1"
+            self.Port = "56850" #port needs to be adjusted every time it changes in Choreograph
         else:
             self.Ip = ip
             self.Port = port
