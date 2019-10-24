@@ -4,9 +4,6 @@
 # You need an ALBroker running
 
 
-
-
-
 class ALNavigation(object):
     def __init__(self, session):
         self.session = session
@@ -170,6 +167,11 @@ class ALNavigation(object):
         if not self.proxy:
             self.proxy = self.session.service("ALNavigation")
         return self.proxy.ping()
+
+    def explore(self, radius):
+        if not self.proxy:
+            self.proxy = self.session.service("ALNavigation")
+        return self.proxy.explore(radius)
 
     def setSecurityDistance(self, arg1):
         """Distance in meters fromwhich the robot should stop if there is an obstacle.
