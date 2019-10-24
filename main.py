@@ -5,7 +5,6 @@ import const
 
 
 def main():
-
     Behavior().start_behavior()
 
 
