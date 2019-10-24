@@ -159,6 +159,11 @@ class ALNavigation(object):
             self.proxy = self.session.service("ALNavigation")
         return self.proxy.navigateTo(x, y, theta, config)
 
+    def navigateToInMap(self, vectorPosition):
+        if not self.proxy:
+            self.proxy = self.session.service("ALNavigation")
+        return self.proxy.navigateToInMap(vectorPosition)
+
     def ping(self):
         """Just a ping. Always returns true
 
@@ -172,6 +177,27 @@ class ALNavigation(object):
         if not self.proxy:
             self.proxy = self.session.service("ALNavigation")
         return self.proxy.explore(radius)
+
+    def saveExploration(self):
+        if not self.proxy:
+            self.proxy = self.session.service("AlNavigation")
+        return self.proxy.saveExploration()
+
+    def startLocalization(self,):
+        if not self.proxy:
+            self.proxy = self.session.service("AlNavigation")
+        return self.proxy.startLocalization()
+
+    def stopLocalization(self,):
+        if not self.proxy:
+            self.proxy = self.session.service("AlNavigation")
+        return self.proxy.stopLocalization()
+
+    def getMetricalMap(self):
+        if not self.proxy:
+            self.proxy = self.session.service("AlNavigation")
+        return self.proxy.getMetricalMap()
+
 
     def setSecurityDistance(self, arg1):
         """Distance in meters fromwhich the robot should stop if there is an obstacle.
