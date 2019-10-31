@@ -8,8 +8,9 @@ import const
 
 class SensingWrapper:
 
-    def __init__(self, robot):
+    def __init__(self):
         self.__robot = const.robot
+        self.__detection = ObjectDetection()
 
     def explore(self, radius):
         return self.__robot.ALNavigation.explore(radius)
@@ -26,7 +27,6 @@ class SensingWrapper:
     def get_metrical_map(self):
         return self.__robot.ALNavigation.getMetricalMap()
         self.__robot = robot
-        self.__detection = ObjectDetection()
 
     def detectObjects(self):
         remote_folder_path = "/home/nao/recordings/cameras/"
