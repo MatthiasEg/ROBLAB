@@ -1,4 +1,6 @@
 import math
+
+import const
 from tools.Robot import Robot
 
 from enum import Enum
@@ -16,8 +18,8 @@ class Actuators(Enum):
 
 class BodyMovementWrapper:
 
-    def __init__(self, robot):
-        self.__robot = robot
+    def __init__(self):
+        self.__robot = const.robot
         self.headJointNames = ["HeadYaw", "HeadPitch"]
         # Using 10% of maximum joint speed
         self.fractionMaxSpeed = 0.1

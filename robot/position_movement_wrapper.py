@@ -3,7 +3,7 @@ import const
 
 class PositionMovementWrapper:
 
-    def __init__(self, robot):
+    def __init__(self):
         self.__robot = const.robot
 
     def enable_collision_protection(self, enabled):
