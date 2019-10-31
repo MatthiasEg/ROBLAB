@@ -1,7 +1,10 @@
+import const
+
+
 class PositionMovementWrapper:
 
-    def __init__(self, robot):
-        self.__robot = robot
+    def __init__(self):
+        self.__robot = const.robot
 
     def enable_collision_protection(self, enabled):
         self.__robot.ALMotion.setExternalCollisionProtectionEnabled(
@@ -47,3 +50,6 @@ class PositionMovementWrapper:
 
     def goToPosition(self, position):
         self.__robot.ALLocalization.goToPosition(position)
+        
+    def navigate_to_coordinate_on_map(self, coordinate_vector):
+        self.__robot.ALNavigation.navigateToInMap(coordinate_vector)
