@@ -16,6 +16,7 @@ class ObjectDetection:
         np.random.seed(42)
         self.__COLORS = np.random.randint(0, 255, size=(len(self.__LABELS), 3), dtype="uint8")
 
+        #weights hier herunterladen: https://pjreddie.com/media/files/yolov3.weights
         weights_path = file_path + "/yolo-coco/yolov3.weights"
         config_path = file_path + "/yolo-coco/yolov3.cfg"
 
