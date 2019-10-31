@@ -69,3 +69,5 @@ fabric.properties
 
 *.pyc
 *.DS_Store
+
+*.weights
