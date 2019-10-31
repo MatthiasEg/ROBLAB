@@ -9,28 +9,31 @@ class ObjectDetection:
         self.__loadYolo()
 
     def __loadYolo(self):
-        filePath = os.path.dirname(os.path.abspath(__file__))
-        labelsPath = filePath + "/yolo-coco/coco.names"
-        self.__LABELS = open(labelsPath).read().strip().split("\n")
+        file_path = os.path.dirname(os.path.abspath(__file__))
+        labels_path = file_path + "/yolo-coco/coco.names"
+        self.__LABELS = open(labels_path).read().strip().split("\n")
 
         np.random.seed(42)
         self.__COLORS = np.random.randint(0, 255, size=(len(self.__LABELS), 3), dtype="uint8")
 
-        weightsPath = filePath + "/yolo-coco/yolov3.weights"
-        configPath = filePath + "/yolo-coco/yolov3.cfg"
+        weights_path = file_path + "/yolo-coco/yolov3.weights"
+        config_path = file_path + "/yolo-coco/yolov3.cfg"
 
         print("Loading YOLO from disk")
-        self.__net = cv2.dnn.readNetFromDarknet(configPath, weightsPath)
+        self.__net = cv2.dnn.readNetFromDarknet(config_path, weights_path)
         ln = self.__net.getLayerNames()
         self.__ln = [ln[i[0] - 1] for i in self.__net.getUnconnectedOutLayers()]
         print("Loading successful")
 
-    def analyze(self, imagePath):
-        frame = cv2.imread(imagePath)
+    def analyze(self, image_path):
+        if not os.path.isfile(image_path):
+            print("Wrong image path!")
+            return
 
+        frame = cv2.imread(image_path)
         (H, W) = frame.shape[:2]
-        centerY = int(H / 2)
-        centerX = int(W / 2)
+        center_y = int(H / 2)
+        center_x = int(W / 2)
         print("H: %s, W: %s" % (H, W))
 
         blob = cv2.dnn.blobFromImage(frame, 1 / 255.0, (416, 416), swapRB=True, crop=False)
@@ -38,14 +41,14 @@ class ObjectDetection:
 
         # intense task
         print("Analyzing file")
-        layerOutputs = self.__net.forward(self.__ln)
+        layer_outputs = self.__net.forward(self.__ln)
         print("Analysis complete")
 
         boxes = []
         confidences = []
         classIDs = []
 
-        for output in layerOutputs:
+        for output in layer_outputs:
             for detection in output:
                 scores = detection[5:]
                 classID = np.argmax(scores)
