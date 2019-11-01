@@ -51,4 +51,4 @@ class Behavior(object):
         img = numpy.array(img, numpy.uint8)
 
         # save image to project root
-        scipy.misc.imsave('map.jpg', img)
+        scipy.misc.imsave('mapMitRadius{}.jpg'.format(radius), img)
