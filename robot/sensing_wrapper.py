@@ -18,6 +18,9 @@ class SensingWrapper:
     def save_exploration_to_robot(self):
         return self.__robot.ALNavigation.saveExploration()
 
+    def load_exploration_from_robot(self, path):
+        return self.__robot.ALNavigation.loadExploration(path)
+
     def start_localization(self):
         return self.__robot.ALNavigation.startLocalization()
 
