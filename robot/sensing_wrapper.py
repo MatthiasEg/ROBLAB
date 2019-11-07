@@ -29,7 +29,6 @@ class SensingWrapper:
 
     def get_metrical_map(self):
         return self.__robot.ALNavigation.getMetricalMap()
-        self.__robot = robot
 
     def detectObjects(self):
         remote_folder_path = "/home/nao/recordings/cameras/"
