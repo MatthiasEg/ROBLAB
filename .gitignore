@@ -71,3 +71,6 @@ fabric.properties
 *.DS_Store
 
 *.weights
+
+.idea/misc.xml
+.idea/group2.iml
