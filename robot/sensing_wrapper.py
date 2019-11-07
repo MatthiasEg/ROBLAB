@@ -45,6 +45,9 @@ class SensingWrapper:
         return self.__robot.ALFaceDetection.subscribe2(event)
 
 
+    def get_robot_position_in_map(self):
+        return self.__robot.ALNavigation.getRobotPositionInMap()
+
     def detectObjects(self):
         remote_folder_path = "/home/nao/recordings/cameras/"
         file_name = "picture.jpg"

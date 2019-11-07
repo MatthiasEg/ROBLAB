@@ -3,7 +3,7 @@ import time
 import numpy
 import scipy.misc
 import const
-import PIL  # import used for scipy.misc.imsave
+# import PIL  # import used for scipy.misc.imsave
 
 from robot.body_movement_wrapper import BodyMovementWrapper
 from robot.position_movement_wrapper import PositionMovementWrapper
@@ -20,6 +20,7 @@ class Behavior(object):
 
     def start_behavior(self):
         # self.__create_map(radius=0.5)
+<<<<<<< HEAD
         self.speech_wrapper.say("hello")
         self.setup_customer_reception()
 
@@ -36,6 +37,9 @@ class Behavior(object):
 
         while True:
             time.sleep(1)
+=======
+        self.__navigate()
+>>>>>>> 0fc9a1121433f6a486989b90c527fd1c3eb96af4
 
     def __initialize_wrappers(self):
         self.body_movement_wrapper = BodyMovementWrapper()
@@ -70,6 +74,7 @@ class Behavior(object):
         img = numpy.array(img, numpy.uint8)
 
         # save image to project root
+<<<<<<< HEAD
         scipy.misc.imsave('mapMitRadius{}.jpg'.format(radius), img)
 
     def on_human_tracked(self, value):
@@ -100,3 +105,25 @@ class Behavior(object):
                 print "Face Infos :  alpha %.3f - beta %.3f" % (faceShapeInfo[1], faceShapeInfo[2])
                 print "Face Infos :  width %.3f - height %.3f" % (faceShapeInfo[3], faceShapeInfo[4])
                 print "Face Extra Infos :" + str(faceExtraInfo)
+=======
+        # scipy.misc.imsave('mapMitRadius{}.jpg'.format(radius), img)
+
+    def __navigate(self):
+        # Load a previously saved exploration
+        self.sensing_wrapper.load_exploration_from_robot('/home/nao/group02HS19/map-4m.explo')
+        # self.position_movement_wrapper.navigate_to_coordinate_on_map()
+
+        # Relocalize the robot and start the localization process.
+        pos = [0.01, 0.01]
+        self.position_movement_wrapper.relocalize_in_map(pos)
+        self.sensing_wrapper.start_localization()
+
+        # Navigate to another place in the map
+        self.position_movement_wrapper.navigate_to_coordinate_on_map([1., 0., 0.])
+
+        # Check where the robot arrived
+        print "I reached: " + str(self.sensing_wrapper.get_robot_position_in_map()[0])
+
+        # Stop localization
+        self.sensing_wrapper.stop_localization()
+>>>>>>> 0fc9a1121433f6a486989b90c527fd1c3eb96af4
