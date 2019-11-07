@@ -10,7 +10,11 @@
 class ALFaceDetection(object):
     def __init__(self, session):
         self.session = session
+        self.memory = session.service("ALMemory")
         self.proxy = None
+
+    def getMemorySubscriber(self, event):
+        return self.memory.subscriber(event)
 
     def force_connect(self):
         self.proxy = self.session.service("ALFaceDetection")
