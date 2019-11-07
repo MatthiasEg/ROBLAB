@@ -69,4 +69,8 @@ fabric.properties
 
 *.pyc
 *.DS_Store
+
 *.weights
+
+.idea/misc.xml
+.idea/group2.iml
