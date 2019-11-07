@@ -198,6 +198,11 @@ class ALNavigation(object):
             self.proxy = self.session.service("AlNavigation")
         return self.proxy.getMetricalMap()
 
+    def loadExploration(self, path):
+        if not self.proxy:
+            self.proxy = self.session.service("AlNavigation")
+        return self.proxy.loadExploration(path)
+
 
     def setSecurityDistance(self, arg1):
         """Distance in meters fromwhich the robot should stop if there is an obstacle.

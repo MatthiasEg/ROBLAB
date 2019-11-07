@@ -16,13 +16,14 @@ class Behavior(object):
         self.__initializeWrappers()
 
     def start_behavior(self):
-        self.__create_map(radius=0.5)
+        # self.__create_map(radius=0.5)
+        self.speech_wrapper.say("hello")
 
     def __initializeWrappers(self):
-        self.body_movement_wrapper = BodyMovementWrapper(self.__robot)
-        self.position_movement_wrapper = PositionMovementWrapper(self.__robot)
-        self.sensing_wrapper = SensingWrapper(self.__robot)
-        self.speech_wrapper = SpeechWrapper(self.__robot)
+        self.body_movement_wrapper = BodyMovementWrapper()
+        self.position_movement_wrapper = PositionMovementWrapper()
+        self.sensing_wrapper = SensingWrapper()
+        self.speech_wrapper = SpeechWrapper()
 
     def __create_map(self, radius):
         # Wake up robot
@@ -51,4 +52,4 @@ class Behavior(object):
         img = numpy.array(img, numpy.uint8)
 
         # save image to project root
-        scipy.misc.imsave('map.jpg', img)
+        scipy.misc.imsave('mapMitRadius{}.jpg'.format(radius), img)
