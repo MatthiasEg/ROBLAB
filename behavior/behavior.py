@@ -1,7 +1,7 @@
 import numpy
 import scipy.misc
 import const
-import PIL  # import used for scipy.misc.imsave
+# import PIL  # import used for scipy.misc.imsave
 
 from robot.body_movement_wrapper import BodyMovementWrapper
 from robot.position_movement_wrapper import PositionMovementWrapper
@@ -17,7 +17,7 @@ class Behavior(object):
 
     def start_behavior(self):
         # self.__create_map(radius=0.5)
-        self.speech_wrapper.say("hello")
+        self.__navigate()
 
     def __initializeWrappers(self):
         self.body_movement_wrapper = BodyMovementWrapper()
@@ -52,4 +52,23 @@ class Behavior(object):
         img = numpy.array(img, numpy.uint8)
 
         # save image to project root
-        scipy.misc.imsave('mapMitRadius{}.jpg'.format(radius), img)
+        # scipy.misc.imsave('mapMitRadius{}.jpg'.format(radius), img)
+
+    def __navigate(self):
+        # Load a previously saved exploration
+        self.sensing_wrapper.load_exploration_from_robot('/home/nao/group02HS19/map-4m.explo')
+        # self.position_movement_wrapper.navigate_to_coordinate_on_map()
+
+        # Relocalize the robot and start the localization process.
+        pos = [0.01, 0.01]
+        self.position_movement_wrapper.relocalize_in_map(pos)
+        self.sensing_wrapper.start_localization()
+
+        # Navigate to another place in the map
+        self.position_movement_wrapper.navigate_to_coordinate_on_map([1., 0., 0.])
+
+        # Check where the robot arrived
+        print "I reached: " + str(self.sensing_wrapper.get_robot_position_in_map()[0])
+
+        # Stop localization
+        self.sensing_wrapper.stop_localization()
