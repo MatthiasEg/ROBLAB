@@ -1,3 +1,5 @@
+import math
+
 import const
 
 
@@ -5,39 +7,26 @@ class PositionMovementWrapper:
 
     def __init__(self):
         self.__robot = const.robot
+        self.enable_collision_protection(True)
 
     def enable_collision_protection(self, enabled):
-        self.__robot.ALMotion.setExternalCollisionProtectionEnabled(
-            "All", enabled)
+        self.__robot.ALMotion.setExternalCollisionProtectionEnabled("All", enabled)
         self.__robot.ALMotion.setCollisionProtectionEnabled("Arms", enabled)
-        self.__robot.ALMotion.setExternalCollisionProtectionEnabled(
-            "Arms", enabled)
-        self.__robot.ALMotion.setExternalCollisionProtectionEnabled(
-            "LArm", enabled)
-        self.__robot.ALMotion.setExternalCollisionProtectionEnabled(
-            "RArm", enabled)
+        self.__robot.ALMotion.setExternalCollisionProtectionEnabled("Arms", enabled)
+        self.__robot.ALMotion.setExternalCollisionProtectionEnabled("LArm", enabled)
+        self.__robot.ALMotion.setExternalCollisionProtectionEnabled("RArm", enabled)
 
         print('enabled collision protection: {}'.format(enabled))
 
-    def enable_autonomous_life(self, enabled):
-        # to disable whole autonomous life
-        # connect to robot via ssh
-        # nao stop
-        # naoqi-bin --disable-life
-        self.__robot.ALMotion.setAutonomousAbilityEnabled("BackgroundMovement", enabled)
-        self.__robot.ALMotion.setAutonomousAbilityEnabled("BasicAwareness", enabled)
-        self.__robot.ALMotion.setAutonomousAbilityEnabled("ListeningMovement", enabled)
-        self.__robot.ALMotion.setAutonomousAbilityEnabled("SpeakingMovement", enabled)
+    def move_to(self, x, y, theta):
+        self.__robot.ALMotion.moveTo(x, y, theta * math.pi / 180)
 
-        self.__robot.ALMotion.setIdlePostureEnabled('Body', enabled)
-        self.__robot.ALMotion.setBreathEnabled('Body', enabled)
+    def move(self, vx, vy, omega):
+        # moves with velocity vx forward, vy to the left and omega anticlockwise
+        self.__robot.ALMotion.move(vx, vy, omega * math.pi / 180)
 
-        print('enabled autonomous life: {}'.format(enabled))
-
-    def move(self, x, y, theta):
-        motion_service = self.__robot.session.service("ALMotion")
-        # self.__robot.ALLocalization.move(x, y, theta)
-        motion_service.moveTo(x, y, theta, _async=False)
+    def stop_movement(self):
+        self.__robot.ALMotion.stopMove()
 
     def learn_home(self):
         self.__robot.ALLocalization.learnHome()
