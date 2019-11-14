@@ -30,8 +30,10 @@ class Behavior(object):
         self.sensing_wrapper.enable_face_recognition()
         self.sensing_wrapper.enable_face_tracking()
 
-        subscriber = self.sensing_wrapper.get_memory_subscriber("FaceDetected")
-        subscriber.signal.connect(self.on_human_tracked)
+        face_detected_subscriber = self.sensing_wrapper.get_memory_subscriber("FaceDetected")
+        just_arrived_detected_subscriber = self.sensing_wrapper.get_memory_subscriber("PeoplePerception/JustArrived")
+        face_detected_subscriber.signal.connect(self.on_human_tracked)
+        just_arrived_detected_subscriber.signal.connect(self.on_just_arrived)
 
         while True:
             time.sleep(1)
@@ -76,7 +78,6 @@ class Behavior(object):
         """
         Callback for event FaceDetected.
         """
-        print("Event received")
         if value == []:  # empty value when the face disappears
             self.got_face = False
         elif not self.got_face:  # only speak the first time a face appears
@@ -102,6 +103,10 @@ class Behavior(object):
                 print "Face Infos :  width %.3f - height %.3f" % (faceShapeInfo[3], faceShapeInfo[4])
                 print "Face Extra Infos :" + str(faceExtraInfo)
 
+    def on_just_arrived(self, id):
+        print(id)
+        self.speech_wrapper.say("id %s just arrived!" % id)
+
     def __navigate(self):
         # Load a previously saved exploration
         self.sensing_wrapper.load_exploration_from_robot('/home/nao/group02HS19/map-4m.explo')
@@ -120,3 +125,5 @@ class Behavior(object):
 
         # Stop localization
         self.sensing_wrapper.stop_localization()
+
+
