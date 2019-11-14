@@ -110,3 +110,6 @@ class BodyMovementWrapper:
 
     def __set_head_intern(self, deg, index):
         self.__robot.ALMotion.setAngles(self.headJointNames[index], math.radians(deg), self.fractionMaxSpeed)
+
+    def get_head_angle_horizontal(self):
+        return self.__robot.ALMotion.getAngles(self.headJointNames[0], False)
