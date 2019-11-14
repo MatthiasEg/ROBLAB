@@ -38,17 +38,27 @@ class ObjectDetection:
         center_x = int(W / 2)
         # print("H: %s, W: %s" % (H, W))
 
+        # print("centerX start: %s, centerX end: %s, centerY start: %s, centerY end: %s" % (center_x-25, center_x+50, center_y-25, center_y+50))
+        cv2.rectangle(frame, (center_x - 25, center_y - 25), (center_x + 50, center_y + 50), [int(c) for c in self.__COLORS[0]], 2)
+
+        center_box = dict()
+        center_box["name"] = "center_box"
+        center_box["centerX"] = center_x
+        center_box["centerY"] = center_y
+
         blob = cv2.dnn.blobFromImage(frame, 1 / 255.0, (416, 416), swapRB=True, crop=False)
         self.__net.setInput(blob)
 
         # intense task
-        print("Analyzing image with min. confidence of %s" % min_confidence)
+        # print("Analyzing image with min. confidence of %s" % min_confidence)
         layer_outputs = self.__net.forward(self.__ln)
-        print("Analysis complete")
+        # print("Analysis complete")
 
         boxes = []
         confidences = []
         classIDs = []
+        detected_objects = []
+        detected_objects.append(center_box)
 
         for output in layer_outputs:
             for detection in output:
@@ -70,23 +80,36 @@ class ObjectDetection:
                         for i in idxs.flatten():
                             if object_to_find_label is not None:
                                 if self.__LABELS[classIDs[i]] == object_to_find_label:
-                                    self.__draw_boxes(i, frame, boxes, classIDs, confidences)
+                                    detected_objects.append(self.__draw_boxes(i, frame, boxes, classIDs, confidences))
                             else:
-                                self.__draw_boxes(i, frame, boxes, classIDs, confidences)
+                                detected_objects.append(self.__draw_boxes(i, frame, boxes, classIDs, confidences))
 
 
-        cv2.imshow("Analyzed Frame", frame)
-        cv2.waitKey(0) & 0xFF == ord('q')
-        cv2.destroyAllWindows()
+        # cv2.imshow("Analyzed Frame", frame)
+        # cv2.waitKey(0) & 0xFF == ord('q')
+        # cv2.destroyAllWindows()
+
+        return detected_objects
+
 
     def __draw_boxes(self, i, frame, boxes, classIDs, confidences):
         (x, y) = (boxes[i][0], boxes[i][1])
         (w, h) = (boxes[i][2], boxes[i][3])
         (cX, cY) = (boxes[i][4], boxes[i][5])
 
-        # print("x: %s y: %s w: %s h: %s" % (str(x), str(y), str(w), str(h)))
-
-        color = [int(c) for c in self.__COLORS[classIDs[i]]]
+        # color = [int(c) for c in self.__COLORS[classIDs[i]]]
+        color = [int(c) for c in self.__COLORS[i]]
         cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
         text = "{}: {:.4f}".format(self.__LABELS[classIDs[i]], confidences[i])
         cv2.putText(frame, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+
+        detected_object_info = dict()
+        detected_object_info["name"] = self.__LABELS[classIDs[i]]
+        detected_object_info["x"] = x
+        detected_object_info["y"] = y
+        detected_object_info["w"] = w
+        detected_object_info["h"] = h
+        detected_object_info["centerX"] = cX
+        detected_object_info["centerY"] = cY
+
+        return detected_object_info
