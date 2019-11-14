@@ -10,6 +10,8 @@ class SensingWrapper:
     def __init__(self):
         self.__robot = const.robot
         self.__detection = ObjectDetection()
+        self.__frontSonarMemoryPath = "Device/SubDeviceList/Platform/Front/Sonar/Sensor/Value"
+        self.__backSonarMemoryPath = "Device/SubDeviceList/Platform/Back/Sonar/Sensor/Value"
 
     def explore(self, radius):
         return self.__robot.ALNavigation.explore(radius)
@@ -47,7 +49,7 @@ class SensingWrapper:
     def get_robot_position_in_map(self):
         return self.__robot.ALNavigation.getRobotPositionInMap()
 
-    def detectObjects(self):
+    def detect_object(self, object_name):
         remote_folder_path = "/home/nao/recordings/cameras/"
         file_name = "picture.jpg"
 
@@ -63,7 +65,26 @@ class SensingWrapper:
         file_transfer.get(remote, local)
         file_transfer.close()
 
-        self.__detection.analyze(file_name)
+        return self.__detection.analyze(file_name, object_name, 0.4)
+
+    def start_sonar_sensors(self):
+        # subscriber name, refresh period( in milliseconds), precision of the extractor
+        self.__robot.ALSonar.subscribe(self.__robot.configuration.name, 1000, .1)
+
+    def stop_sonar_sensors(self):
+        self.__robot.ALSonar.unsubscribe(self.__robot.configuration.name)
+
+    def get_sonar_distance(self, sonar):
+        al_memory_path = ""
+        if sonar is "Front":
+            al_memory_path = self.__frontSonarMemoryPath
+        elif sonar is "Back":
+            al_memory_path = self.__backSonarMemoryPath
+        else:
+            raise Exception("Invalid sonar sensor parameter!")
+
+        return self.__robot.ALMemory.getData(al_memory_path)
+
 
     def enable_face_recognition(self):
         self.__robot.ALFaceDetection.setRecognitionEnabled(True)
