@@ -1,11 +1,8 @@
 import math
 
-import const
-from tools.Robot import Robot
-
 from enum import Enum
 
-from tools import Robot
+import const
 
 
 class Actuators(Enum):
@@ -23,6 +20,30 @@ class BodyMovementWrapper:
         self.headJointNames = ["HeadYaw", "HeadPitch"]
         # Using 10% of maximum joint speed
         self.fractionMaxSpeed = 0.1
+        self.enable_autonomous_life(False)
+        self.enable_move_arms(False)
+
+    def enable_autonomous_life(self, enabled):
+        # to disable whole autonomous life
+        self.__robot.session.service("ALAutonomousLife").setAutonomousAbilityEnabled("BackgroundMovement", enabled)
+        self.__robot.session.service("ALAutonomousLife").setAutonomousAbilityEnabled("BasicAwareness", enabled)
+        self.__robot.session.service("ALAutonomousLife").setAutonomousAbilityEnabled("ListeningMovement", enabled)
+        self.__robot.session.service("ALAutonomousLife").setAutonomousAbilityEnabled("SpeakingMovement", enabled)
+
+        self.__robot.ALMotion.setIdlePostureEnabled('Body', enabled)
+        self.__robot.ALMotion.setBreathEnabled('Body', enabled)
+
+        print('enabled autonomous life: {}'.format(enabled))
+
+    def enable_move_arms(self, enabled):
+        self.__robot.ALMotion.setMoveArmsEnabled(enabled, enabled)
+
+    def initial_position(self):
+        self.__robot.ALRobotPosture.goToPosture("StandInit", self.fractionMaxSpeed)
+        self.set_head_down(30)
+
+    def initial_position_stand(self):
+        self.__robot.ALRobotPosture.goToPosture("Stand", self.fractionMaxSpeed)
 
     def open_left_hand(self):
         self.__robot.ALMotion.openHand("LHand")
