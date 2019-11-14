@@ -164,6 +164,21 @@ class ALNavigation(object):
             self.proxy = self.session.service("ALNavigation")
         return self.proxy.navigateToInMap(vectorPosition)
 
+    def getRobotPositionInMap(self):
+        if not self.proxy:
+            self.proxy = self.session.service("ALNavigation")
+        return self.proxy.getRobotPositionInMap()
+
+    def loadExploration(self, path):
+        if not self.proxy:
+            self.proxy = self.session.service("ALNavigation")
+        return self.proxy.loadExploration(path)
+
+    def relocalizeInMap(self, estimation):
+        if not self.proxy:
+            self.proxy = self.session.service("AlNavigation")
+        return self.proxy.relocalizeInMap(estimation)
+
     def ping(self):
         """Just a ping. Always returns true
 
@@ -198,10 +213,7 @@ class ALNavigation(object):
             self.proxy = self.session.service("AlNavigation")
         return self.proxy.getMetricalMap()
 
-    def loadExploration(self, path):
-        if not self.proxy:
-            self.proxy = self.session.service("AlNavigation")
-        return self.proxy.loadExploration(path)
+    
 
 
     def setSecurityDistance(self, arg1):

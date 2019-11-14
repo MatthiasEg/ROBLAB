@@ -28,17 +28,22 @@ class PositionMovementWrapper:
     def stop_movement(self):
         self.__robot.ALMotion.stopMove()
 
-    def learnHome(self):
+    def learn_home(self):
         self.__robot.ALLocalization.learnHome()
 
-    def goToHome(self):
+    def go_to_home(self):
         self.__robot.ALLocalization.goToHome()
 
-    def getPositon(self):
-        self.__robot.ALLocalization.getRobotPosition()
+    def get_positon(self):
+        return self.__robot.ALLocalization.getRobotPosition()
 
-    def goToPosition(self, position):
+    def go_to_position(self, position):
         self.__robot.ALLocalization.goToPosition(position)
         
     def navigate_to_coordinate_on_map(self, coordinate_vector):
         self.__robot.ALNavigation.navigateToInMap(coordinate_vector)
+
+    def relocalize_in_map(self, vectorPosition):
+        self.__robot.ALNavigation.relocalizeInMap(vectorPosition)
+
+
