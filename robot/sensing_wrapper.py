@@ -44,7 +44,6 @@ class SensingWrapper:
     def subscribe_to_event(self, event):
         return self.__robot.ALFaceDetection.subscribe2(event)
 
-
     def get_robot_position_in_map(self):
         return self.__robot.ALNavigation.getRobotPositionInMap()
 
@@ -68,6 +67,7 @@ class SensingWrapper:
 
     def enable_face_recognition(self):
         self.__robot.ALFaceDetection.setRecognitionEnabled(True)
+        self.__robot.ALFaceDetection.subscribe2("FaceDetection")
 
     def enable_face_tracking(self):
         self.__robot.ALFaceDetection.setTrackingEnabled(True)
