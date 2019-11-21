@@ -90,11 +90,9 @@ class SensingWrapper:
 
     def disable_face_tracking(self):
         self.__robot.ALFaceDetection.setTrackingEnabled(False)
-        self.__robot.ALFaceDetection.unsubscribe("FaceDetection")
 
     def enable_face_recognition(self):
         self.__robot.ALFaceDetection.setRecognitionEnabled(True)
-        self.__robot.ALFaceDetection.subscribe2("FaceDetection")
 
     def get_memory_subscriber(self, event):
         return self.__robot.ALFaceDetection.getMemorySubscriber(event)
