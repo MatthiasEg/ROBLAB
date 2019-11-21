@@ -181,12 +181,6 @@ class Behavior(object):
         else:
             self.__ask_person_amount()
 
-    def __initialize_wrappers(self):
-        self.body_movement_wrapper = BodyMovementWrapper()
-        self.position_movement_wrapper = PositionMovementWrapper()
-        self.sensing_wrapper = SensingWrapper()
-        self.speech_wrapper = SpeechWrapper()
-
     def __ask_person_amount_correct_callback(self, message):
         print('Ask Person triggered')
         if message[0] != '':
@@ -237,3 +231,9 @@ class Behavior(object):
         # save image to project root
 
         scipy.misc.imsave('mapMitRadius{}.jpg'.format(radius), img)
+
+    def __initialize_wrappers(self):
+        self.body_movement_wrapper = BodyMovementWrapper()
+        self.position_movement_wrapper = PositionMovementWrapper()
+        self.sensing_wrapper = SensingWrapper()
+        self.speech_wrapper = SpeechWrapper()
