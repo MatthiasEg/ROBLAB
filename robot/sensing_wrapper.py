@@ -98,3 +98,6 @@ class SensingWrapper:
 
     def get_memory_subscriber(self, event):
         return self.__robot.ALFaceDetection.getMemorySubscriber(event)
+
+    def enable_fast_mode(self):
+        return self.__robot.ALPeoplePerception.setFastModeEnabled(True)

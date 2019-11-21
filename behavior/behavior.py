@@ -22,7 +22,7 @@ class Behavior(object):
     def start_behavior(self):
         # self.body_movement_wrapper.move_head_up(10)
         self.speech_wrapper.say("hello")
-        # self.setup_customer_reception()
+        self.setup_customer_reception()
         # self.__navigate()
         # self.__ask_to_follow()
 
@@ -35,6 +35,7 @@ class Behavior(object):
         self.sensing_wrapper.set_maximum_detection_range_in_meters(3)
         self.sensing_wrapper.enable_face_recognition()
         self.sensing_wrapper.enable_face_tracking()
+        self.sensing_wrapper.enable_fast_mode()
 
         # face_detected_subscriber = self.sensing_wrapper.get_memory_subscriber("FaceDetected")
         # face_detected_subscriber.signal.connect(self.on_human_tracked)
