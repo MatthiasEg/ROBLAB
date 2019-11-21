@@ -42,50 +42,20 @@ class Behavior(object):
         # self.sensing_wrapper.enable_fast_mode()
 
         face_detected_subscriber = self.sensing_wrapper.get_memory_subscriber("FaceDetected")
-        face_detected_subscriber.signal.connect(self.on_human_tracked)
+        face_detected_subscriber.signal.connect(self.__on_human_tracked)
         self.sensing_wrapper.subscribe("huso")
 
         while not self.__first_person_detected:
             time.sleep(1)
 
         visible_people_subscriber = self.sensing_wrapper.get_memory_subscriber("PeoplePerception/VisiblePeopleList")
-        visible_people_subscriber.signal.connect(self.on_people_visible)
+        visible_people_subscriber.signal.connect(self.__on_people_visible)
         self.sensing_wrapper.subscribe("VisiblePeopleList")
 
         while True:
             time.sleep(1)
 
-    def __create_map(self, radius):
-        # Wake up robot
-        # Wake up robot
-        self.__robot.ALMotion.wakeUp()  # Explore the environement, in a radius of 2 m.
-        error_code = self.sensing_wrapper.explore(radius)
-        if error_code != 0:
-            print "Exploration failed."
-            return
-        # Saves the exploration on disk
-        path = self.sensing_wrapper.save_exploration_to_robot()
-        print "Exploration saved at path: \"" + path + "\""
-        # Start localization to navigate in map
-        self.sensing_wrapper.start_localization()
-        # Come back to initial position
-        self.position_movement_wrapper.navigate_to_coordinate_on_map([
-            0., 0., 0.])
-        # Stop localization
-        self.sensing_wrapper.stop_localization()
-        # Retrieve and display the map built by the robot
-        result_map = self.sensing_wrapper.get_metrical_map()
-        map_width = result_map[1]
-        map_height = result_map[2]
-        img = numpy.array(result_map[4]).reshape(map_width, map_height)
-        img = (100 - img) * 2.55  # from 0..100 to 255..0
-        img = numpy.array(img, numpy.uint8)
-
-        # save image to project root
-
-        scipy.misc.imsave('mapMitRadius{}.jpg'.format(radius), img)
-
-    def on_human_tracked(self, value):
+    def __on_human_tracked(self, value):
         if value == []:  # empty value when the face disappears
             self.__got_face = False
         elif not self.__got_face:
@@ -98,7 +68,7 @@ class Behavior(object):
                 self.speech_wrapper.say("Please come and stay in front of me.")
                 self.__first_person_detected = True
 
-    def on_people_visible(self, list):
+    def __on_people_visible(self, list):
         if self.__first_to_enter_callback_two:
             self.__first_to_enter_callback_two = False
             self.sensing_wrapper.unsubscribe("VisiblePeopleList")
@@ -134,15 +104,15 @@ class Behavior(object):
                     faceShapeInfo[3], faceShapeInfo[4])
                 print "Face Extra Infos :" + str(faceExtraInfo)
 
-    def on_just_arrived(self, id):
+    def __on_just_arrived(self, id):
         print(id)
         self.speech_wrapper.animated_say("id %s just arrived!" % id)
 
-    def on_people_list(self, list):
+    def __on_people_list(self, list):
         self.speech_wrapper.animated_say("list changed!" % list)
         print(list)
 
-    def on_population_updated(self, args):
+    def __on_population_updated(self, args):
         self.speech_wrapper.animated_say("population updated!")
         print("population updated")
 
@@ -262,3 +232,33 @@ class Behavior(object):
 
     def __assign_table(self):
         pass
+
+    def __create_map(self, radius):
+        # Wake up robot
+        # Wake up robot
+        self.__robot.ALMotion.wakeUp()  # Explore the environement, in a radius of 2 m.
+        error_code = self.sensing_wrapper.explore(radius)
+        if error_code != 0:
+            print "Exploration failed."
+            return
+        # Saves the exploration on disk
+        path = self.sensing_wrapper.save_exploration_to_robot()
+        print "Exploration saved at path: \"" + path + "\""
+        # Start localization to navigate in map
+        self.sensing_wrapper.start_localization()
+        # Come back to initial position
+        self.position_movement_wrapper.navigate_to_coordinate_on_map([
+            0., 0., 0.])
+        # Stop localization
+        self.sensing_wrapper.stop_localization()
+        # Retrieve and display the map built by the robot
+        result_map = self.sensing_wrapper.get_metrical_map()
+        map_width = result_map[1]
+        map_height = result_map[2]
+        img = numpy.array(result_map[4]).reshape(map_width, map_height)
+        img = (100 - img) * 2.55  # from 0..100 to 255..0
+        img = numpy.array(img, numpy.uint8)
+
+        # save image to project root
+
+        scipy.misc.imsave('mapMitRadius{}.jpg'.format(radius), img)
