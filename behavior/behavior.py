@@ -9,6 +9,7 @@ from robot.body_movement_wrapper import BodyMovementWrapper
 from robot.position_movement_wrapper import PositionMovementWrapper
 from robot.sensing_wrapper import SensingWrapper
 from robot.speech_wrapper import SpeechWrapper
+from robot.body_movement_wrapper import Actuators
 
 
 class Behavior(object):
@@ -21,7 +22,9 @@ class Behavior(object):
     def start_behavior(self):
         # self.body_movement_wrapper.move_head_up(10)
         self.speech_wrapper.say("hello")
-        self.setup_customer_reception()
+        # self.setup_customer_reception()
+        # self.__navigate()
+        # self.__ask_to_follow()
 
     def setup_customer_reception(self):
         if not self.sensing_wrapper.is_face_detection_enabled():
@@ -112,7 +115,7 @@ class Behavior(object):
         # self.position_movement_wrapper.navigate_to_coordinate_on_map()
 
         # Relocalize the robot and start the localization process.
-        pos = [0.01, 0.01]
+        pos = [0., 0.]
         self.position_movement_wrapper.relocalize_in_map(pos)
         self.sensing_wrapper.start_localization()
 
@@ -124,6 +127,23 @@ class Behavior(object):
 
         # Stop localization
         self.sensing_wrapper.stop_localization()
+
+    def __ask_to_follow(self):
+        print('hi')
+        self.body_movement_wrapper.moveArmsUp(Actuators.RArm, 120)
+        time.sleep(1)
+        self.body_movement_wrapper.moveArmsDown(Actuators.RArm, 160)
+
+    def patrick(self):
+        self.body_movement_wrapper.enableMoveArms(True)
+        self.speech_wrapper.say('Learning home')
+        self.position_movement_wrapper.learn_home()
+        self.speech_wrapper.say('wiggle wiggle')
+        self.position_movement_wrapper.move(1, 2, 0)
+        self.speech_wrapper.say('wiggle wiggle')
+        self.position_movement_wrapper.move(2, 1, 0)
+        self.speech_wrapper.say("I'm going home bitch")
+        self.position_movement_wrapper.go_to_home()
 
     def __create_map(self, radius):
         # Wake up robot
