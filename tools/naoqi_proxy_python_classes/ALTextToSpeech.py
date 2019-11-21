@@ -147,7 +147,7 @@ class ALTextToSpeech(object):
         """
         if not self.proxy:
             self.proxy = self.session.service("ALTextToSpeech")
-        return self.proxy.say(stringToSay, language)
+        return self.proxy.animated_say(stringToSay, language)
 
     def sayToFile(self, pStringToSay, pFileName):
         """Performs the text-to-speech operations: it takes a std::string as input and outputs the corresponding audio signal in the specified file.

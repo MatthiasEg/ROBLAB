@@ -4,9 +4,6 @@
 # You need an ALBroker running
 
 
-
-
-
 class ALFaceDetection(object):
     def __init__(self, session):
         self.session = session

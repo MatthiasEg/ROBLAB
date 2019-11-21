@@ -20,8 +20,9 @@ class Behavior(object):
         self.got_face = False
 
     def start_behavior(self):
+        # self.body_movement_wrapper.move_head_up(10)
         self.speech_wrapper.say("hello")
-        # self.setup_customer_reception()
+        self.setup_customer_reception()
         # self.__navigate()
         # self.__ask_to_follow()
         self.__recognize_persons()
@@ -30,16 +31,32 @@ class Behavior(object):
         if not self.sensing_wrapper.is_face_detection_enabled():
             raise Exception('No Face detection possible with this system!')
 
+        self.sensing_wrapper.reset_population()
+
         self.sensing_wrapper.set_maximum_detection_range_in_meters(3)
         self.sensing_wrapper.enable_face_recognition()
         self.sensing_wrapper.enable_face_tracking()
+        self.sensing_wrapper.enable_fast_mode()
 
-        face_detected_subscriber = self.sensing_wrapper.get_memory_subscriber(
-            "FaceDetected")
-        just_arrived_detected_subscriber = self.sensing_wrapper.get_memory_subscriber(
-            "PeoplePerception/JustArrived")
-        face_detected_subscriber.signal.connect(self.on_human_tracked)
-        just_arrived_detected_subscriber.signal.connect(self.on_just_arrived)
+        # face_detected_subscriber = self.sensing_wrapper.get_memory_subscriber("FaceDetected")
+        # face_detected_subscriber.signal.connect(self.on_human_tracked)
+        # self.sensing_wrapper.subscribe("FaceDetected")
+
+        # just_arrived_detected_subscriber = self.sensing_wrapper.get_memory_subscriber("PeoplePerception/JustArrived")
+        # just_arrived_detected_subscriber.signal.connect(self.on_just_arrived)
+        # self.sensing_wrapper.subscribe("JustArrived")
+
+        visible_people_subscriber = self.sensing_wrapper.get_memory_subscriber("PeoplePerception/VisiblePeopleList")
+        visible_people_subscriber.signal.connect(self.on_people_visible)
+        self.sensing_wrapper.subscribe("VisiblePeopleList")
+
+        # people_list_subscriber = self.sensing_wrapper.get_memory_subscriber("PeoplePerception/PeopleList")
+        # people_list_subscriber.signal.connect(self.on_people_list)
+        # self.sensing_wrapper.subscribe("PeopleList")
+
+        # population_updated_subscriber = self.sensing_wrapper.get_memory_subscriber("PeoplePerception/PopulationUpdated")
+        # population_updated_subscriber.signal.connect(self.on_population_updated)
+        # self.sensing_wrapper.subscribe("PopulationUpdated")
 
         while True:
             time.sleep(1)
@@ -90,7 +107,7 @@ class Behavior(object):
         elif not self.got_face:  # only speak the first time a face appears
             self.got_face = True
             print "I saw a face!"
-            self.speech_wrapper.say("I saw you!")
+            self.speech_wrapper.animated_say("I saw you!")
             # First Field = TimeStamp.
             timeStamp = value[0]
             print "TimeStamp is: " + str(timeStamp)
@@ -114,7 +131,18 @@ class Behavior(object):
 
     def on_just_arrived(self, id):
         print(id)
-        self.speech_wrapper.say("id %s just arrived!" % id)
+        self.speech_wrapper.animated_say("id %s just arrived!" % id)
+
+    def on_people_visible(self, list):
+        print(list)
+
+    def on_people_list(self, list):
+        self.speech_wrapper.animated_say("list changed!" % list)
+        print(list)
+
+    def on_population_updated(self, args):
+        self.speech_wrapper.animated_say("population updated!")
+        print("population updated")
 
     def __navigate(self):
         # Load a previously saved exploration

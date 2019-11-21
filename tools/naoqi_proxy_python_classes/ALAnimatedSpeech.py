@@ -94,7 +94,7 @@ class ALAnimatedSpeech(object):
         """
         if not self.proxy:
             self.proxy = self.session.service("ALAnimatedSpeech")
-        return self.proxy.say(text)
+        return self.proxy.animated_say(text)
 
     def say2(self, text, configuration):
         """Say the annotated text given in parameter and animate it with animations inserted in the text.
@@ -104,7 +104,7 @@ class ALAnimatedSpeech(object):
         """
         if not self.proxy:
             self.proxy = self.session.service("ALAnimatedSpeech")
-        return self.proxy.say(text, configuration)
+        return self.proxy.animated_say(text, configuration)
 
     def setBodyLanguageEnabled(self, enable):
         """DEPRECATED since 1.22: use setBodyLanguageMode instead.Enable or disable the automatic body language on the speech.If it is enabled, anywhere you have not annotate your text with animation,the robot will fill the gap with automatically calculated gestures.If it is disabled, the robot will move only where you annotate it withanimations.

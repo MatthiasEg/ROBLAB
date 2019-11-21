@@ -43,8 +43,8 @@ class SensingWrapper:
     def set_maximum_detection_range_in_meters(self, range):
         return self.__robot.ALPeoplePerception.setMaximumDetectionRange(range)
 
-    def subscribe_to_event(self, event):
-        return self.__robot.ALFaceDetection.subscribe2(event)
+    def subscribe(self, name):
+        return self.__robot.ALFaceDetection.subscribe2(name)
 
     def get_robot_position_in_map(self):
         return self.__robot.ALNavigation.getRobotPositionInMap()
@@ -85,13 +85,17 @@ class SensingWrapper:
 
         return self.__robot.ALMemory.getData(al_memory_path)
 
-
-    def enable_face_recognition(self):
-        self.__robot.ALFaceDetection.setRecognitionEnabled(True)
-        self.__robot.ALFaceDetection.subscribe2("FaceDetection")
-
     def enable_face_tracking(self):
         self.__robot.ALFaceDetection.setTrackingEnabled(True)
 
+    def disable_face_tracking(self):
+        self.__robot.ALFaceDetection.setTrackingEnabled(False)
+
+    def enable_face_recognition(self):
+        self.__robot.ALFaceDetection.setRecognitionEnabled(True)
+
     def get_memory_subscriber(self, event):
         return self.__robot.ALFaceDetection.getMemorySubscriber(event)
+
+    def enable_fast_mode(self):
+        return self.__robot.ALPeoplePerception.setFastModeEnabled(True)
