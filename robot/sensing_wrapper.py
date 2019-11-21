@@ -46,6 +46,9 @@ class SensingWrapper:
     def subscribe(self, name):
         return self.__robot.ALFaceDetection.subscribe2(name)
 
+    def unsubscribe(self, name):
+        return self.__robot.ALFaceDetection.unsubscribe(name)
+
     def get_robot_position_in_map(self):
         return self.__robot.ALNavigation.getRobotPositionInMap()
 
