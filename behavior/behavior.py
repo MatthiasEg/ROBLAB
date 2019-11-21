@@ -19,6 +19,7 @@ class Behavior(object):
         self.got_face = False
 
     def start_behavior(self):
+        # self.body_movement_wrapper.move_head_up(10)
         self.speech_wrapper.say("hello")
         self.setup_customer_reception()
 
@@ -26,14 +27,31 @@ class Behavior(object):
         if not self.sensing_wrapper.is_face_detection_enabled():
             raise Exception('No Face detection possible with this system!')
 
+        self.sensing_wrapper.reset_population()
+
         self.sensing_wrapper.set_maximum_detection_range_in_meters(3)
         self.sensing_wrapper.enable_face_recognition()
         self.sensing_wrapper.enable_face_tracking()
 
-        face_detected_subscriber = self.sensing_wrapper.get_memory_subscriber("FaceDetected")
-        just_arrived_detected_subscriber = self.sensing_wrapper.get_memory_subscriber("PeoplePerception/JustArrived")
-        face_detected_subscriber.signal.connect(self.on_human_tracked)
-        just_arrived_detected_subscriber.signal.connect(self.on_just_arrived)
+        # face_detected_subscriber = self.sensing_wrapper.get_memory_subscriber("FaceDetected")
+        # face_detected_subscriber.signal.connect(self.on_human_tracked)
+        # self.sensing_wrapper.subscribe("FaceDetected")
+
+        # just_arrived_detected_subscriber = self.sensing_wrapper.get_memory_subscriber("PeoplePerception/JustArrived")
+        # just_arrived_detected_subscriber.signal.connect(self.on_just_arrived)
+        # self.sensing_wrapper.subscribe("JustArrived")
+
+        visible_people_subscriber = self.sensing_wrapper.get_memory_subscriber("PeoplePerception/VisiblePeopleList")
+        visible_people_subscriber.signal.connect(self.on_people_visible)
+        self.sensing_wrapper.subscribe("VisiblePeopleList")
+
+        # people_list_subscriber = self.sensing_wrapper.get_memory_subscriber("PeoplePerception/PeopleList")
+        # people_list_subscriber.signal.connect(self.on_people_list)
+        # self.sensing_wrapper.subscribe("PeopleList")
+
+        # population_updated_subscriber = self.sensing_wrapper.get_memory_subscriber("PeoplePerception/PopulationUpdated")
+        # population_updated_subscriber.signal.connect(self.on_population_updated)
+        # self.sensing_wrapper.subscribe("PopulationUpdated")
 
         while True:
             time.sleep(1)
@@ -43,6 +61,69 @@ class Behavior(object):
         self.position_movement_wrapper = PositionMovementWrapper()
         self.sensing_wrapper = SensingWrapper()
         self.speech_wrapper = SpeechWrapper()
+
+    def on_human_tracked(self, value):
+        """
+        Callback for event FaceDetected.
+        """
+        if value == []:  # empty value when the face disappears
+            self.got_face = False
+        elif not self.got_face:  # only speak the first time a face appears
+            self.got_face = True
+            print "I saw a face!"
+            self.speech_wrapper.animated_say("I saw you!")
+            # First Field = TimeStamp.
+            timeStamp = value[0]
+            print "TimeStamp is: " + str(timeStamp)
+
+            # Second Field = array of face_Info's.
+            faceInfoArray = value[1]
+            for j in range(len(faceInfoArray) - 1):
+                faceInfo = faceInfoArray[j]
+
+                # First Field = Shape info.
+                faceShapeInfo = faceInfo[0]
+
+                # Second Field = Extra info (empty for now).
+                faceExtraInfo = faceInfo[1]
+
+                print "Face Infos :  alpha %.3f - beta %.3f" % (faceShapeInfo[1], faceShapeInfo[2])
+                print "Face Infos :  width %.3f - height %.3f" % (faceShapeInfo[3], faceShapeInfo[4])
+                print "Face Extra Infos :" + str(faceExtraInfo)
+
+    def on_just_arrived(self, id):
+        print(id)
+        self.speech_wrapper.animated_say("id %s just arrived!" % id)
+
+    def on_people_visible(self, list):
+        print(list)
+
+    def on_people_list(self, list):
+        self.speech_wrapper.animated_say("list changed!" % list)
+        print(list)
+
+    def on_population_updated(self, args):
+        self.speech_wrapper.animated_say("population updated!")
+        print("population updated")
+
+    def __navigate(self):
+        # Load a previously saved exploration
+        self.sensing_wrapper.load_exploration_from_robot('/home/nao/group02HS19/map-4m.explo')
+        # self.position_movement_wrapper.navigate_to_coordinate_on_map()
+
+        # Relocalize the robot and start the localization process.
+        pos = [0.01, 0.01]
+        self.position_movement_wrapper.relocalize_in_map(pos)
+        self.sensing_wrapper.start_localization()
+
+        # Navigate to another place in the map
+        self.position_movement_wrapper.navigate_to_coordinate_on_map([1., 0., 0.])
+
+        # Check where the robot arrived
+        print "I reached: " + str(self.sensing_wrapper.get_robot_position_in_map()[0])
+
+        # Stop localization
+        self.sensing_wrapper.stop_localization()
 
     def __create_map(self, radius):
         # Wake up robot
@@ -73,57 +154,3 @@ class Behavior(object):
         # save image to project root
 
         scipy.misc.imsave('mapMitRadius{}.jpg'.format(radius), img)
-
-    def on_human_tracked(self, value):
-        """
-        Callback for event FaceDetected.
-        """
-        if value == []:  # empty value when the face disappears
-            self.got_face = False
-        elif not self.got_face:  # only speak the first time a face appears
-            self.got_face = True
-            print "I saw a face!"
-            self.speech_wrapper.say("I saw you!")
-            # First Field = TimeStamp.
-            timeStamp = value[0]
-            print "TimeStamp is: " + str(timeStamp)
-
-            # Second Field = array of face_Info's.
-            faceInfoArray = value[1]
-            for j in range(len(faceInfoArray) - 1):
-                faceInfo = faceInfoArray[j]
-
-                # First Field = Shape info.
-                faceShapeInfo = faceInfo[0]
-
-                # Second Field = Extra info (empty for now).
-                faceExtraInfo = faceInfo[1]
-
-                print "Face Infos :  alpha %.3f - beta %.3f" % (faceShapeInfo[1], faceShapeInfo[2])
-                print "Face Infos :  width %.3f - height %.3f" % (faceShapeInfo[3], faceShapeInfo[4])
-                print "Face Extra Infos :" + str(faceExtraInfo)
-
-    def on_just_arrived(self, id):
-        print(id)
-        self.speech_wrapper.say("id %s just arrived!" % id)
-
-    def __navigate(self):
-        # Load a previously saved exploration
-        self.sensing_wrapper.load_exploration_from_robot('/home/nao/group02HS19/map-4m.explo')
-        # self.position_movement_wrapper.navigate_to_coordinate_on_map()
-
-        # Relocalize the robot and start the localization process.
-        pos = [0.01, 0.01]
-        self.position_movement_wrapper.relocalize_in_map(pos)
-        self.sensing_wrapper.start_localization()
-
-        # Navigate to another place in the map
-        self.position_movement_wrapper.navigate_to_coordinate_on_map([1., 0., 0.])
-
-        # Check where the robot arrived
-        print "I reached: " + str(self.sensing_wrapper.get_robot_position_in_map()[0])
-
-        # Stop localization
-        self.sensing_wrapper.stop_localization()
-
-
