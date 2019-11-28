@@ -94,7 +94,7 @@ class ALAnimatedSpeech(object):
         """
         if not self.proxy:
             self.proxy = self.session.service("ALAnimatedSpeech")
-        return self.proxy.animated_say(text)
+        return self.proxy.say(text)
 
     def say2(self, text, configuration):
         """Say the annotated text given in parameter and animate it with animations inserted in the text.
