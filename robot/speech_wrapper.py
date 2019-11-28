@@ -10,7 +10,7 @@ class SpeechWrapper:
         self.__robot.ALAnimatedSpeech.animated_say(text)
 
     def say(self, text):
-        self.__robot.ALAnimatedSpeech.say(text)
+        self.__robot.ALTextToSpeech.say(text)
 
     def start_to_listen(self, vocabulary, language, callback):
         # self.__robot.ALMemory.subscribeToEvent("SpeechRecognition", module, callback)

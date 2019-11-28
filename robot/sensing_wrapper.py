@@ -102,3 +102,14 @@ class SensingWrapper:
 
     def enable_fast_mode(self):
         return self.__robot.ALPeoplePerception.setFastModeEnabled(True)
+
+    def start_Face_Tracking(self, faceSize):
+        targetName = "Face"
+        faceWidth = faceSize
+        self.__robot.ALTracker.registerTarget(targetName, faceWidth)
+        self.__robot.ALTracker.track(targetName)
+
+    def stop_Face_Tracking(self):
+        self.__robot.ALTracker.stopTracker()
+        self.__robot.ALTracker.unregisterAllTargets()
+        self.__robot.ALMotion.rest()
