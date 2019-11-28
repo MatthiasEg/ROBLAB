@@ -6,5 +6,5 @@ robot = Robot(config)
 
 min_persons = 1
 max_persons = 4
-persons_strings = ['one', 'two', 'three', 'four']
+persons_strings = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'aight', 'nine', 'ten']
 speech_recognition_language = 'English'
