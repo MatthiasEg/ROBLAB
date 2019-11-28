@@ -8,3 +8,4 @@ min_persons = 2
 max_persons = 4
 person_amount_vocab = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'aight', 'nine', 'ten']
 speech_recognition_language = 'English'
+path_to_pictures = 'pictures/'

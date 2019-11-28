@@ -63,24 +63,25 @@ class Behavior(object):
 
         self.body_movement_wrapper.enable_autonomous_life(False)
 
-        number = self.__calculate_number_of_faces()
+        self.__person_amount = self.__get_number_of_faces_and_store_picture("initial_picture")
+        self.__ask_person_amount_correct()
 
         while True:
             time.sleep(1)
 
-    def __calculate_number_of_faces(self):
+    def __get_number_of_faces_and_store_picture(self, file_name_without_jpg):
         self.__camera = Camera(const.robot)
         self.__camera.configure_camera(self.__camera.cameras["top"], self.__camera.resolutions["640x480"],
                                        self.__camera.formats["jpg"])
         self.__file_transfer = FileTransfer(const.robot)
 
         remote_folder_path = "/home/nao/recordings/cameras/"
-        file_name = "faces.jpg"
+        file_name = file_name_without_jpg + ".jpg"
         self.__camera.take_picture(remote_folder_path, file_name)
-        local = file_name
+        local_project_path = const.path_to_pictures + file_name
         remote = remote_folder_path + file_name
-        self.__file_transfer.get(remote, local)
-        number_of_faces = self.__get_number_of_faces_from_picture(local)
+        self.__file_transfer.get(remote, local_project_path)
+        number_of_faces = self.__get_number_of_faces_from_picture(local_project_path)
         return number_of_faces
 
     def __get_number_of_faces_from_picture(self, picture_path):
@@ -100,7 +101,6 @@ class Behavior(object):
         )
 
         return len(faces)
-
 
     def __on_human_tracked(self, value):
         if value == []:  # empty value when the face disappears
