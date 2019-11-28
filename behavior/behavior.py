@@ -63,7 +63,7 @@ class Behavior(object):
 
         self.body_movement_wrapper.enable_autonomous_life(False)
 
-        self.__person_amount = self.__get_number_of_faces_and_store_picture("initial_picture")
+        self.__person_amount = self.__get_number_of_faces_and_store_picture(const.img_people_before_table_search)
         self.__ask_person_amount_correct()
 
         while True:
