@@ -21,10 +21,14 @@ class Behavior(object):
         self.__first_person_detected = False
         self.__first_to_enter_callback = True
         self.__first_to_enter_callback_two = True
+        self.__person_amount = None
+        self.__person_amount_correct = False
 
     def start_behavior(self):
         # self.body_movement_wrapper.move_head_up(10)
         self.speech_wrapper.say("hello")
+        # self.speech_wrapper.say("learning home")
+        # self.position_movement_wrapper.learn_home()
         self.setup_customer_reception()
         # self.__navigate()
         # self.__ask_to_follow()
@@ -41,12 +45,15 @@ class Behavior(object):
         self.sensing_wrapper.enable_face_tracking()
         # self.sensing_wrapper.enable_fast_mode()
 
+        self.body_movement_wrapper.enable_autonomous_life(True)
+
         face_detected_subscriber = self.sensing_wrapper.get_memory_subscriber("FaceDetected")
         face_detected_subscriber.signal.connect(self.__on_human_tracked)
         self.sensing_wrapper.subscribe("huso")
 
         while not self.__first_person_detected:
             time.sleep(1)
+        self.body_movement_wrapper.enable_autonomous_life(False)
 
         visible_people_subscriber = self.sensing_wrapper.get_memory_subscriber("PeoplePerception/VisiblePeopleList")
         visible_people_subscriber.signal.connect(self.__on_people_visible)
@@ -113,12 +120,6 @@ class Behavior(object):
         # Stop localization
         self.sensing_wrapper.stop_localization()
 
-    def __ask_to_follow(self):
-        print('hi')
-        self.body_movement_wrapper.moveArmsUp(Actuators.RArm, 120)
-        time.sleep(1)
-        self.body_movement_wrapper.moveArmsDown(Actuators.RArm, 160)
-
     def __recognize_persons(self):
         amount = 4
         if amount == 1:
@@ -128,43 +129,43 @@ class Behavior(object):
         else:
             self.speech_wrapper.say("I am seeing {} persons".format(amount))
 
-        self.person_amount = amount
+        self.__person_amount = amount
         self.__ask_person_amount_correct()
 
     def __ask_person_amount(self):
-        self.person_amount = None
+        self.__person_amount = None
         self.speech_wrapper.say("For how many people should I search a table?")
         self.speech_wrapper.say("We have tables for {} to {} persons".format(const.min_persons, const.max_persons))
         self.speech_wrapper.start_to_listen(
-            const.persons_strings, const.speech_recognition_language, self.__ask_person_amount_callback)
+            const.person_amount_vocab, const.speech_recognition_language, self.__on_person_amount_answered)
         time.sleep(5)
         self.speech_wrapper.stop_listening()
-        if self.person_amount is None:
+        if self.__person_amount is None:
             self.__ask_person_amount()
         else:
             self.__ask_person_amount_correct()
 
-    def __ask_person_amount_callback(self, message):
+    def __on_person_amount_answered(self, message):
         print('Ask Person amount triggered')
 
         m = message[0]
         if m != '':
-            word_found = next((x for x in const.persons_strings if x in m), None)
+            word_found = next((x for x in const.person_amount_vocab if x in m), None)
             if word_found is not None:
-                self.person_amount = const.persons_strings.index(word_found) + 1
+                self.__person_amount = const.person_amount_vocab.index(word_found) + 1
 
         print(message)
 
     def __ask_person_amount_correct(self):
-        if self.person_amount == 1:
+        if self.__person_amount == 1:
             self.speech_wrapper.say(
                 "Would you like me to search a table for a single person?")
         else:
             self.speech_wrapper.say(
-                "Would you like me to search a table for {} people?".format(self.person_amount))
+                "Would you like me to search a table for {} people?".format(self.__person_amount))
 
         self.speech_wrapper.start_to_listen(
-            ['Yes', 'No'], const.speech_recognition_language, self.__ask_person_amount_correct_callback)
+            ['Yes', 'No'], const.speech_recognition_language, self.__on_person_amount_correct_answered)
         time.sleep(5)
         self.speech_wrapper.stop_listening()
 
@@ -172,35 +173,57 @@ class Behavior(object):
             self.__ask_person_amount_correct()
             return
 
-        if self.person_amount_correct:
-            print(self.person_amount)
-            if self.person_amount < const.min_persons or self.person_amount > const.max_persons:
+        if self.__person_amount_correct:
+            print(self.__person_amount)
+            if self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
                 self.speech_wrapper.say("Unfortunately, we do not have a table for this amount of people.")
                 return
             self.__search_table()
         else:
             self.__ask_person_amount()
 
-    def __ask_person_amount_correct_callback(self, message):
+    def __on_person_amount_correct_answered(self, message):
         print('Ask Person triggered')
         if message[0] != '':
             if 'No' in message[0]:
-                self.person_amount_correct = False
+                self.__person_amount_correct = False
             elif 'Yes' in message[0]:
-                self.person_amount_correct = True
+                self.__person_amount_correct = True
         print(message)
 
     def __search_table(self):
         self.speech_wrapper.say("Please wait. I will search the perfect table for you")
 
+        # TODO search table...
+
+        # when table found
+        self.__return_to_waiting_zone()
+
     def __return_to_waiting_zone(self):
-        # self.position_movement_wrapper.learn_home()
-        # self.position_movement_wrapper.move(1, 2, 0)
-        # self.position_movement_wrapper.go_to_home()
-        pass
+        self.position_movement_wrapper.go_to_home()
+        # TODO change this or create attribute
+        # if self.assigned:
+        #     # self.setup_customer_reception()
+        #     pass
+        # else:
+        #     self.__ask_to_follow()
+        #     self.__return_to_table()
+
+    def __ask_to_follow(self):
+        self.speech_wrapper.say("Thank you for your patience. Please follow me to your table.")
+        self.body_movement_wrapper.moveArmsUp(Actuators.RArm, 120)
+        time.sleep(1)
+        self.body_movement_wrapper.moveArmsDown(Actuators.RArm, 160)
+
+    def __return_to_table(self):
+        # TODO implement logic to return to the table that was found
+
+        self.__assign_table()
 
     def __assign_table(self):
-        pass
+        self.speech_wrapper.say("This is your table. Please wait. A human person will be serving you shortly. Enjoy your stay.")
+        time.sleep(2)
+        self.__return_to_waiting_zone()
 
     def __create_map(self, radius):
         # Wake up robot
