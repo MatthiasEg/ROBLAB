@@ -114,29 +114,6 @@ class Behavior(object):
                 self.speech_wrapper.say("Please come and stay in front of me.")
                 self.__first_person_detected = True
 
-    def __on_people_visible(self, arg):
-        if self.__first_to_enter_callback_two:
-            self.__first_to_enter_callback_two = False
-            self.sensing_wrapper.unsubscribe("VisiblePeopleList")
-            print(arg)
-            self.speech_wrapper.say("Let me estimate the amount.")
-            if len(arg) == 1:
-                self.speech_wrapper.say("I think you are only a single person")
-            elif len(arg) == 2:
-                self.speech_wrapper.say("I think you are two people")
-
-    def __on_just_arrived(self, id):
-        print(id)
-        self.speech_wrapper.animated_say("id %s just arrived!" % id)
-
-    def __on_people_list(self, list):
-        self.speech_wrapper.animated_say("list changed!" % list)
-        print(list)
-
-    def __on_population_updated(self, args):
-        self.speech_wrapper.animated_say("population updated!")
-        print("population updated")
-
     def __navigate(self):
         # Load a previously saved exploration
         self.sensing_wrapper.load_exploration_from_robot(
