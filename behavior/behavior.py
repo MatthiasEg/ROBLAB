@@ -6,6 +6,7 @@ import scipy.misc
 import const
 import cv2
 import sys
+import face_recognition
 # import PIL  # import used for scipy.misc.imsave
 
 from robot.body_movement_wrapper import BodyMovementWrapper
@@ -176,6 +177,8 @@ class Behavior(object):
         if self.__person_amount == 1:
             self.speech_wrapper.say(
                 "Would you like me to search a table for a single person?")
+        elif self.__person_amount == 0:
+            self.__ask_person_amount()
         else:
             self.speech_wrapper.say(
                 "Would you like me to search a table for {} people?".format(self.__person_amount))
@@ -212,7 +215,8 @@ class Behavior(object):
         self.__return_to_waiting_zone()
 
     def __return_to_waiting_zone(self):
-        self.position_movement_wrapper.go_to_home()
+        self.__find_person()
+        # self.position_movement_wrapper.go_to_home()
         # TODO change this or create attribute
         # if self.assigned:
         #     # self.setup_customer_reception()
@@ -220,6 +224,15 @@ class Behavior(object):
         # else:
         #     self.__ask_to_follow()
         #     self.__return_to_table()
+
+    def __find_person(self):
+        people_before_table_search = face_recognition.load_image_file("C://Users/Patrick/Desktop/test_images/group1.jpg")
+        people_after_table_search = face_recognition.load_image_file("C://Users/Patrick/Desktop/test_images/pat1.jpg")
+        known_faces = []
+        for encoding in face_recognition.face_encodings(people_after_table_search):
+            known_faces.append(encoding)
+        unknown_face_encoding = face_recognition.face_encodings(people_before_table_search)[0]
+        print(face_recognition.compare_faces(known_faces, unknown_face_encoding))
 
     def __ask_to_follow(self):
         self.speech_wrapper.say("Thank you for your patience. Please follow me to your table.")
