@@ -1,11 +1,16 @@
+import os
 import time
 
 import numpy
 import scipy.misc
 import const
+import cv2
+import sys
 # import PIL  # import used for scipy.misc.imsave
 
 from robot.body_movement_wrapper import BodyMovementWrapper
+from robot.object_detection.Camera import Camera
+from robot.object_detection.FileTransfer import FileTransfer
 from robot.position_movement_wrapper import PositionMovementWrapper
 from robot.sensing_wrapper import SensingWrapper
 from robot.speech_wrapper import SpeechWrapper
@@ -26,10 +31,11 @@ class Behavior(object):
 
     def start_behavior(self):
         # self.body_movement_wrapper.move_head_up(10)
-        self.speech_wrapper.say("hello")
+        # self.speech_wrapper.say("hello")
         # self.speech_wrapper.say("learning home")
         # self.position_movement_wrapper.learn_home()
         self.setup_customer_reception()
+        # self.__get_number_of_faces_from_picture()
         # self.__navigate()
         # self.__ask_to_follow()
         # self.__recognize_persons()
@@ -43,7 +49,7 @@ class Behavior(object):
         self.sensing_wrapper.set_maximum_detection_range_in_meters(3)
         self.sensing_wrapper.enable_face_recognition()
         self.sensing_wrapper.enable_face_tracking()
-        # self.sensing_wrapper.enable_fast_mode()
+        self.sensing_wrapper.enable_fast_mode()
 
         self.body_movement_wrapper.enable_autonomous_life(True)
 
@@ -53,14 +59,47 @@ class Behavior(object):
 
         while not self.__first_person_detected:
             time.sleep(1)
+
         self.body_movement_wrapper.enable_autonomous_life(False)
 
-        visible_people_subscriber = self.sensing_wrapper.get_memory_subscriber("PeoplePerception/VisiblePeopleList")
-        visible_people_subscriber.signal.connect(self.__on_people_visible)
-        self.sensing_wrapper.subscribe("VisiblePeopleList")
+        number = self.__calculate_number_of_faces()
 
         while True:
             time.sleep(1)
+
+    def __calculate_number_of_faces(self):
+        self.__camera = Camera(const.robot)
+        self.__camera.configure_camera(self.__camera.cameras["top"], self.__camera.resolutions["640x480"],
+                                       self.__camera.formats["jpg"])
+        self.__file_transfer = FileTransfer(const.robot)
+
+        remote_folder_path = "/home/nao/recordings/cameras/"
+        file_name = "faces.jpg"
+        self.__camera.take_picture(remote_folder_path, file_name)
+        local = file_name
+        remote = remote_folder_path + file_name
+        self.__file_transfer.get(remote, local)
+        number_of_faces = self.__get_number_of_faces_from_picture(local)
+        return number_of_faces
+
+    def __get_number_of_faces_from_picture(self, picture_path):
+        # Create the haar cascade
+        faceCascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
+
+        image = cv2.imread(picture_path)
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+        # Detect faces in the image
+        faces = faceCascade.detectMultiScale(
+            gray,
+            scaleFactor=1.1,
+            minNeighbors=5,
+            minSize=(30, 30),
+            flags=cv2.CASCADE_SCALE_IMAGE
+        )
+
+        return len(faces)
+
 
     def __on_human_tracked(self, value):
         if value == []:  # empty value when the face disappears
@@ -75,15 +114,15 @@ class Behavior(object):
                 self.speech_wrapper.say("Please come and stay in front of me.")
                 self.__first_person_detected = True
 
-    def __on_people_visible(self, list):
+    def __on_people_visible(self, arg):
         if self.__first_to_enter_callback_two:
             self.__first_to_enter_callback_two = False
             self.sensing_wrapper.unsubscribe("VisiblePeopleList")
-            print(list)
+            print(arg)
             self.speech_wrapper.say("Let me estimate the amount.")
-            if len(list) == 1:
+            if len(arg) == 1:
                 self.speech_wrapper.say("I think you are only a single person")
-            elif len(list) == 2:
+            elif len(arg) == 2:
                 self.speech_wrapper.say("I think you are two people")
 
     def __on_just_arrived(self, id):
@@ -221,7 +260,8 @@ class Behavior(object):
         self.__assign_table()
 
     def __assign_table(self):
-        self.speech_wrapper.say("This is your table. Please wait. A human person will be serving you shortly. Enjoy your stay.")
+        self.speech_wrapper.say(
+            "This is your table. Please wait. A human person will be serving you shortly. Enjoy your stay.")
         time.sleep(2)
         self.__return_to_waiting_zone()
 
