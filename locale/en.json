@@ -1,12 +1,19 @@
 {
     "vocabularies": {
         "personAmount": ["one", "two", "three", "four", "five", "six", "seven", "aight", "nine", "ten"],
-        "yesNo": ["Yes", "No"]
+        "yes": ["yes", "yep", "yeah", "yo", "sure", "ok", "alright", "ja"],
+        "no": ["no", "nope", "nein", "niet", "not", "don't"]
     },
     "sentences": {
         "hello": "Hello",
-        "greeting": "Hello welcome to the restaurant dinner for one!",
-        "estimateAmountOfPeople": "I would like to estimate the amount of people of your group.",
+        "greeting": [
+            "Hello welcome to the restaurant dinner for one!",
+            "Welcome to our famous restaurant dinner or one, humans!"
+        ],
+        "estimateAmountOfPeople": [
+            "I would like to estimate the amount of people of your group.",
+            "Please let me quickly estimate the amount of people"
+        ],
         "stayInFrontOfMe": "Please come and stay in front of me.",
         "seeingOnePerson": "I am seeing one person",
         "seeingMultiplePersons": "I am seeing {} persons",
@@ -14,8 +21,14 @@
         "availableTables": "We have tables for {} to {} persons",
         "askToSearchTableForOnePerson": "Would you like me to search a table for a single person?",
         "askToSearchTableForMultiplePersons": "Would you like me to search a table for {} people?",
-        "noTablesForAmount": "Unfortunately, we do not have a table for this amount of people.",
-        "searchTable": "Please wait. I will search the perfect table for you",
+        "noTablesForAmount": [
+            "Unfortunately, we do not have a table for this amount of people.",
+            "I am sorry, but we currently don't have a table for this amount of people."
+        ],
+        "searchTable": [
+            "Please wait. I will search the perfect table for you",
+            "Please stand by. I try to find a wonderful table for you."
+        ],
         "askToFollow": "Thank you for your patience. Please follow me to your table.",
         "assignTable": "This is your table. Please wait. A human employee will be serving you shortly. Enjoy your stay."
     }
