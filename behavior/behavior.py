@@ -72,7 +72,7 @@ class Behavior(object):
         self.body_movement_wrapper.enable_autonomous_life(True)
 
         face_detected_subscriber = self.sensing_wrapper.get_memory_subscriber("FaceDetected")
-        face_detected_subscriber.signal.connect(self.__on_human_tracked)
+        face_detected_subscriber.signal.connect(self.__human_detected)
         self.sensing_wrapper.subscribe("detect_face")
 
         while not self.__first_person_detected:
@@ -84,25 +84,26 @@ class Behavior(object):
 
         self.__person_amount_estimator.stop_estimation()
         self.__person_amount = self.__person_amount_estimator.get_estimated_person_amount()
+        print (self.__person_amount_estimator.get_picture_path_of_highest_amount_of_seen_people())
 
-        # self.__person_amount = self.__get_number_of_faces_and_store_picture(const.img_people_before_table_search)
-        self.__ask_person_amount_correct()
-
-        self.__person_amount = self.__person_amount_estimator.get_estimated_person_amount()
         self.body_movement_wrapper.enable_autonomous_life(False)
         self.__ask_person_amount_correct()
+        self.__person_amount_estimator.clear_results()
 
         while True:
             time.sleep(1)
 
-    def __on_human_tracked(self, value):
+    def __human_detected(self, value):
         if value == []:  # empty value when the face disappears
             self.__got_face = False
         elif not self.__got_face:
             self.__got_face = True
             if self.__first_to_enter_callback:
                 self.__first_to_enter_callback = False
+
+                self.__person_amount_estimator.change_picture_file_name(const.img_people_before_table_search)
                 self.__person_amount_estimator.start_estimation()
+
                 self.sensing_wrapper.unsubscribe("detect_face")
                 self.speech_wrapper.say_random(self.__sentences["greeting"])
                 self.speech_wrapper.say_random(self.__sentences["estimateAmountOfPeople"])
@@ -157,13 +158,13 @@ class Behavior(object):
         if self.__person_amount is None:
             self.__ask_person_amount()
         else:
-          if self.__recognized_words_certainty > 0.7:
-            if self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
-                self.speech_wrapper.say_random(self.__sentences["noTablesForAmount"])
-                return
-            self.__search_table()
-          else:
-            self.__ask_person_amount_correct()
+            if self.__recognized_words_certainty > 0.7:
+                if self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
+                    self.speech_wrapper.say_random(self.__sentences["noTablesForAmount"])
+                    return
+                self.__search_table()
+            else:
+                self.__ask_person_amount_correct()
 
     def __on_person_amount_answered(self, message):
         print('Ask Person amount triggered')
@@ -187,10 +188,10 @@ class Behavior(object):
             self.speech_wrapper.say(self.__sentences["askToSearchTableForMultiplePersons"].format(self.__person_amount))
 
         self.speech_wrapper.start_to_listen(
-          self.__vocabularies["yes"] + self.__vocabularies["no"],
-          const.speech_recognition_language,
-          const.speech_recognition_precision,
-          self.__on_person_amount_correct_answered)
+            self.__vocabularies["yes"] + self.__vocabularies["no"],
+            const.speech_recognition_language,
+            const.speech_recognition_precision,
+            self.__on_person_amount_correct_answered)
         self.__waiting_for_an_answer = True
         while self.__waiting_for_an_answer:
             time.sleep(1)
@@ -208,11 +209,11 @@ class Behavior(object):
     def __on_person_amount_correct_answered(self, message):
         print('Ask Person triggered')
         if message[0] != '':
-          msg = message[0].replace('<...>', '').strip()
-          if msg in self.__vocabularies["no"]:
+            msg = message[0].replace('<...>', '').strip()
+            if msg in self.__vocabularies["no"]:
                 self.__person_amount_correct = False
                 self.__waiting_for_an_answer = False
-          elif msg in self.__vocabularies["yes"]:
+            elif msg in self.__vocabularies["yes"]:
                 self.__person_amount_correct = True
                 self.__waiting_for_an_answer = False
         print(message)
