@@ -8,7 +8,7 @@
         "hello": "Hello",
         "greeting": [
             "Hello welcome to the restaurant dinner for one!",
-            "Welcome to our famous restaurant dinner for one humans!"
+            "Welcome to our famous restaurant dinner for one!"
         ],
         "estimateAmountOfPeople": [
             "I would like to estimate the amount of people of your group.",
@@ -28,7 +28,7 @@
         "searchTable": [
             "Please wait. I will search the perfect table for you.",
             "Please stand by. I try to find a wonderful table for you.",
-            "Please wait here and let me search a fitting table for you."
+            "Please wait here and let me search a nice table for you."
         ],
         "askToFollow": "Thank you for your patience. Please follow me to your table.",
         "assignTable": "This is your table. Please wait. A human employee will be serving you shortly. Enjoy your stay."

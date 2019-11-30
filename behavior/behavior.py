@@ -199,52 +199,13 @@ class Behavior(object):
         # when table found
         self.__return_to_waiting_zone()
 
-    def __return_to_waiting_zone(self):
-        self.position_movement_wrapper.go_to_home()
-        if self.__wait_for_new_customers:
-          self.setup_customer_reception()
-        else:
-          if self.__find_person():
-              self.speech_wrapper.say('I remember you')
-              self.__ask_to_follow()
-              self.__return_to_table()
-          else:
-              self.speech_wrapper.say('Where are you?')
-
-    def __find_person(self):
-        self.body_movement_wrapper.enable_autonomous_life(True)
-
-        self.__person_amount_estimator.start_estimation()
-      
-        # while (const.img_people_after_table_search) == 0:
-        time.sleep(2)
-
-        self.__person_amount_estimator.stop_estimation()
-
-        self.body_movement_wrapper.enable_autonomous_life(False)
-
-        people_before_table_search = face_recognition.load_image_file(
-            os.path.join(os.getcwd(), const.path_to_pictures, const.img_people_before_table_search + '.jpg'))
-        people_after_table_search = face_recognition.load_image_file(
-            os.path.join(os.getcwd(), const.path_to_pictures, const.img_people_after_table_search + '.jpg'))
-        known_faces = []
-
-        for encoding in face_recognition.face_encodings(people_before_table_search):
-            known_faces.append(encoding)
-
-        for face in face_recognition.face_encodings(people_after_table_search):
-            if True in face_recognition.compare_faces(known_faces, face):
-                return True
-
-        return False
-
     def __ask_to_follow(self):
         self.speech_wrapper.say(self.__sentences["askToFollow"])
         self.body_movement_wrapper.moveArmsUp(Actuators.RArm, 120)
         time.sleep(1)
         self.body_movement_wrapper.moveArmsDown(Actuators.RArm, 160)
 
-    def __return_to_table(self):
+    def __go_to_table(self):
         # TODO implement logic to return to the table that was found
 
         self.__assign_table()
@@ -254,3 +215,11 @@ class Behavior(object):
         time.sleep(2)
         self.__wait_for_new_customers = True
         self.__return_to_waiting_zone()
+
+    def __return_to_waiting_zone(self):
+        self.position_movement_wrapper.go_to_home()
+        if self.__wait_for_new_customers:
+          self.setup_customer_reception()
+        else:
+            self.__ask_to_follow()
+            self.__go_to_table()
