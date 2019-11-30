@@ -9,7 +9,7 @@ import sys
 import json
 import face_recognition
 # import PIL  # import used for scipy.misc.imsave
-
+from person_amount_estimator import PersonAmountEstimator
 from robot.body_movement_wrapper import BodyMovementWrapper
 from robot.object_detection.Camera import Camera
 from robot.object_detection.FileTransfer import FileTransfer
@@ -29,9 +29,10 @@ class Behavior(object):
         self.__first_person_detected = False
         self.__first_to_enter_callback = True
         self.__first_to_enter_callback_two = True
-        self.__person_amount = None
+        self.__person_amount = 0
         self.__person_amount_correct = False
         self.__waiting_for_an_answer = False
+        self.__person_amount_estimator = PersonAmountEstimator()
 
     def __initialize_wrappers(self):
         self.body_movement_wrapper = BodyMovementWrapper()
@@ -71,11 +72,20 @@ class Behavior(object):
 
         face_detected_subscriber = self.sensing_wrapper.get_memory_subscriber("FaceDetected")
         face_detected_subscriber.signal.connect(self.__on_human_tracked)
-        self.sensing_wrapper.subscribe("huso")
+        self.sensing_wrapper.subscribe("detect_face")
 
         while not self.__first_person_detected:
             time.sleep(1)
 
+        # self.speech_wrapper.say("Hello I'm currently estimating the amount of people.")
+        # self.speech_wrapper.say("Hmm hmm Hmm let me estimate")
+        # self.speech_wrapper.say("Wait a second my friend")
+
+        self.__person_amount_estimator.stop_estimation()
+        self.__person_amount = self.__person_amount_estimator.get_estimated_person_amount()
+
+        # self.__person_amount = self.__get_number_of_faces_and_store_picture(const.img_people_before_table_search)
+        self.__ask_person_amount_correct()
         self.body_movement_wrapper.enable_autonomous_life(False)
 
         self.__person_amount = self.__get_number_of_faces_and_store_picture(const.img_people_before_table_search)
@@ -257,8 +267,10 @@ class Behavior(object):
 
         self.body_movement_wrapper.enable_autonomous_life(False)
 
-        people_before_table_search = face_recognition.load_image_file(os.path.join(os.getcwd(), const.path_to_pictures, const.img_people_before_table_search + '.jpg'))
-        people_after_table_search = face_recognition.load_image_file(os.path.join(os.getcwd(), const.path_to_pictures, const.img_people_after_table_search + '.jpg'))
+        people_before_table_search = face_recognition.load_image_file(
+            os.path.join(os.getcwd(), const.path_to_pictures, const.img_people_before_table_search + '.jpg'))
+        people_after_table_search = face_recognition.load_image_file(
+            os.path.join(os.getcwd(), const.path_to_pictures, const.img_people_after_table_search + '.jpg'))
         known_faces = []
 
         for encoding in face_recognition.face_encodings(people_before_table_search):
