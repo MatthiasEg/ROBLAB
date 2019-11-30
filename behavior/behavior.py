@@ -2,7 +2,7 @@ import json
 import os
 import time
 
-import face_recognition
+# import face_recognition
 
 import const
 # import PIL  # import used for scipy.misc.imsave
@@ -76,9 +76,6 @@ class Behavior(object):
         print (self.__person_amount_estimator.get_picture_path_of_highest_amount_of_seen_people())
 
         self.body_movement_wrapper.enable_autonomous_life(False)
-
-        while True:
-            time.sleep(1)
 
     def __human_detected(self, value):
         if value == []:  # empty value when the face disappears
