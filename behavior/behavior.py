@@ -49,14 +49,8 @@ class Behavior(object):
         self.__vocabularies = data["vocabularies"]
 
     def start_behavior(self):
-        # self.body_movement_wrapper.move_head_up(10)
-        # self.speech_wrapper.say("hello")
-        # self.speech_wrapper.say("learning home")
-        # self.position_movement_wrapper.learn_home()
         self.setup_customer_reception()
         # self.__get_number_of_faces_from_picture()
-        # self.__navigate()
-        # self.__ask_to_follow()
         # self.__recognize_persons()
 
     def setup_customer_reception(self):
@@ -110,28 +104,6 @@ class Behavior(object):
                 self.speech_wrapper.say(self.__sentences["estimateAmountOfPeople"])
                 self.speech_wrapper.say(self.__sentences["stayInFrontOfMe"])
                 self.__first_person_detected = True
-
-    def __navigate(self):
-        # Load a previously saved exploration
-        self.sensing_wrapper.load_exploration_from_robot(
-            '/home/nao/group02HS19/map-4m.explo')
-        # self.position_movement_wrapper.navigate_to_coordinate_on_map()
-
-        # Relocalize the robot and start the localization process.
-        pos = [0., 0.]
-        self.position_movement_wrapper.relocalize_in_map(pos)
-        self.sensing_wrapper.start_localization()
-
-        # Navigate to another place in the map
-        self.position_movement_wrapper.navigate_to_coordinate_on_map([
-            1., 0., 0.])
-
-        # Check where the robot arrived
-        print "I reached: " + \
-              str(self.sensing_wrapper.get_robot_position_in_map()[0])
-
-        # Stop localization
-        self.sensing_wrapper.stop_localization()
 
     def __recognize_persons(self):
         amount = 4
@@ -282,33 +254,3 @@ class Behavior(object):
         time.sleep(2)
         self.__wait_for_new_customers = True
         self.__return_to_waiting_zone()
-
-    def __create_map(self, radius):
-        # Wake up robot
-        # Wake up robot
-        self.__robot.ALMotion.wakeUp()  # Explore the environement, in a radius of 2 m.
-        error_code = self.sensing_wrapper.explore(radius)
-        if error_code != 0:
-            print "Exploration failed."
-            return
-        # Saves the exploration on disk
-        path = self.sensing_wrapper.save_exploration_to_robot()
-        print "Exploration saved at path: \"" + path + "\""
-        # Start localization to navigate in map
-        self.sensing_wrapper.start_localization()
-        # Come back to initial position
-        self.position_movement_wrapper.navigate_to_coordinate_on_map([
-            0., 0., 0.])
-        # Stop localization
-        self.sensing_wrapper.stop_localization()
-        # Retrieve and display the map built by the robot
-        result_map = self.sensing_wrapper.get_metrical_map()
-        map_width = result_map[1]
-        map_height = result_map[2]
-        img = numpy.array(result_map[4]).reshape(map_width, map_height)
-        img = (100 - img) * 2.55  # from 0..100 to 255..0
-        img = numpy.array(img, numpy.uint8)
-
-        # save image to project root
-
-        scipy.misc.imsave('mapMitRadius{}.jpg'.format(radius), img)
