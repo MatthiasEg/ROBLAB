@@ -11,6 +11,10 @@ class SpeechWrapper:
         self.__robot.ALAnimatedSpeech.animated_say(text)
 
     def say(self, text):
+        if (type(text) == list):
+            self.say_random(text)
+            return
+            
         self.__robot.ALTextToSpeech.say(text)
 
     def say_random(self, list):

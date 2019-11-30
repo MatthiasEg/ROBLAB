@@ -8,11 +8,11 @@
         "hello": "Hello",
         "greeting": [
             "Hello welcome to the restaurant dinner for one!",
-            "Welcome to our famous restaurant dinner or one, humans!"
+            "Welcome to our famous restaurant dinner for one humans!"
         ],
         "estimateAmountOfPeople": [
             "I would like to estimate the amount of people of your group.",
-            "Please let me quickly estimate the amount of people"
+            "Please let me quickly estimate the amount of people."
         ],
         "stayInFrontOfMe": "Please come and stay in front of me.",
         "seeingOnePerson": "I am seeing one person",
@@ -23,11 +23,12 @@
         "askToSearchTableForMultiplePersons": "Would you like me to search a table for {} people?",
         "noTablesForAmount": [
             "Unfortunately, we do not have a table for this amount of people.",
-            "I am sorry, but we currently don't have a table for this amount of people."
+            "I'm sorry, but we currently don't have a table for this amount of people."
         ],
         "searchTable": [
-            "Please wait. I will search the perfect table for you",
-            "Please stand by. I try to find a wonderful table for you."
+            "Please wait. I will search the perfect table for you.",
+            "Please stand by. I try to find a wonderful table for you.",
+            "Please wait here and let me search a fitting table for you."
         ],
         "askToFollow": "Thank you for your patience. Please follow me to your table.",
         "assignTable": "This is your table. Please wait. A human employee will be serving you shortly. Enjoy your stay."

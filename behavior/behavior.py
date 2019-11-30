@@ -25,6 +25,7 @@ class Behavior(object):
         self.__robot = const.robot
         self.__initialize_wrappers()
         self.__load_locales()
+        self.__wait_for_new_customers = True
         self.__got_face = False
         self.__first_person_detected = False
         self.__first_to_enter_callback = True
@@ -104,9 +105,10 @@ class Behavior(object):
                 self.__first_to_enter_callback = False
                 self.__person_amount_estimator.start_estimation()
                 self.sensing_wrapper.unsubscribe("detect_face")
-                self.speech_wrapper.say_random(self.__sentences["greeting"])
-                self.speech_wrapper.say_random(self.__sentences["estimateAmountOfPeople"])
-                self.speech_wrapper.say_random(self.__sentences["stayInFrontOfMe"])
+                self.__wait_for_new_customers = False
+                self.speech_wrapper.say(self.__sentences["greeting"])
+                self.speech_wrapper.say(self.__sentences["estimateAmountOfPeople"])
+                self.speech_wrapper.say(self.__sentences["stayInFrontOfMe"])
                 self.__first_person_detected = True
 
     def __navigate(self):
@@ -157,9 +159,9 @@ class Behavior(object):
         if self.__person_amount is None:
             self.__ask_person_amount()
         else:
-          if self.__recognized_words_certainty > 0.7:
+          if self.__recognized_words_certainty > 0.55:
             if self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
-                self.speech_wrapper.say_random(self.__sentences["noTablesForAmount"])
+                self.speech_wrapper.say(self.__sentences["noTablesForAmount"])
                 return
             self.__search_table()
           else:
@@ -199,7 +201,7 @@ class Behavior(object):
         if self.__person_amount_correct:
             print(self.__person_amount)
             if self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
-                self.speech_wrapper.say_random(self.__sentences["noTablesForAmount"])
+                self.speech_wrapper.say(self.__sentences["noTablesForAmount"])
                 return
             self.__search_table()
         else:
@@ -218,7 +220,7 @@ class Behavior(object):
         print(message)
 
     def __search_table(self):
-        self.speech_wrapper.say_random(self.__sentences["searchTable"])
+        self.speech_wrapper.say(self.__sentences["searchTable"])
 
         # TODO search table...
 
@@ -226,24 +228,26 @@ class Behavior(object):
         self.__return_to_waiting_zone()
 
     def __return_to_waiting_zone(self):
-        if self.__find_person():
-            self.speech_wrapper.say('I remember you')
+        self.position_movement_wrapper.go_to_home()
+        if self.__wait_for_new_customers:
+          self.setup_customer_reception()
         else:
-            self.speech_wrapper.say('Who are you?')
-        # self.position_movement_wrapper.go_to_home()
-        # TODO change this or create attribute
-        # if self.assigned:
-        #     # self.setup_customer_reception()
-        #     pass
-        # else:
-        self.__ask_to_follow()
-        self.__return_to_table()
+          if self.__find_person():
+              self.speech_wrapper.say('I remember you')
+              self.__ask_to_follow()
+              self.__return_to_table()
+          else:
+              self.speech_wrapper.say('Where are you?')
 
     def __find_person(self):
         self.body_movement_wrapper.enable_autonomous_life(True)
 
-        while self.__get_number_of_faces_and_store_picture(const.img_people_after_table_search) == 0:
-            time.sleep(2)
+        self.__person_amount_estimator.start_estimation()
+      
+        # while (const.img_people_after_table_search) == 0:
+        time.sleep(2)
+
+        self.__person_amount_estimator.stop_estimation()
 
         self.body_movement_wrapper.enable_autonomous_life(False)
 
@@ -276,6 +280,7 @@ class Behavior(object):
     def __assign_table(self):
         self.speech_wrapper.say(self.__sentences["assignTable"])
         time.sleep(2)
+        self.__wait_for_new_customers = True
         self.__return_to_waiting_zone()
 
     def __create_map(self, radius):
