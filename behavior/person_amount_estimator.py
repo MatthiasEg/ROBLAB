@@ -62,6 +62,4 @@ class PersonAmountEstimator:
             flags=cv2.CASCADE_SCALE_IMAGE
         )
 
-        print (len(faces))
-
         return len(faces)
