@@ -16,7 +16,7 @@ class SpeechWrapper:
     def say_random(self, list):
         self.say(random.choice(list))
 
-    def start_to_listen(self, vocabulary, language, callback):
+    def start_to_listen(self, vocabulary, language, precision, callback):
         # self.__robot.ALMemory.subscribeToEvent("SpeechRecognition", module, callback)
         self.subscriber = self.__robot.ALMemory.subscriber("WordRecognized")
         self.subscriber.signal.connect(callback)
@@ -26,7 +26,7 @@ class SpeechWrapper:
         self.__robot.ALSpeechRecognition.setLanguage(language)
         self.__robot.ALSpeechRecognition.setVocabulary(vocabulary, True)
         self.__robot.ALSpeechRecognition.pause(False)
-        self.__robot.ALSpeechRecognition.subscribe("SpeechDetection", 200, 0.5)
+        self.__robot.ALSpeechRecognition.subscribe("SpeechDetection", 200, precision)
         # SpeechRecognition.calibrate()
         # SpeechRecognition.enableAutoDetection()
 

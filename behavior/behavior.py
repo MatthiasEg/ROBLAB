@@ -32,6 +32,7 @@ class Behavior(object):
         self.__person_amount = 0
         self.__person_amount_correct = False
         self.__waiting_for_an_answer = False
+        self.__recognized_words_certainty = 0
         self.__person_amount_estimator = PersonAmountEstimator()
 
     def __initialize_wrappers(self):
@@ -134,8 +135,6 @@ class Behavior(object):
         amount = 4
         if amount == 1:
             self.speech_wrapper.say(self.__sentences["seeingOnePerson"])
-        elif amount > 1 and amount < (const.max_persons + 1):
-            self.speech_wrapper.say(self.__sentences["seeingMultiplePersons"].format(amount))
         else:
             self.speech_wrapper.say(self.__sentences["seeingMultiplePersons"].format(amount))
 
@@ -147,7 +146,10 @@ class Behavior(object):
         self.speech_wrapper.say(self.__sentences["askAmountToSearch"])
         self.speech_wrapper.say(self.__sentences["availableTables"].format(const.min_persons, const.max_persons))
         self.speech_wrapper.start_to_listen(
-            self.__vocabularies["personAmount"], const.speech_recognition_language, self.__on_person_amount_answered)
+            self.__vocabularies["personAmount"],
+            const.speech_recognition_language,
+            const.speech_recognition_precision,
+            self.__on_person_amount_answered)
         self.__waiting_for_an_answer = True
         while self.__waiting_for_an_answer:
             time.sleep(1)
@@ -155,6 +157,12 @@ class Behavior(object):
         if self.__person_amount is None:
             self.__ask_person_amount()
         else:
+          if self.__recognized_words_certainty > 0.7:
+            if self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
+                self.speech_wrapper.say_random(self.__sentences["noTablesForAmount"])
+                return
+            self.__search_table()
+          else:
             self.__ask_person_amount_correct()
 
     def __on_person_amount_answered(self, message):
@@ -164,6 +172,7 @@ class Behavior(object):
         if m != '':
             word_found = next((x for x in self.__vocabularies["personAmount"] if x in m), None)
             if word_found is not None:
+                self.__recognized_words_certainty = message[1]
                 self.__person_amount = self.__vocabularies["personAmount"].index(word_found) + 1
                 self.__waiting_for_an_answer = False
 
@@ -178,7 +187,10 @@ class Behavior(object):
             self.speech_wrapper.say(self.__sentences["askToSearchTableForMultiplePersons"].format(self.__person_amount))
 
         self.speech_wrapper.start_to_listen(
-            ['Yes', 'No'], const.speech_recognition_language, self.__on_person_amount_correct_answered)
+          self.__vocabularies["yes"] + self.__vocabularies["no"],
+          const.speech_recognition_language,
+          const.speech_recognition_precision,
+          self.__on_person_amount_correct_answered)
         self.__waiting_for_an_answer = True
         while self.__waiting_for_an_answer:
             time.sleep(1)
