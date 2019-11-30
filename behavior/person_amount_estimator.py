@@ -18,7 +18,7 @@ class PersonAmountEstimator:
 
     def __estimate(self):
         while self.should_estimate:
-            estimated_number = self.__get_number_of_faces_and_store_picture("people_before_table_search")
+            estimated_number = self.__get_number_of_faces_and_store_picture(const.img_people_before_table_search)
             print("Estimated number of people: ", estimated_number)
             self.all_estimations.append(estimated_number)
 

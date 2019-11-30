@@ -41,10 +41,10 @@ class Behavior(object):
         self.speech_wrapper = SpeechWrapper()
 
     def __load_locales(self):
-      with open(os.path.join(os.getcwd(), const.path_to_locale_file), 'r') as f:
-        data = json.load(f)
-      self.__sentences = data["sentences"]
-      self.__vocabularies = data["vocabularies"]
+        with open(os.path.join(os.getcwd(), const.path_to_locale_file), 'r') as f:
+            data = json.load(f)
+        self.__sentences = data["sentences"]
+        self.__vocabularies = data["vocabularies"]
 
     def start_behavior(self):
         # self.body_movement_wrapper.move_head_up(10)
@@ -75,7 +75,7 @@ class Behavior(object):
         self.sensing_wrapper.subscribe("detect_face")
 
         while not self.__first_person_detected:
-            time.sleep(1)
+            time.sleep(0.1)
 
         # self.speech_wrapper.say("Hello I'm currently estimating the amount of people.")
         # self.speech_wrapper.say("Hmm hmm Hmm let me estimate")
@@ -86,46 +86,13 @@ class Behavior(object):
 
         # self.__person_amount = self.__get_number_of_faces_and_store_picture(const.img_people_before_table_search)
         self.__ask_person_amount_correct()
-        self.body_movement_wrapper.enable_autonomous_life(False)
 
-        self.__person_amount = self.__get_number_of_faces_and_store_picture(const.img_people_before_table_search)
+        self.__person_amount = self.__person_amount_estimator.get_estimated_person_amount()
         self.__ask_person_amount_correct()
 
+        self.body_movement_wrapper.enable_autonomous_life(False)
         while True:
             time.sleep(1)
-
-    def __get_number_of_faces_and_store_picture(self, file_name_without_jpg):
-        self.__camera = Camera(const.robot)
-        self.__camera.configure_camera(self.__camera.cameras["top"], self.__camera.resolutions["640x480"],
-                                       self.__camera.formats["jpg"])
-        self.__file_transfer = FileTransfer(const.robot)
-
-        remote_folder_path = "/home/nao/recordings/cameras/"
-        file_name = file_name_without_jpg + ".jpg"
-        self.__camera.take_picture(remote_folder_path, file_name)
-        local_project_path = const.path_to_pictures + file_name
-        remote = remote_folder_path + file_name
-        self.__file_transfer.get(remote, local_project_path)
-        number_of_faces = self.__get_number_of_faces_from_picture(local_project_path)
-        return number_of_faces
-
-    def __get_number_of_faces_from_picture(self, picture_path):
-        # Create the haar cascade
-        faceCascade = cv2.CascadeClassifier("data/haarcascade_frontalface_default.xml")
-
-        image = cv2.imread(picture_path)
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-        # Detect faces in the image
-        faces = faceCascade.detectMultiScale(
-            gray,
-            scaleFactor=1.1,
-            minNeighbors=5,
-            minSize=(30, 30),
-            flags=cv2.CASCADE_SCALE_IMAGE
-        )
-
-        return len(faces)
 
     def __on_human_tracked(self, value):
         if value == []:  # empty value when the face disappears
@@ -134,6 +101,7 @@ class Behavior(object):
             self.__got_face = True
             if self.__first_to_enter_callback:
                 self.__first_to_enter_callback = False
+                self.__person_amount_estimator.start_estimation()
                 self.sensing_wrapper.unsubscribe("detect_face")
                 self.speech_wrapper.say(self.__sentences["greeting"])
                 self.speech_wrapper.say(self.__sentences["estimateAmountOfPeople"])
