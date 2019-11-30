@@ -1,7 +1,7 @@
 {
     "vocabularies": {
         "personAmount": ["one", "two", "three", "four", "five", "six", "seven", "aight", "nine", "ten"],
-        "yes": ["yes", "yep", "yeah", "yo", "sure", "ok", "alright", "correct", "ja"],
+        "yes": ["yes", "yep", "yeah", "sure", "ok", "alright", "correct", "ja"],
         "no": ["no", "nope", "nein", "niet", "not", "don't"]
     },
     "sentences": {
