@@ -27,6 +27,8 @@ class PersonAmountEstimator:
 
     def get_estimated_person_amount(self):
         print("All estimations: ", self.all_estimations)
+        if len(self.all_estimations) is 0:
+            return 0
         return round(statistics.mean(self.all_estimations), 0)
 
     def __get_number_of_faces_and_store_picture(self, file_name_without_jpg):
