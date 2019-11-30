@@ -6,7 +6,7 @@ import scipy.misc
 import const
 import cv2
 import sys
-import face_recognition
+# import face_recognition
 # import PIL  # import used for scipy.misc.imsave
 
 from robot.body_movement_wrapper import BodyMovementWrapper
@@ -86,7 +86,7 @@ class Behavior(object):
 
     def __get_number_of_faces_from_picture(self, picture_path):
         # Create the haar cascade
-        faceCascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
+        faceCascade = cv2.CascadeClassifier("data/haarcascade_frontalface_default.xml")
 
         image = cv2.imread(picture_path)
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
