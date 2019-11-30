@@ -73,7 +73,6 @@ class Behavior(object):
         time.sleep(2)
         self.__person_amount_estimator.stop_estimation()
         self.__person_amount = self.__person_amount_estimator.get_estimated_person_amount()
-        print (self.__person_amount_estimator.get_picture_path_of_highest_amount_of_seen_people())
 
         self.body_movement_wrapper.enable_autonomous_life(False)
 
