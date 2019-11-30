@@ -49,11 +49,13 @@ class Behavior(object):
         self.__vocabularies = data["vocabularies"]
 
     def start_behavior(self):
-        self.setup_customer_reception()
+        self.__setup_customer_reception()
+        self.__ask_person_amount_correct()
+        self.__person_amount_estimator.clear_results()
         # self.__get_number_of_faces_from_picture()
         # self.__recognize_persons()
 
-    def setup_customer_reception(self):
+    def __setup_customer_reception(self):
         if not self.sensing_wrapper.is_face_detection_enabled():
             raise Exception('No Face detection possible with this system!')
 
@@ -79,8 +81,6 @@ class Behavior(object):
         print (self.__person_amount_estimator.get_picture_path_of_highest_amount_of_seen_people())
 
         self.body_movement_wrapper.enable_autonomous_life(False)
-        self.__ask_person_amount_correct()
-        self.__person_amount_estimator.clear_results()
 
         while True:
             time.sleep(1)
@@ -129,13 +129,13 @@ class Behavior(object):
         if self.__person_amount is None:
             self.__ask_person_amount()
         else:
-          if self.__recognized_words_certainty > 0.55:
-            if self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
-                self.speech_wrapper.say(self.__sentences["noTablesForAmount"])
-                return
-            self.__search_table()
-          else:
-            self.__ask_person_amount_correct()
+            if self.__recognized_words_certainty > 0.55:
+                if self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
+                    self.speech_wrapper.say(self.__sentences["noTablesForAmount"])
+                    return
+                self.__search_table()
+            else:
+                self.__ask_person_amount_correct()
 
     def __on_person_amount_answered(self, message):
         print('Ask Person amount triggered')
@@ -200,14 +200,14 @@ class Behavior(object):
     def __return_to_waiting_zone(self):
         self.position_movement_wrapper.go_to_home()
         if self.__wait_for_new_customers:
-          self.setup_customer_reception()
+            self.__setup_customer_reception()
         else:
-          if self.__find_person():
-              self.speech_wrapper.say('I remember you')
-              self.__ask_to_follow()
-              self.__return_to_table()
-          else:
-              self.speech_wrapper.say('Where are you?')
+            if self.__find_person():
+                self.speech_wrapper.say('I remember you')
+                self.__ask_to_follow()
+                self.__return_to_table()
+            else:
+                self.speech_wrapper.say('Where are you?')
 
     def __find_person(self):
         self.body_movement_wrapper.enable_autonomous_life(True)
