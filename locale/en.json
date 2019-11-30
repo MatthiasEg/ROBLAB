@@ -1,0 +1,22 @@
+{
+    "vocabularies": {
+        "personAmount": ["one", "two", "three", "four", "five", "six", "seven", "aight", "nine", "ten"],
+        "yesNo": ["Yes", "No"]
+    },
+    "sentences": {
+        "hello": "Hello",
+        "greeting": "Hello welcome to the restaurant dinner for one!",
+        "estimateAmountOfPeople": "I would like to estimate the amount of people of your group.",
+        "stayInFrontOfMe": "Please come and stay in front of me.",
+        "seeingOnePerson": "I am seeing one person",
+        "seeingMultiplePersons": "I am seeing {} persons",
+        "askAmountToSearch": "For how many people should I search a table?",
+        "availableTables": "We have tables for {} to {} persons",
+        "askToSearchTableForOnePerson": "Would you like me to search a table for a single person?",
+        "askToSearchTableForMultiplePersons": "Would you like me to search a table for {} people?",
+        "noTablesForAmount": "Unfortunately, we do not have a table for this amount of people.",
+        "searchTable": "Please wait. I will search the perfect table for you",
+        "askToFollow": "Thank you for your patience. Please follow me to your table.",
+        "assignTable": "This is your table. Please wait. A human employee will be serving you shortly. Enjoy your stay."
+    }
+}

@@ -6,7 +6,8 @@ import scipy.misc
 import const
 import cv2
 import sys
-# import face_recognition
+import json
+import face_recognition
 # import PIL  # import used for scipy.misc.imsave
 
 from robot.body_movement_wrapper import BodyMovementWrapper
@@ -23,6 +24,7 @@ class Behavior(object):
     def __init__(self):
         self.__robot = const.robot
         self.__initialize_wrappers()
+        self.__load_locales()
         self.__got_face = False
         self.__first_person_detected = False
         self.__first_to_enter_callback = True
@@ -30,6 +32,18 @@ class Behavior(object):
         self.__person_amount = None
         self.__person_amount_correct = False
         self.__waiting_for_an_answer = False
+
+    def __initialize_wrappers(self):
+        self.body_movement_wrapper = BodyMovementWrapper()
+        self.position_movement_wrapper = PositionMovementWrapper()
+        self.sensing_wrapper = SensingWrapper()
+        self.speech_wrapper = SpeechWrapper()
+
+    def __load_locales(self):
+      with open(os.path.join(os.getcwd(), const.path_to_locale_file), 'r') as f:
+        data = json.load(f)
+      self.__sentences = data["sentences"]
+      self.__vocabularies = data["vocabularies"]
 
     def start_behavior(self):
         # self.body_movement_wrapper.move_head_up(10)
@@ -111,9 +125,9 @@ class Behavior(object):
             if self.__first_to_enter_callback:
                 self.__first_to_enter_callback = False
                 self.sensing_wrapper.unsubscribe("huso")
-                self.speech_wrapper.say("Hello welcome to the restaurant dinner for one!")
-                self.speech_wrapper.say("I would like to estimate the amount of people of your group.")
-                self.speech_wrapper.say("Please come and stay in front of me.")
+                self.speech_wrapper.say(self.__sentences["greeting"])
+                self.speech_wrapper.say(self.__sentences["estimateAmountOfPeople"])
+                self.speech_wrapper.say(self.__sentences["stayInFrontOfMe"])
                 self.__first_person_detected = True
 
     def __navigate(self):
@@ -141,21 +155,21 @@ class Behavior(object):
     def __recognize_persons(self):
         amount = 4
         if amount == 1:
-            self.speech_wrapper.say("I am seeing one person")
+            self.speech_wrapper.say(self.__sentences["seeingOnePerson"])
         elif amount > 1 and amount < (const.max_persons + 1):
-            self.speech_wrapper.say("I am seeing {} persons".format(amount))
+            self.speech_wrapper.say(self.__sentences["seeingMultiplePersons"].format(amount))
         else:
-            self.speech_wrapper.say("I am seeing {} persons".format(amount))
+            self.speech_wrapper.say(self.__sentences["seeingMultiplePersons"].format(amount))
 
         self.__person_amount = amount
         self.__ask_person_amount_correct()
 
     def __ask_person_amount(self):
         self.__person_amount = None
-        self.speech_wrapper.say("For how many people should I search a table?")
-        self.speech_wrapper.say("We have tables for {} to {} persons".format(const.min_persons, const.max_persons))
+        self.speech_wrapper.say(self.__sentences["askAmountToSearch"])
+        self.speech_wrapper.say(self.__sentences["availableTables"].format(const.min_persons, const.max_persons))
         self.speech_wrapper.start_to_listen(
-            const.person_amount_vocab, const.speech_recognition_language, self.__on_person_amount_answered)
+            self.__vocabularies["personAmount"], const.speech_recognition_language, self.__on_person_amount_answered)
         self.__waiting_for_an_answer = True
         while self.__waiting_for_an_answer:
             time.sleep(1)
@@ -170,22 +184,20 @@ class Behavior(object):
 
         m = message[0]
         if m != '':
-            word_found = next((x for x in const.person_amount_vocab if x in m), None)
+            word_found = next((x for x in self.__vocabularies["personAmount"] if x in m), None)
             if word_found is not None:
-                self.__person_amount = const.person_amount_vocab.index(word_found) + 1
+                self.__person_amount = self.__vocabularies["personAmount"].index(word_found) + 1
                 self.__waiting_for_an_answer = False
 
         print(message)
 
     def __ask_person_amount_correct(self):
         if self.__person_amount == 1:
-            self.speech_wrapper.say(
-                "Would you like me to search a table for a single person?")
+            self.speech_wrapper.say(self.__sentences["askToSearchTableForOnePerson"])
         elif self.__person_amount == 0:
             self.__ask_person_amount()
         else:
-            self.speech_wrapper.say(
-                "Would you like me to search a table for {} people?".format(self.__person_amount))
+            self.speech_wrapper.say(self.__sentences["askToSearchTableForMultiplePersons"].format(self.__person_amount))
 
         self.speech_wrapper.start_to_listen(
             ['Yes', 'No'], const.speech_recognition_language, self.__on_person_amount_correct_answered)
@@ -197,7 +209,7 @@ class Behavior(object):
         if self.__person_amount_correct:
             print(self.__person_amount)
             if self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
-                self.speech_wrapper.say("Unfortunately, we do not have a table for this amount of people.")
+                self.speech_wrapper.say(self.__sentences["noTablesForAmount"])
                 return
             self.__search_table()
         else:
@@ -215,7 +227,7 @@ class Behavior(object):
         print(message)
 
     def __search_table(self):
-        self.speech_wrapper.say("Please wait. I will search the perfect table for you")
+        self.speech_wrapper.say(self.__sentences["searchTable"])
 
         # TODO search table...
 
@@ -238,7 +250,7 @@ class Behavior(object):
 
     def __find_person(self):
         self.body_movement_wrapper.enable_autonomous_life(True)
-        
+
         while self.__get_number_of_faces_and_store_picture(const.img_people_after_table_search) == 0:
             time.sleep(2)
 
@@ -258,7 +270,7 @@ class Behavior(object):
         return False
 
     def __ask_to_follow(self):
-        self.speech_wrapper.say("Thank you for your patience. Please follow me to your table.")
+        self.speech_wrapper.say(self.__sentences["askToFollow"])
         self.body_movement_wrapper.moveArmsUp(Actuators.RArm, 120)
         time.sleep(1)
         self.body_movement_wrapper.moveArmsDown(Actuators.RArm, 160)
@@ -269,8 +281,7 @@ class Behavior(object):
         self.__assign_table()
 
     def __assign_table(self):
-        self.speech_wrapper.say(
-            "This is your table. Please wait. A human employee will be serving you shortly. Enjoy your stay.")
+        self.speech_wrapper.say(self.__sentences["assignTable"])
         time.sleep(2)
         self.__return_to_waiting_zone()
 
@@ -303,9 +314,3 @@ class Behavior(object):
         # save image to project root
 
         scipy.misc.imsave('mapMitRadius{}.jpg'.format(radius), img)
-
-    def __initialize_wrappers(self):
-        self.body_movement_wrapper = BodyMovementWrapper()
-        self.position_movement_wrapper = PositionMovementWrapper()
-        self.sensing_wrapper = SensingWrapper()
-        self.speech_wrapper = SpeechWrapper()
