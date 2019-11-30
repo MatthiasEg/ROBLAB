@@ -208,7 +208,7 @@ class Behavior(object):
     def __return_to_waiting_zone(self):
         self.position_movement_wrapper.go_to_home()
         if self.__wait_for_new_customers:
-          self.setup_customer_reception()
+          self.__setup_customer_reception()
         else:
             self.__ask_to_follow()
             self.__go_to_table()
