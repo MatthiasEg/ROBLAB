@@ -259,14 +259,18 @@ class Behavior(object):
 
     def __go_to_table(self):
         # TODO implement logic to return to the table that was found
+        self.body_movement_wrapper.enable_autonomous_life(False)
         self.speech_wrapper.say(self.__sentences["searchTable"])
         try:
             self.position_movement_wrapper.move_to(0, 0, 180)
+            self.body_movement_wrapper.set_head_down(0)
+            self.body_movement_wrapper.set_head_right(0)
+            time.sleep(1)
             self.__go_to_cups_for_amount_of_persons(self.__person_amount)
         except Exception, e:
             print(e)
             self.position_movement_wrapper.stop_movement()
-
+        self.body_movement_wrapper.enable_autonomous_life(True)
         self.__assign_table()
 
     def __assign_table(self):
