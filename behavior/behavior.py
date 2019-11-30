@@ -78,10 +78,7 @@ class Behavior(object):
         while not self.__first_person_detected:
             time.sleep(0.1)
 
-        # self.speech_wrapper.say("Hello I'm currently estimating the amount of people.")
-        # self.speech_wrapper.say("Hmm hmm Hmm let me estimate")
-        # self.speech_wrapper.say("Wait a second my friend")
-
+        time.sleep(2)
         self.__person_amount_estimator.stop_estimation()
         self.__person_amount = self.__person_amount_estimator.get_estimated_person_amount()
         print (self.__person_amount_estimator.get_picture_path_of_highest_amount_of_seen_people())
