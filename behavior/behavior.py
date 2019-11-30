@@ -1,22 +1,17 @@
+import json
 import os
 import time
 
-import numpy
-import scipy.misc
+# import face_recognition
+
 import const
-import cv2
-import sys
-import json
-import face_recognition
 # import PIL  # import used for scipy.misc.imsave
 from person_amount_estimator import PersonAmountEstimator
+from robot.body_movement_wrapper import Actuators
 from robot.body_movement_wrapper import BodyMovementWrapper
-from robot.object_detection.Camera import Camera
-from robot.object_detection.FileTransfer import FileTransfer
 from robot.position_movement_wrapper import PositionMovementWrapper
 from robot.sensing_wrapper import SensingWrapper
 from robot.speech_wrapper import SpeechWrapper
-from robot.body_movement_wrapper import Actuators
 
 
 class Behavior(object):
@@ -49,11 +44,13 @@ class Behavior(object):
         self.__vocabularies = data["vocabularies"]
 
     def start_behavior(self):
-        self.setup_customer_reception()
+        self.__setup_customer_reception()
+        self.__ask_person_amount_correct()
+        self.__person_amount_estimator.clear_results()
         # self.__get_number_of_faces_from_picture()
         # self.__recognize_persons()
 
-    def setup_customer_reception(self):
+    def __setup_customer_reception(self):
         if not self.sensing_wrapper.is_face_detection_enabled():
             raise Exception('No Face detection possible with this system!')
 
@@ -67,37 +64,29 @@ class Behavior(object):
         self.body_movement_wrapper.enable_autonomous_life(True)
 
         face_detected_subscriber = self.sensing_wrapper.get_memory_subscriber("FaceDetected")
-        face_detected_subscriber.signal.connect(self.__on_human_tracked)
+        face_detected_subscriber.signal.connect(self.__human_detected)
         self.sensing_wrapper.subscribe("detect_face")
 
         while not self.__first_person_detected:
             time.sleep(0.1)
 
-        # self.speech_wrapper.say("Hello I'm currently estimating the amount of people.")
-        # self.speech_wrapper.say("Hmm hmm Hmm let me estimate")
-        # self.speech_wrapper.say("Wait a second my friend")
-
+        time.sleep(2)
         self.__person_amount_estimator.stop_estimation()
         self.__person_amount = self.__person_amount_estimator.get_estimated_person_amount()
 
-        # self.__person_amount = self.__get_number_of_faces_and_store_picture(const.img_people_before_table_search)
-        self.__ask_person_amount_correct()
-
-        self.__person_amount = self.__person_amount_estimator.get_estimated_person_amount()
         self.body_movement_wrapper.enable_autonomous_life(False)
-        self.__ask_person_amount_correct()
 
-        while True:
-            time.sleep(1)
-
-    def __on_human_tracked(self, value):
+    def __human_detected(self, value):
         if value == []:  # empty value when the face disappears
             self.__got_face = False
         elif not self.__got_face:
             self.__got_face = True
             if self.__first_to_enter_callback:
                 self.__first_to_enter_callback = False
+
+                self.__person_amount_estimator.change_picture_file_name(const.img_people_before_table_search)
                 self.__person_amount_estimator.start_estimation()
+
                 self.sensing_wrapper.unsubscribe("detect_face")
                 self.__wait_for_new_customers = False
                 self.speech_wrapper.say(self.__sentences["greeting"])
@@ -131,13 +120,13 @@ class Behavior(object):
         if self.__person_amount is None:
             self.__ask_person_amount()
         else:
-          if self.__recognized_words_certainty > 0.55:
-            if self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
-                self.speech_wrapper.say(self.__sentences["noTablesForAmount"])
-                return
-            self.__search_table()
-          else:
-            self.__ask_person_amount_correct()
+            if self.__recognized_words_certainty > 0.55:
+                if self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
+                    self.speech_wrapper.say(self.__sentences["noTablesForAmount"])
+                    return
+                self.__search_table()
+            else:
+                self.__ask_person_amount_correct()
 
     def __on_person_amount_answered(self, message):
         print('Ask Person amount triggered')
@@ -161,10 +150,10 @@ class Behavior(object):
             self.speech_wrapper.say(self.__sentences["askToSearchTableForMultiplePersons"].format(self.__person_amount))
 
         self.speech_wrapper.start_to_listen(
-          self.__vocabularies["yes"] + self.__vocabularies["no"],
-          const.speech_recognition_language,
-          const.speech_recognition_precision,
-          self.__on_person_amount_correct_answered)
+            self.__vocabularies["yes"] + self.__vocabularies["no"],
+            const.speech_recognition_language,
+            const.speech_recognition_precision,
+            self.__on_person_amount_correct_answered)
         self.__waiting_for_an_answer = True
         while self.__waiting_for_an_answer:
             time.sleep(1)
@@ -182,11 +171,11 @@ class Behavior(object):
     def __on_person_amount_correct_answered(self, message):
         print('Ask Person triggered')
         if message[0] != '':
-          msg = message[0].replace('<...>', '').strip()
-          if msg in self.__vocabularies["no"]:
+            msg = message[0].replace('<...>', '').strip()
+            if msg in self.__vocabularies["no"]:
                 self.__person_amount_correct = False
                 self.__waiting_for_an_answer = False
-          elif msg in self.__vocabularies["yes"]:
+            elif msg in self.__vocabularies["yes"]:
                 self.__person_amount_correct = True
                 self.__waiting_for_an_answer = False
         print(message)
