@@ -134,7 +134,7 @@ class Behavior(object):
             self.__got_face = True
             if self.__first_to_enter_callback:
                 self.__first_to_enter_callback = False
-                self.sensing_wrapper.unsubscribe("huso")
+                self.sensing_wrapper.unsubscribe("detect_face")
                 self.speech_wrapper.say(self.__sentences["greeting"])
                 self.speech_wrapper.say(self.__sentences["estimateAmountOfPeople"])
                 self.speech_wrapper.say(self.__sentences["stayInFrontOfMe"])
