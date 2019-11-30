@@ -1,22 +1,17 @@
+import json
 import os
 import time
 
-import numpy
-import scipy.misc
-import const
-import cv2
-import sys
-import json
 import face_recognition
+
+import const
 # import PIL  # import used for scipy.misc.imsave
 from person_amount_estimator import PersonAmountEstimator
+from robot.body_movement_wrapper import Actuators
 from robot.body_movement_wrapper import BodyMovementWrapper
-from robot.object_detection.Camera import Camera
-from robot.object_detection.FileTransfer import FileTransfer
 from robot.position_movement_wrapper import PositionMovementWrapper
 from robot.sensing_wrapper import SensingWrapper
 from robot.speech_wrapper import SpeechWrapper
-from robot.body_movement_wrapper import Actuators
 
 
 class Behavior(object):
