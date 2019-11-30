@@ -29,6 +29,7 @@ class Behavior(object):
         self.__first_to_enter_callback_two = True
         self.__person_amount = None
         self.__person_amount_correct = False
+        self.__waiting_for_an_answer = False
 
     def start_behavior(self):
         # self.body_movement_wrapper.move_head_up(10)
@@ -155,7 +156,9 @@ class Behavior(object):
         self.speech_wrapper.say("We have tables for {} to {} persons".format(const.min_persons, const.max_persons))
         self.speech_wrapper.start_to_listen(
             const.person_amount_vocab, const.speech_recognition_language, self.__on_person_amount_answered)
-        time.sleep(5)
+        self.__waiting_for_an_answer = True
+        while self.__waiting_for_an_answer:
+            time.sleep(1)
         self.speech_wrapper.stop_listening()
         if self.__person_amount is None:
             self.__ask_person_amount()
@@ -170,6 +173,7 @@ class Behavior(object):
             word_found = next((x for x in const.person_amount_vocab if x in m), None)
             if word_found is not None:
                 self.__person_amount = const.person_amount_vocab.index(word_found) + 1
+                self.__waiting_for_an_answer = False
 
         print(message)
 
@@ -185,7 +189,9 @@ class Behavior(object):
 
         self.speech_wrapper.start_to_listen(
             ['Yes', 'No'], const.speech_recognition_language, self.__on_person_amount_correct_answered)
-        time.sleep(5)
+        self.__waiting_for_an_answer = True
+        while self.__waiting_for_an_answer:
+            time.sleep(1)
         self.speech_wrapper.stop_listening()
 
         if self.__person_amount_correct:
@@ -202,8 +208,10 @@ class Behavior(object):
         if message[0] != '':
             if 'No' in message[0]:
                 self.__person_amount_correct = False
+                self.__waiting_for_an_answer = False
             elif 'Yes' in message[0]:
                 self.__person_amount_correct = True
+                self.__waiting_for_an_answer = False
         print(message)
 
     def __search_table(self):
@@ -215,24 +223,39 @@ class Behavior(object):
         self.__return_to_waiting_zone()
 
     def __return_to_waiting_zone(self):
-        self.__find_person()
+        if self.__find_person():
+            self.speech_wrapper.say('I remember you')
+        else:
+            self.speech_wrapper.say('Who are you?')
         # self.position_movement_wrapper.go_to_home()
         # TODO change this or create attribute
         # if self.assigned:
         #     # self.setup_customer_reception()
         #     pass
         # else:
-        #     self.__ask_to_follow()
-        #     self.__return_to_table()
+        self.__ask_to_follow()
+        self.__return_to_table()
 
     def __find_person(self):
-        people_before_table_search = face_recognition.load_image_file("C://Users/Patrick/Desktop/test_images/group1.jpg")
-        people_after_table_search = face_recognition.load_image_file("C://Users/Patrick/Desktop/test_images/pat1.jpg")
+        self.body_movement_wrapper.enable_autonomous_life(True)
+        
+        while self.__get_number_of_faces_and_store_picture(const.img_people_after_table_search) == 0:
+            time.sleep(2)
+
+        self.body_movement_wrapper.enable_autonomous_life(False)
+
+        people_before_table_search = face_recognition.load_image_file(os.path.join(os.getcwd(), const.path_to_pictures, const.img_people_before_table_search + '.jpg'))
+        people_after_table_search = face_recognition.load_image_file(os.path.join(os.getcwd(), const.path_to_pictures, const.img_people_after_table_search + '.jpg'))
         known_faces = []
-        for encoding in face_recognition.face_encodings(people_after_table_search):
+
+        for encoding in face_recognition.face_encodings(people_before_table_search):
             known_faces.append(encoding)
-        unknown_face_encoding = face_recognition.face_encodings(people_before_table_search)[0]
-        print(face_recognition.compare_faces(known_faces, unknown_face_encoding))
+
+        for face in face_recognition.face_encodings(people_after_table_search):
+            if True in face_recognition.compare_faces(known_faces, face):
+                return True
+
+        return False
 
     def __ask_to_follow(self):
         self.speech_wrapper.say("Thank you for your patience. Please follow me to your table.")
@@ -247,7 +270,7 @@ class Behavior(object):
 
     def __assign_table(self):
         self.speech_wrapper.say(
-            "This is your table. Please wait. A human person will be serving you shortly. Enjoy your stay.")
+            "This is your table. Please wait. A human employee will be serving you shortly. Enjoy your stay.")
         time.sleep(2)
         self.__return_to_waiting_zone()
 
