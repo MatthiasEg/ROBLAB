@@ -182,10 +182,7 @@ class Behavior(object):
         print(message)
 
     def __search_table(self):
-        print("todo")
-        # when table found
-        # TODO:
-        # self.__return_to_waiting_zone()
+        self.__go_to_table()
 
     time_movement_start = None
 
