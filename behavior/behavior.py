@@ -125,8 +125,8 @@ class Behavior(object):
             if self.__first_to_enter_callback:
                 self.__first_to_enter_callback = False
                 self.sensing_wrapper.unsubscribe("huso")
-                self.speech_wrapper.say(self.__sentences["greeting"])
-                self.speech_wrapper.say(self.__sentences["estimateAmountOfPeople"])
+                self.speech_wrapper.say_random(self.__sentences["greeting"])
+                self.speech_wrapper.say_random(self.__sentences["estimateAmountOfPeople"])
                 self.speech_wrapper.say(self.__sentences["stayInFrontOfMe"])
                 self.__first_person_detected = True
 
@@ -209,7 +209,7 @@ class Behavior(object):
         if self.__person_amount_correct:
             print(self.__person_amount)
             if self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
-                self.speech_wrapper.say(self.__sentences["noTablesForAmount"])
+                self.speech_wrapper.say_random(self.__sentences["noTablesForAmount"])
                 return
             self.__search_table()
         else:
@@ -218,16 +218,17 @@ class Behavior(object):
     def __on_person_amount_correct_answered(self, message):
         print('Ask Person triggered')
         if message[0] != '':
-            if 'No' in message[0]:
+          msg = message[0].replace('<...>', '').strip()
+          if msg in self.__vocabularies["no"]:
                 self.__person_amount_correct = False
                 self.__waiting_for_an_answer = False
-            elif 'Yes' in message[0]:
+          elif msg in self.__vocabularies["yes"]:
                 self.__person_amount_correct = True
                 self.__waiting_for_an_answer = False
         print(message)
 
     def __search_table(self):
-        self.speech_wrapper.say(self.__sentences["searchTable"])
+        self.speech_wrapper.say_random(self.__sentences["searchTable"])
 
         # TODO search table...
 

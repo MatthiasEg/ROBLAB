@@ -1,4 +1,5 @@
 import const
+import random
 
 
 class SpeechWrapper:
@@ -11,6 +12,9 @@ class SpeechWrapper:
 
     def say(self, text):
         self.__robot.ALTextToSpeech.say(text)
+
+    def say_random(self, list):
+        self.say(random.choice(list))
 
     def start_to_listen(self, vocabulary, language, callback):
         # self.__robot.ALMemory.subscribeToEvent("SpeechRecognition", module, callback)
