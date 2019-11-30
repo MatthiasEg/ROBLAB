@@ -88,9 +88,9 @@ class Behavior(object):
         self.__ask_person_amount_correct()
 
         self.__person_amount = self.__person_amount_estimator.get_estimated_person_amount()
+        self.body_movement_wrapper.enable_autonomous_life(False)
         self.__ask_person_amount_correct()
 
-        self.body_movement_wrapper.enable_autonomous_life(False)
         while True:
             time.sleep(1)
 
@@ -103,9 +103,9 @@ class Behavior(object):
                 self.__first_to_enter_callback = False
                 self.__person_amount_estimator.start_estimation()
                 self.sensing_wrapper.unsubscribe("detect_face")
-                self.speech_wrapper.say(self.__sentences["greeting"])
-                self.speech_wrapper.say(self.__sentences["estimateAmountOfPeople"])
-                self.speech_wrapper.say(self.__sentences["stayInFrontOfMe"])
+                self.speech_wrapper.say_random(self.__sentences["greeting"])
+                self.speech_wrapper.say_random(self.__sentences["estimateAmountOfPeople"])
+                self.speech_wrapper.say_random(self.__sentences["stayInFrontOfMe"])
                 self.__first_person_detected = True
 
     def __navigate(self):
