@@ -196,6 +196,8 @@ class Behavior(object):
                 if goal_centers is not None:
                     # TODO[mario]: search for persons
                     # if person matches x axis threshold -> table occupied
+
+
                     self.__ask_to_follow()
                     self.__go_to_table(goal_centers)
                     self.body_movement_wrapper.enable_autonomous_life(True)
@@ -240,6 +242,12 @@ class Behavior(object):
                 else:
                     self.position_movement_wrapper.move(0.5, 0, 0)
 
+    def __move_towards_goal_location(self, goal_centers):
+        pixels_to_move_x = (640 / 2) - goal_centers[0]
+        degrees_to_move_x = int(round(pixels_to_move_x / 15.0))
+        print("table goal position: %s, move_x: %s" % (goal_centers, degrees_to_move_x))
+        self.position_movement_wrapper.move(0.5, 0, degrees_to_move_x)
+
     def __search_for_correct_table(self):
         print("Couldn't find your object. Searching around")
         number_of_turns = 0
@@ -265,12 +273,6 @@ class Behavior(object):
                     number_of_turns = 0
             else:
                 break
-
-    def __move_towards_goal_location(self, goal_centers):
-        pixels_to_move_x = (640 / 2) - goal_centers[0]
-        degrees_to_move_x = int(round(pixels_to_move_x / 15.0))
-        print("table goal position: %s, move_x: %s" % (goal_centers, degrees_to_move_x))
-        self.position_movement_wrapper.move(0.5, 0, degrees_to_move_x)
 
     def __assign_table(self):
         self.speech_wrapper.say(self.__sentences["assignTable"])
