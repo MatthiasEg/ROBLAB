@@ -229,7 +229,7 @@ class Behavior(object):
                 break
             else:
                 print("Couldn't find your object. Searching around")
-                if (number_of_turns is 0):
+                if number_of_turns is 0:
                     self.position_movement_wrapper.stop_movement()
                     self.body_movement_wrapper.set_head_down(0)
                     self.position_movement_wrapper.move_to(0, 0, 90)
