@@ -30,6 +30,12 @@
             "Please stand by. I try to find a wonderful table for you.",
             "Please wait here and let me search a nice table for you."
         ],
+        "noTableAvailable": [
+            "Unfortunately, all matching tables are already occupied. We are sorry for the inconvenience."
+        ],
+        "comeBackAnotherDay": [
+            "We would love to welcome you on another day at the dinner for one restaurant!"
+        ],
         "askToFollow": "Thank you for your patience. Please follow me to your table.",
         "assignTable": "This is your table. Please wait. A human employee will be serving you shortly. Enjoy your stay."
     }
