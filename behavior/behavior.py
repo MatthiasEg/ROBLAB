@@ -2,8 +2,6 @@ import json
 import os
 import time
 
-# import face_recognition
-
 import const
 # import PIL  # import used for scipy.misc.imsave
 from person_amount_estimator import PersonAmountEstimator
@@ -12,6 +10,9 @@ from robot.body_movement_wrapper import BodyMovementWrapper
 from robot.position_movement_wrapper import PositionMovementWrapper
 from robot.sensing_wrapper import SensingWrapper
 from robot.speech_wrapper import SpeechWrapper
+
+
+# import face_recognition
 
 
 class Behavior(object):
@@ -184,31 +185,57 @@ class Behavior(object):
     def __search_table(self):
         self.__go_to_table()
 
-    time_movement_start = None
+    def __move_towards_goal_location(self, goal_centers):
+        pixels_to_move_x = (640 / 2) - goal_centers[0]
+        degrees_to_move_x = int(round(pixels_to_move_x / 15.0))
+        print("goal: %s, move_x: %s" % (goal_centers, degrees_to_move_x))
+        self.position_movement_wrapper.move(0.5, 0, degrees_to_move_x)
+
+    def __ask_to_follow(self):
+        self.speech_wrapper.say(self.__sentences["askToFollow"])
+        self.body_movement_wrapper.moveArmsUp(Actuators.RArm, 120)
+        time.sleep(1)
+        self.body_movement_wrapper.moveArmsDown(Actuators.RArm, 160)
+
+    def __go_to_table(self):
+        # TODO implement logic to return to the table that was found
+        self.speech_wrapper.say(self.__sentences["searchTable"])
+        self.body_movement_wrapper.enable_autonomous_life(False)
+        try:
+            self.position_movement_wrapper.move_to(0, 0, 180)
+            self.body_movement_wrapper.set_head_down(0)
+            self.body_movement_wrapper.set_head_right(0)
+            time.sleep(1)
+            self.__go_to_cups_for_amount_of_persons(self.__person_amount)
+        except Exception, e:
+            print(e)
+            self.position_movement_wrapper.stop_movement()
+        self.body_movement_wrapper.enable_autonomous_life(True)
+        self.__assign_table()
 
     def __go_to_cups_for_amount_of_persons(self, cup_goal):
         number_of_turns = 0
         max_turns = 5
         while True:
-            goal_centers = self.sensing_wrapper.get_cup_goal_centers(cup_goal)
+            goal_centers = self.sensing_wrapper.get_red_cups_center_position(cup_goal)
             if goal_centers is not None:
                 self.speech_wrapper.say("I found your table!")
                 time.sleep(1)
                 self.speech_wrapper.say("Please, follow me!")
                 self.__move_towards_goal_location(goal_centers)
-                self.time_movement_start = round(time.time() * 1000)
+                time_movement_start = round(time.time() * 1000)
                 while True:
                     distance_meters = self.sensing_wrapper.get_sonar_distance("Front")
                     print("distance: %s" % distance_meters)
                     if float(distance_meters) >= 1.5:
                         if float(distance_meters) >= 1.0:
-                            goal_centers = self.sensing_wrapper.get_cup_goal_centers(cup_goal)
+                            goal_centers = self.sensing_wrapper.get_red_cups_center_position(cup_goal)
                             if goal_centers is not None:
                                 now = round(time.time() * 1000)
-                                diff = now - self.time_movement_start
+                                diff = now - time_movement_start
                                 if diff <= 2000:
                                     self.__move_towards_goal_location(goal_centers)
-                                    self.time_movement_start = round(time.time() * 1000)
+                                    time_movement_start = round(time.time() * 1000)
                                 else:
                                     self.position_movement_wrapper.move(0.5, 0, 0)
                             else:
@@ -241,34 +268,6 @@ class Behavior(object):
                     time.sleep(2)
                     self.position_movement_wrapper.stop_movement()
                     number_of_turns = 0
-
-    def __move_towards_goal_location(self, goal_centers):
-        pixels_to_move_x = (640 / 2) - goal_centers[0]
-        degrees_to_move_x = int(round(pixels_to_move_x / 15.0))
-        print("goal: %s, move_x: %s" % (goal_centers, degrees_to_move_x))
-        self.position_movement_wrapper.move(0.5, 0, degrees_to_move_x)
-
-    def __ask_to_follow(self):
-        self.speech_wrapper.say(self.__sentences["askToFollow"])
-        self.body_movement_wrapper.moveArmsUp(Actuators.RArm, 120)
-        time.sleep(1)
-        self.body_movement_wrapper.moveArmsDown(Actuators.RArm, 160)
-
-    def __go_to_table(self):
-        # TODO implement logic to return to the table that was found
-        self.body_movement_wrapper.enable_autonomous_life(False)
-        self.speech_wrapper.say(self.__sentences["searchTable"])
-        try:
-            self.position_movement_wrapper.move_to(0, 0, 180)
-            self.body_movement_wrapper.set_head_down(0)
-            self.body_movement_wrapper.set_head_right(0)
-            time.sleep(1)
-            self.__go_to_cups_for_amount_of_persons(self.__person_amount)
-        except Exception, e:
-            print(e)
-            self.position_movement_wrapper.stop_movement()
-        self.body_movement_wrapper.enable_autonomous_life(True)
-        self.__assign_table()
 
     def __assign_table(self):
         self.speech_wrapper.say(self.__sentences["assignTable"])

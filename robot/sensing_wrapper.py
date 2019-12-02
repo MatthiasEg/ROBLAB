@@ -1,18 +1,26 @@
-from robot.object_detection.Camera import Camera
-from robot.object_detection.FileTransfer import FileTransfer
-from robot.object_detection.object_detection import ObjectDetection
 from pandas import Series
 
 import const
+from robot.object_detection.Camera import Camera
+from robot.object_detection.FileTransfer import FileTransfer
+from robot.object_detection.object_detection import ObjectDetection
 
 
 class SensingWrapper:
+    __MAX_CUPS_ON_IMAGE = 9.0
+    __MAX_IMAGE_WIDTH = 640.0
 
     def __init__(self):
         self.__robot = const.robot
+        self.__camera = Camera(self.__robot)
+        self.__camera.configure_camera(self.__camera.cameras["top"], self.__camera.resolutions["640x480"],
+                                       self.__camera.formats["jpg"])
+        self.__file_transfer = FileTransfer(const.robot)
         self.__detection = ObjectDetection()
         self.__frontSonarMemoryPath = "Device/SubDeviceList/Platform/Front/Sonar/Sensor/Value"
         self.__backSonarMemoryPath = "Device/SubDeviceList/Platform/Back/Sonar/Sensor/Value"
+
+        self.start_sonar_sensors()
 
     def is_face_detection_enabled(self):
         return self.__robot.ALPeoplePerception.isFaceDetectionEnabled()
@@ -58,29 +66,17 @@ class SensingWrapper:
         self.__robot.ALTracker.unregisterAllTargets()
         self.__robot.ALMotion.rest()
 
-    def detect_object(self, object_name):
-        remote_folder_path = "/home/nao/recordings/cameras/"
-        file_name = "object_detection.jpg"
+    def get_object_positions(self, object_name):
+        image_path = "object_detection.jpg"
+        self.__take_picture(image_path)
 
-        camera = Camera(self.__robot)
-        camera.configure_camera(camera.cameras["top"], camera.resolutions["640x480"], camera.formats["jpg"])
+        return self.__detection.get_object_positions(image_path, object_name, 0.4)
 
-        camera.take_picture(remote_folder_path, file_name)
+    def get_red_cups_center_position(self, cup_goal):
+        image_path = "cup_detection.jpg"
+        self.__take_picture(image_path)
 
-        # copy file to local path
-        local = file_name
-        remote = remote_folder_path + file_name
-        file_transfer = FileTransfer(self.__robot)
-        file_transfer.get(remote, local)
-        file_transfer.close()
-
-        return self.__detection.analyze(file_name, object_name, 0.4)
-
-    MAX_CUPS_ON_IMAGE = 9.0
-    MAX_IMAGE_WIDTH = 640.0
-
-    def get_cup_goal_centers(self, cup_goal):
-        keypoints = self.__detection.get_red_cup_keypoints()
+        keypoints = self.__detection.get_red_cup_keypoints(image_path)
         center_goals = None
         if len(keypoints) > 0:
             center_goals = self.__get_cup_group_center(cup_goal, keypoints)
@@ -101,7 +97,7 @@ class SensingWrapper:
             if center is not None:
                 return center["x"], center["y"]
             return None
-        elif len(keypoint_sizes) <= self.MAX_CUPS_ON_IMAGE:
+        elif len(keypoint_sizes) <= self.__MAX_CUPS_ON_IMAGE:
             current_index = 0
             center_goals = []
             while current_index <= (len(keypoint_sizes) - cup_goal):
@@ -175,7 +171,6 @@ class SensingWrapper:
         self.__robot.ALSonar.unsubscribe("Pepper")
 
     def get_sonar_distance(self, sonar):
-        al_memory_path = ""
         if sonar is "Front":
             al_memory_path = self.__frontSonarMemoryPath
         elif sonar is "Back":
@@ -184,6 +179,21 @@ class SensingWrapper:
             raise Exception("Invalid sonar sensor parameter!")
 
         return self.__robot.ALMemory.getData(al_memory_path)
+
+    def __take_picture(self, file_name):
+        remote_folder_path = "/home/nao/recordings/cameras/"
+        self.__camera.take_picture(remote_folder_path, file_name)
+        local = file_name
+        remote = remote_folder_path + file_name
+
+        self.__file_transfer.get(remote, local)
+
+    def __del__(self):
+        try:
+            self.__file_transfer.close()
+            self.stop_sonar_sensors()
+        except Exception, ex:
+            print(ex)
 
 
 

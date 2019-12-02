@@ -1,20 +1,13 @@
-import numpy as np
-import cv2
 import os
 
-import const
-from robot.object_detection.Camera import Camera
-from robot.object_detection.FileTransfer import FileTransfer
+import cv2
+import numpy as np
 
 
 class ObjectDetection:
 
     def __init__(self):
         self.__load_yolo()
-        self.__camera = Camera(const.robot)
-        self.__camera.configure_camera(self.__camera.cameras["top"], self.__camera.resolutions["640x480"],
-                                       self.__camera.formats["jpg"])
-        self.__file_transfer = FileTransfer(const.robot)
 
     def __load_yolo(self):
         file_path = os.path.dirname(os.path.abspath(__file__))
@@ -34,23 +27,15 @@ class ObjectDetection:
         self.__ln = [ln[i[0] - 1] for i in self.__net.getUnconnectedOutLayers()]
         print("YOLO loaded successfully!")
 
-    def analyze(self, image_path, object_to_find_label, min_confidence=0.3):
+    def get_object_positions(self, image_path, object_to_find_label, min_confidence=0.3):
         if not os.path.isfile(image_path):
-            raise ValueError("Object detection: Wrong image path!")
+            raise ValueError("Object detection: Couldn't find image!")
 
         min_confidence = float(min_confidence)
         frame = cv2.imread(image_path)
         (H, W) = frame.shape[:2]
-        center_y = int(H / 2)
-        center_x = int(W / 2)
 
-        cv2.rectangle(frame, (center_x - 30, center_y - 30), (center_x + 60, center_y + 60), [int(c) for c in self.__COLORS[0]], 2)
-
-        center_box = dict()
-        center_box["name"] = "center_box"
-        center_box["centerX"] = center_x
-        center_box["centerY"] = center_y
-
+        # TODO[mario]: Check params
         blob = cv2.dnn.blobFromImage(frame, 1 / 255.0, (416, 416), swapRB=True, crop=False)
         self.__net.setInput(blob)
         layer_outputs = self.__net.forward(self.__ln)
@@ -59,7 +44,6 @@ class ObjectDetection:
         confidences = []
         classIDs = []
         detected_objects = []
-        detected_objects.append(center_box)
 
         for output in layer_outputs:
             for detection in output:
@@ -81,24 +65,28 @@ class ObjectDetection:
                         for i in idxs.flatten():
                             if object_to_find_label is not None:
                                 if self.__LABELS[classIDs[i]] == object_to_find_label:
-                                    detected_objects.append(self.__draw_boxes(i, frame, boxes, classIDs, confidences))
+                                    detected_objects.append(
+                                        self.__build_object_position_info(i, frame, boxes, classIDs, confidences))
                             else:
-                                detected_objects.append(self.__draw_boxes(i, frame, boxes, classIDs, confidences))
+                                detected_objects.append(
+                                    self.__build_object_position_info(i, frame, boxes, classIDs, confidences))
 
+        # cv2.imshow("Object Detection", frame)
+        # cv2.waitKey(1)
 
-        # cv2.imshow("Analyzed Frame", frame)
+        # cv2.imshow("Object Detection", frame)
         # cv2.waitKey(0) & 0xFF == ord('q')
         # cv2.destroyAllWindows()
 
         return detected_objects
 
-    def __draw_boxes(self, i, frame, boxes, classIDs, confidences):
+    def __build_object_position_info(self, i, frame, boxes, classIDs, confidences):
         (x, y) = (boxes[i][0], boxes[i][1])
         (w, h) = (boxes[i][2], boxes[i][3])
         (cX, cY) = (boxes[i][4], boxes[i][5])
 
-        # color = [int(c) for c in self.__COLORS[classIDs[i]]]
-        color = [int(c) for c in self.__COLORS[i]]
+        color = [int(c) for c in self.__COLORS[classIDs[i]]]
+        # color = [int(c) for c in self.__COLORS[i]]
         cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
         text = "{}: {:.4f}".format(self.__LABELS[classIDs[i]], confidences[i])
         cv2.putText(frame, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
@@ -114,15 +102,15 @@ class ObjectDetection:
 
         return detected_object_info
 
-    def get_red_cup_keypoints(self):
+    def get_red_cup_keypoints(self, image_path):
+        if not os.path.isfile(image_path):
+            raise ValueError("Object detection: Couldn't find image!")
+
+        cv_image = cv2.imread(image_path)
+
+        blob_params = self.__build_blob_detector_params()
         hsv_red_lower = (166, 155, 100)
         hsv_red_upper = (180, 255, 255)
-
-        file_name = "temp_picture.jpg"
-        self.__take_picture(file_name)
-
-        cv_image = cv2.imread(file_name)
-        blob_params = self.__build_blob_detector_params()
 
         return self.__get_keypoints(cv_image, hsv_red_lower, hsv_red_upper, blob_params)
 
@@ -165,37 +153,28 @@ class ObjectDetection:
         mask = cv2.dilate(mask, None, iterations=2)
         mask = cv2.erode(mask, None, iterations=2)
 
-         # - Apply blob detection
+        # - Apply blob detection
         detector = cv2.SimpleBlobDetector_create(blob_params)
         # Reverse the mask: blobs are black on white
         reversemask = 255 - mask
         keypoints = detector.detect(reversemask)
 
-        self.draw_keypoints(image, keypoints)
+        self.__draw_keypoints(image, keypoints)
 
         return keypoints
 
     @staticmethod
-    def draw_keypoints(image,  # -- Input image
-                       keypoints,  # -- CV keypoints
-                       line_color=(0, 0, 255),  # -- line's color (b,g,r)
-                       ):
+    def __draw_keypoints(image,  # -- Input image
+                         keypoints,  # -- CV keypoints
+                         line_color=(0, 0, 255),  # -- line's color (b,g,r)
+                         ):
 
         # -- Draw detected blobs as red circles.
         # -- cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS ensures the size of the circle corresponds to the size of blob
         im_with_keypoints = cv2.drawKeypoints(image, keypoints, np.array([]), line_color,
                                               cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-        cv2.imshow("Keypoints", im_with_keypoints)
+        cv2.imshow("Red Cups", im_with_keypoints)
         cv2.waitKey(1)
 
-    def __take_picture(self, file_name):
-        remote_folder_path = "/home/nao/recordings/cameras/"
-        self.__camera.take_picture(remote_folder_path, file_name)
-        local = file_name
-        remote = remote_folder_path + file_name
-
-        self.__file_transfer.get(remote, local)
-
     def __del__(self):
-        self.__file_transfer.close()
         cv2.destroyAllWindows()
