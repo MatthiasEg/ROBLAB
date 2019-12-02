@@ -192,14 +192,26 @@ class Behavior(object):
 
         try:
             while True:
-                goal_centers = self.sensing_wrapper.get_red_cups_center_position(self.__person_amount)
-                if goal_centers is not None:
-                    # TODO[mario]: search for persons
-                    # if person matches x axis threshold -> table occupied
+                goal_center = self.sensing_wrapper.get_red_cups_center_position(self.__person_amount)
+                if goal_center is not None:
+                    detected_persons = self.sensing_wrapper.get_object_positions("person")
 
+                    if len(detected_persons) > 0:
+                        person_x_positions = map(lambda r: r["centerX"], detected_persons)
+                        goal_x = goal_center[0]
+                        range_min = goal_x - 100 if goal_x - 100 >= 0 else 0
+                        range_max = goal_x + 100 if goal_x + 100 <= 640 else 640
+                        for x_coord in person_x_positions:
+                            if range_min <= x_coord <= range_max:
+                                self.body_movement_wrapper.enable_autonomous_life(True)
+                                self.position_movement_wrapper.move_to(0, 0, 180)
+                                self.speech_wrapper.say(self.__sentences["noTableAvailable"])
+                                time.sleep(1)
+                                self.speech_wrapper.say(self.__sentences["comeBackAnotherDay"])
+                                break
 
                     self.__ask_to_follow()
-                    self.__go_to_table(goal_centers)
+                    self.__go_to_table(goal_center)
                     self.body_movement_wrapper.enable_autonomous_life(True)
                     self.__assign_table()
                 else:
@@ -214,19 +226,19 @@ class Behavior(object):
         time.sleep(1)
         self.body_movement_wrapper.moveArmsDown(Actuators.RArm, 160)
 
-    def __go_to_table(self, goal_centers):
-        self.__move_towards_goal_location(goal_centers)
+    def __go_to_table(self, goal_center):
+        self.__move_towards_goal_location(goal_center)
         while True:
             time_movement_start = round(time.time() * 1000)
             distance_meters = self.sensing_wrapper.get_sonar_distance("Front")
             if float(distance_meters) >= 1.5:
                 if float(distance_meters) >= 1.0:
-                    goal_centers = self.sensing_wrapper.get_red_cups_center_position(self.__person_amount)
-                    if goal_centers is not None:
+                    goal_center = self.sensing_wrapper.get_red_cups_center_position(self.__person_amount)
+                    if goal_center is not None:
                         now = round(time.time() * 1000)
                         diff = now - time_movement_start
                         if diff <= 2000:
-                            self.__move_towards_goal_location(goal_centers)
+                            self.__move_towards_goal_location(goal_center)
                         else:
                             self.position_movement_wrapper.move(0.5, 0, 0)
                     else:
@@ -242,10 +254,10 @@ class Behavior(object):
                 else:
                     self.position_movement_wrapper.move(0.5, 0, 0)
 
-    def __move_towards_goal_location(self, goal_centers):
-        pixels_to_move_x = (640 / 2) - goal_centers[0]
+    def __move_towards_goal_location(self, goal_center):
+        pixels_to_move_x = (640 / 2) - goal_center[0]
         degrees_to_move_x = int(round(pixels_to_move_x / 15.0))
-        print("table goal position: %s, move_x: %s" % (goal_centers, degrees_to_move_x))
+        print("table goal position: %s, move_x: %s" % (goal_center, degrees_to_move_x))
         self.position_movement_wrapper.move(0.5, 0, degrees_to_move_x)
 
     def __search_for_correct_table(self):
