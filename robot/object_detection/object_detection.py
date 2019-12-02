@@ -71,12 +71,8 @@ class ObjectDetection:
                                 detected_objects.append(
                                     self.__build_object_position_info(i, frame, boxes, classIDs, confidences))
 
-        # cv2.imshow("Object Detection", frame)
-        # cv2.waitKey(1)
-
-        # cv2.imshow("Object Detection", frame)
-        # cv2.waitKey(0) & 0xFF == ord('q')
-        # cv2.destroyAllWindows()
+        cv2.imshow("Object Detection", frame)
+        cv2.waitKey(1)
 
         return detected_objects
 
