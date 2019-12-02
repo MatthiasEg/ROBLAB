@@ -26,11 +26,37 @@ class SensingWrapper:
     def set_maximum_detection_range_in_meters(self, range):
         return self.__robot.ALPeoplePerception.setMaximumDetectionRange(range)
 
-    def subscribe(self, name):
+    def start_face_detection(self, name):
         return self.__robot.ALFaceDetection.subscribe2(name)
 
-    def unsubscribe(self, name):
+    def stop_face_detection(self, name):
         return self.__robot.ALFaceDetection.unsubscribe(name)
+
+    def enable_face_tracking(self):
+        self.__robot.ALFaceDetection.setTrackingEnabled(True)
+
+    def disable_face_tracking(self):
+        self.__robot.ALFaceDetection.setTrackingEnabled(False)
+
+    def enable_face_recognition(self):
+        self.__robot.ALFaceDetection.setRecognitionEnabled(True)
+
+    def get_memory_subscriber(self, event):
+        return self.__robot.ALFaceDetection.getMemorySubscriber(event)
+
+    def enable_fast_mode(self):
+        return self.__robot.ALPeoplePerception.setFastModeEnabled(True)
+
+    def start_face_tracking(self, faceSize):
+        targetName = "Face"
+        faceWidth = faceSize
+        self.__robot.ALTracker.registerTarget(targetName, faceWidth)
+        self.__robot.ALTracker.track(targetName)
+
+    def stop_face_tracking(self):
+        self.__robot.ALTracker.stopTracker()
+        self.__robot.ALTracker.unregisterAllTargets()
+        self.__robot.ALMotion.rest()
 
     def detect_object(self, object_name):
         remote_folder_path = "/home/nao/recordings/cameras/"
@@ -159,29 +185,5 @@ class SensingWrapper:
 
         return self.__robot.ALMemory.getData(al_memory_path)
 
-    def enable_face_tracking(self):
-        self.__robot.ALFaceDetection.setTrackingEnabled(True)
 
-    def disable_face_tracking(self):
-        self.__robot.ALFaceDetection.setTrackingEnabled(False)
-
-    def enable_face_recognition(self):
-        self.__robot.ALFaceDetection.setRecognitionEnabled(True)
-
-    def get_memory_subscriber(self, event):
-        return self.__robot.ALFaceDetection.getMemorySubscriber(event)
-
-    def enable_fast_mode(self):
-        return self.__robot.ALPeoplePerception.setFastModeEnabled(True)
-
-    def start_Face_Tracking(self, faceSize):
-        targetName = "Face"
-        faceWidth = faceSize
-        self.__robot.ALTracker.registerTarget(targetName, faceWidth)
-        self.__robot.ALTracker.track(targetName)
-
-    def stop_Face_Tracking(self):
-        self.__robot.ALTracker.stopTracker()
-        self.__robot.ALTracker.unregisterAllTargets()
-        self.__robot.ALMotion.rest()
 

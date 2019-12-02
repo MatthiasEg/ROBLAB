@@ -66,7 +66,7 @@ class Behavior(object):
 
         face_detected_subscriber = self.sensing_wrapper.get_memory_subscriber("FaceDetected")
         face_detected_subscriber.signal.connect(self.__human_detected)
-        self.sensing_wrapper.subscribe("detect_face")
+        self.sensing_wrapper.start_face_detection("detect_face")
 
         while not self.__first_person_detected:
             time.sleep(0.1)
@@ -88,7 +88,7 @@ class Behavior(object):
                 self.__person_amount_estimator.change_picture_file_name(const.img_people_before_table_search)
                 self.__person_amount_estimator.start_estimation()
 
-                self.sensing_wrapper.unsubscribe("detect_face")
+                self.sensing_wrapper.stop_face_detection("detect_face")
                 self.__wait_for_new_customers = False
                 self.speech_wrapper.say(self.__sentences["greeting"])
                 self.speech_wrapper.say(self.__sentences["estimateAmountOfPeople"])
