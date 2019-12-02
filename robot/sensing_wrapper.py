@@ -79,11 +79,11 @@ class SensingWrapper:
         keypoints = self.__detection.get_red_cup_keypoints(image_path)
         center_goals = None
         if len(keypoints) > 0:
-            center_goals = self.__get_cup_group_center(cup_goal, keypoints)
+            center_goals = self.__get_cup_group_center_position(cup_goal, keypoints)
 
         return center_goals
 
-    def __get_cup_group_center(self, cup_goal, keypoints):
+    def __get_cup_group_center_position(self, cup_goal, keypoints):
         cup_goal = int(cup_goal)
         keypoints.sort(key=lambda x: x["x"])
         sizes = map(lambda r: r["size"], keypoints)
@@ -93,7 +93,7 @@ class SensingWrapper:
         if len(keypoint_sizes) < cup_goal:
             return None
         elif len(keypoint_sizes) is cup_goal:
-            center = self.__get_centers(keypoint_sizes, keypoints)
+            center = self.__calculate_centers(keypoint_sizes, keypoints)
             if center is not None:
                 return center["x"], center["y"]
             return None
@@ -101,33 +101,17 @@ class SensingWrapper:
             current_index = 0
             center_goals = []
             while current_index <= (len(keypoint_sizes) - cup_goal):
-                goal_series, goal_keypoints = self.__get_stuff(cup_goal, keypoint_sizes, keypoints, current_index)
-                center_goal = self.__get_centers(goal_series, goal_keypoints)
+                goal_series, goal_keypoints = self.__build_goal_params(cup_goal, keypoint_sizes, keypoints, current_index)
+                center_goal = self.__calculate_centers(goal_series, goal_keypoints)
                 if center_goal is not None:
                     center_goals.append(center_goal)
                 current_index = current_index + 1
 
-            return self.__fucking(center_goals)
+            return self.__filter_goal_positions(center_goals)
         return None
 
-    def __fucking(self, center_goals):
-        indexes_to_remove = set()
-        for i in range(len(center_goals)):
-            if i < len(center_goals) - 1:
-                if (center_goals[i + 1]["x"] - center_goals[i]["x"]) <= 100:
-                    indexes_to_remove.add(i)
-                    indexes_to_remove.add(i + 1)
-
-        bla = center_goals[:]
-        for num, name in enumerate(center_goals):
-            if num in indexes_to_remove:
-                bla.remove(name)
-
-        if len(bla) is 1:
-            return bla[0]["x"], bla[0]["y"]
-        return None
-
-    def __get_stuff(self, cup_goal, keypoint_sizes, keypoints, current_index):
+    @staticmethod
+    def __build_goal_params(cup_goal, keypoint_sizes, keypoints, current_index):
         goal_keypoints = []
         goal_sizes = []
         for x in range(cup_goal):
@@ -137,7 +121,7 @@ class SensingWrapper:
 
         return goal_series, goal_keypoints
 
-    def __get_centers(self, keypoint_sizes, keypoints):
+    def __calculate_centers(self, keypoint_sizes, keypoints):
         if keypoint_sizes.std() < 2.5:
             x_values = map(lambda r: r["x"], keypoints)
             x_min = float(min(x_values))
@@ -157,11 +141,30 @@ class SensingWrapper:
         else:
             return None
 
-    def __calculate_axis_center(self, centers):
+    @staticmethod
+    def __calculate_axis_center(centers):
         center_min = min(centers)
         center_max = max(centers)
         distance_between_x = center_max - center_min
         return center_max - (distance_between_x / 2)
+
+    @staticmethod
+    def __filter_goal_positions(center_goals):
+        indexes_to_remove = set()
+        for i in range(len(center_goals)):
+            if i < len(center_goals) - 1:
+                if (center_goals[i + 1]["x"] - center_goals[i]["x"]) <= 100:
+                    indexes_to_remove.add(i)
+                    indexes_to_remove.add(i + 1)
+
+        bla = center_goals[:]
+        for num, name in enumerate(center_goals):
+            if num in indexes_to_remove:
+                bla.remove(name)
+
+        if len(bla) >= 1:
+            return bla[0]["x"], bla[0]["y"]
+        return None
 
     def start_sonar_sensors(self):
         # subscriber name, refresh period( in milliseconds), precision of the extractor
