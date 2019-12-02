@@ -14,24 +14,6 @@ class SensingWrapper:
         self.__frontSonarMemoryPath = "Device/SubDeviceList/Platform/Front/Sonar/Sensor/Value"
         self.__backSonarMemoryPath = "Device/SubDeviceList/Platform/Back/Sonar/Sensor/Value"
 
-    def explore(self, radius):
-        return self.__robot.ALNavigation.explore(radius)
-
-    def save_exploration_to_robot(self):
-        return self.__robot.ALNavigation.saveExploration()
-
-    def load_exploration_from_robot(self, path):
-        return self.__robot.ALNavigation.loadExploration(path)
-
-    def start_localization(self):
-        return self.__robot.ALNavigation.startLocalization()
-
-    def stop_localization(self):
-        return self.__robot.ALNavigation.stopLocalization()
-
-    def get_metrical_map(self):
-        return self.__robot.ALNavigation.getMetricalMap()
-
     def is_face_detection_enabled(self):
         return self.__robot.ALPeoplePerception.isFaceDetectionEnabled()
 
@@ -50,12 +32,9 @@ class SensingWrapper:
     def unsubscribe(self, name):
         return self.__robot.ALFaceDetection.unsubscribe(name)
 
-    def get_robot_position_in_map(self):
-        return self.__robot.ALNavigation.getRobotPositionInMap()
-
     def detect_object(self, object_name):
         remote_folder_path = "/home/nao/recordings/cameras/"
-        file_name = "picture.jpg"
+        file_name = "object_detection.jpg"
 
         camera = Camera(self.__robot)
         camera.configure_camera(camera.cameras["top"], camera.resolutions["640x480"], camera.formats["jpg"])
@@ -75,7 +54,7 @@ class SensingWrapper:
     MAX_IMAGE_WIDTH = 640.0
 
     def get_cup_goal_centers(self, cup_goal):
-        keypoints = self.__detection.get_cup_keypoints()
+        keypoints = self.__detection.get_red_cup_keypoints()
         center_goals = None
         if len(keypoints) > 0:
             center_goals = self.__get_cup_group_center(cup_goal, keypoints)
@@ -206,6 +185,3 @@ class SensingWrapper:
         self.__robot.ALTracker.unregisterAllTargets()
         self.__robot.ALMotion.rest()
 
-    def __del__(self):
-        print("saf")
-        # self.stop_sonar_sensors()
