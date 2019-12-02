@@ -49,6 +49,7 @@ class Behavior(object):
         self.__setup_customer_reception()
         self.__ask_person_amount_correct()
         self.__person_amount_estimator.clear_results()
+
         # self.__get_number_of_faces_from_picture()
         # self.__recognize_persons()
 
@@ -195,30 +196,39 @@ class Behavior(object):
                 goal_center = self.sensing_wrapper.get_red_cups_center_position(self.__person_amount)
                 if goal_center is not None:
                     detected_persons = self.sensing_wrapper.get_object_positions("person")
-
-                    if len(detected_persons) > 0:
-                        person_x_positions = map(lambda r: r["centerX"], detected_persons)
-                        goal_x = goal_center[0]
-                        range_min = goal_x - 100 if goal_x - 100 >= 0 else 0
-                        range_max = goal_x + 100 if goal_x + 100 <= 640 else 640
-                        for x_coord in person_x_positions:
-                            if range_min <= x_coord <= range_max:
-                                self.body_movement_wrapper.enable_autonomous_life(True)
-                                self.position_movement_wrapper.move_to(0, 0, 180)
-                                self.speech_wrapper.say(self.__sentences["noTableAvailable"])
-                                time.sleep(1)
-                                self.speech_wrapper.say(self.__sentences["comeBackAnotherDay"])
-                                break
-
-                    self.__ask_to_follow()
-                    self.__go_to_table(goal_center)
-                    self.body_movement_wrapper.enable_autonomous_life(True)
-                    self.__assign_table()
+                    table_occupied = self.__is_table_occupied(detected_persons, goal_center)
+                    if table_occupied:
+                        self.body_movement_wrapper.enable_autonomous_life(True)
+                        self.position_movement_wrapper.move_to(0, 0, 180)
+                        self.speech_wrapper.say(self.__sentences["noTableAvailable"])
+                        time.sleep(1)
+                        self.speech_wrapper.say(self.__sentences["comeBackAnotherDay"])
+                        break
+                    else:
+                        self.__ask_to_follow()
+                        self.__go_to_table(goal_center)
+                        self.body_movement_wrapper.enable_autonomous_life(True)
+                        self.position_movement_wrapper.move_to(0, 0, 180)
+                        self.__assign_table()
+                        break
                 else:
                     self.__search_for_correct_table()
         except Exception, e:
             print(e)
             self.position_movement_wrapper.stop_movement()
+
+    @staticmethod
+    def __is_table_occupied(detected_persons, goal_center):
+        if len(detected_persons) > 0:
+            person_x_positions = map(lambda r: r["centerX"], detected_persons)
+            goal_x = goal_center[0]
+            range_min = goal_x - 100 if goal_x - 100 >= 0 else 0
+            range_max = goal_x + 100 if goal_x + 100 <= 640 else 640
+
+            for x_coord in person_x_positions:
+                if range_min <= x_coord <= range_max:
+                    return True
+        return False
 
     def __ask_to_follow(self):
         self.speech_wrapper.say(self.__sentences["askToFollow"])
@@ -278,7 +288,7 @@ class Behavior(object):
                     time.sleep(.5)
                     number_of_turns = number_of_turns + 1
                 else:
-                    self.position_movement_wrapper.move_to(0, 0, -90)
+                    self.position_movement_wrapper.move_to(0, 0, 90)
                     self.position_movement_wrapper.move(.5, 0, 0)
                     time.sleep(2)
                     self.position_movement_wrapper.stop_movement()
