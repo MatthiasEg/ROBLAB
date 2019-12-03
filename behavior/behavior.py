@@ -92,10 +92,10 @@ class Behavior(object):
 
         time.sleep(2)
 
-        for i in range(3):
+        for i in range(const.people_counting_number_of_retries):
             if not self.__ask_person_amount_correct():
                 self.speech_wrapper.say(self.__sentences["estimateAmountOfPeopleAgain"])
-                self.__person_amount = self.__count_people(2)
+                self.__person_amount = self.__count_people(const.people_counting_time)
             else:
                 break                
 
@@ -103,6 +103,7 @@ class Behavior(object):
 
 
     def __count_people(self, time):
+        self.__person_amount_estimator.clear_results()
         self.__person_amount_estimator.change_picture_file_name(const.people_recognized)
         self.__person_amount_estimator.start_estimation()
         self.speech_wrapper.say(self.__sentences["estimateAmountOfPeople"])
@@ -123,7 +124,7 @@ class Behavior(object):
                 self.sensing_wrapper.stop_face_detection("detect_face")
                 self.__wait_for_new_customers = False
                 self.speech_wrapper.say(self.__sentences["greeting"])
-                self.__person_amount = self.__count_people()
+                self.__person_amount = self.__count_people(const.people_counting_time)
                 self.__first_person_detected = True
 
     def __ask_person_amount(self):
