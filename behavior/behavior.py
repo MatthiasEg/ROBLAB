@@ -87,7 +87,7 @@ class Behavior(object):
             if self.__first_to_enter_callback:
                 self.__first_to_enter_callback = False
 
-                self.__person_amount_estimator.change_picture_file_name(const.img_people_before_table_search)
+                self.__person_amount_estimator.change_picture_file_name(const.people_recognized)
                 self.__person_amount_estimator.start_estimation()
 
                 self.sensing_wrapper.stop_face_detection("detect_face")
