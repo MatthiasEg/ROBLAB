@@ -1,0 +1,45 @@
+{
+    "vocabularies": {
+        "personAmount": ["eins", "zwei", "drei", "vier", "fünf", "sechs", "sieben", "acht", "neun", "zehn"],
+        "yes": ["ja", "jap", "jep", "jup", "sicher", "ok", "natürlich", "korrekt", "richtig", "genau", "gut", "yes", "yeah"],
+        "no": ["nein", "nicht", "no", "nope", "falsch"]
+    },
+    "sentences": {
+        "hello": "Hallo",
+        "greeting": [
+            "Hallo und willkommen im Restaurant dinner for one!",
+            "Herzlich willkommen im berühmten Restaurant dinner for one!"
+        ],
+        "estimateAmountOfPeople": [
+            "Ich möchte gerne die Anzahl Personen in Ihrer Gruppe abschätzen.",
+            "Bitte lassen Sie mich kurz die Anzahl Personen schätzen."
+        ],
+        "estimateAmountOfPeopleAgain": [
+            "Lassen Sie mich das nochmals versuchen."
+        ],
+        "stayInFrontOfMe": "Bitte stehen Sie alle vor mich hin.",
+        "seeingOnePerson": "Ich sehe eine Person",
+        "seeingMultiplePersons": "Ich sehe {} Personen",
+        "askAmountToSearch": "Für wie viele Personen soll ich einen Tisch suchen?",
+        "availableTables": "Wir haben Tische für {} bis {} Personen",
+        "askToSearchTableForOnePerson": "Möchten Sie, dass ich einen Tisch für eine Person suche?",
+        "askToSearchTableForMultiplePersons": "Möchten Sie, dass ich einen Tisch für {} Personen suche?",
+        "noTablesForAmount": [
+            "Leider haben wir nicht genügend freie Plätze für diese Anzahl Personen.",
+            "Es tut mir leid, im Moment haben wir keine Tische für so viele Personen."
+        ],
+        "searchTable": [
+            "Bitte warten Sie einen Moment. Ich suche den perfekten Tisch für Sie!",
+            "Einen Moment bitte. Ich versuche einen idealen Platz für Sie zu finden!",
+            "Bitte warten Sie, ich finde einen netten Tisch für Sie!"
+        ],
+        "noTableAvailable": [
+            "Leider sind alle passenden Tische bereits belegt. Wir entschuldigen uns für die Unannehmlichkeiten."
+        ],
+        "comeBackAnotherDay": [
+            "Gerne heissen wir Sie an einem anderen Tag wieder herzlich in unserem Restaurant dinner for one willkommen!"
+        ],
+        "askToFollow": "Danke für Ihre Geduld! Bitte folgen Sie mir zu Ihrem Tisch.",
+        "assignTable": "Hier ist Ihr Tisch. Sie können sich bereits setzen. Ein menschlicher Mitarbeiter wird sie gleich bedienen. Geniessen Sie Ihren Aufenthalt!"
+    }
+}
