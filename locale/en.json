@@ -14,6 +14,9 @@
             "I would like to estimate the amount of people of your group.",
             "Please let me quickly estimate the amount of people."
         ],
+        "estimateAmountOfPeopleAgain": [
+            "Let me try this again."
+        ],
         "stayInFrontOfMe": "Please come and stay in front of me.",
         "seeingOnePerson": "I am seeing one person",
         "seeingMultiplePersons": "I am seeing {} persons",
