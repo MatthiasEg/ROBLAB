@@ -46,10 +46,18 @@ class Behavior(object):
 
     def start_behavior(self):
         self.position_movement_wrapper.learn_home()
-        self.__setup_customer_reception()            
+        self.__setup_customer_reception()
 
-        # while not self.__person_amount_correct:
-        #     self.__ask_person_amount()
+        while not self.__person_amount_correct or self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
+
+            if self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
+                self.speech_wrapper.say(self.__sentences["noTablesForAmount"])
+
+            if self.__ask_person_amount() is not None
+                if self.__recognized_words_certainty > 0.55:
+                    break
+
+        self.__search_table()
 
         # if self.__search_table():
         #     self.__ask_to_follow()
@@ -76,19 +84,35 @@ class Behavior(object):
         self.body_movement_wrapper.enable_autonomous_life(True)
 
         face_detected_subscriber = self.sensing_wrapper.get_memory_subscriber("FaceDetected")
-        face_detected_subscriber.signal.connect(self.__human_detected)
+        face_detected_subscriber.signal.connect(self.__on_human_detected)
         self.sensing_wrapper.start_face_detection("detect_face")
 
         while not self.__first_person_detected:
             time.sleep(0.1)
 
         time.sleep(2)
-        self.__person_amount_estimator.stop_estimation()
-        self.__person_amount = self.__person_amount_estimator.get_estimated_person_amount()
+
+        for i in range(3):
+            if not self.__ask_person_amount_correct():
+                self.speech_wrapper.say(self.__sentences["estimateAmountOfPeopleAgain"])
+                self.__person_amount = self.__count_people(2)
+            else:
+                break                
 
         self.body_movement_wrapper.enable_autonomous_life(False)
 
-    def __human_detected(self, value):
+
+    def __count_people(self, time):
+        self.__person_amount_estimator.change_picture_file_name(const.people_recognized)
+        self.__person_amount_estimator.start_estimation()
+        self.speech_wrapper.say(self.__sentences["estimateAmountOfPeople"])
+        self.speech_wrapper.say(self.__sentences["stayInFrontOfMe"])
+        time.sleep(time)
+        self.__person_amount_estimator.stop_estimation()
+        return self.__person_amount_estimator.get_estimated_person_amount()
+
+
+    def __on_human_detected(self, value):
         if value == []:  # empty value when the face disappears
             self.__got_face = False
         elif not self.__got_face:
@@ -96,25 +120,11 @@ class Behavior(object):
             if self.__first_to_enter_callback:
                 self.__first_to_enter_callback = False
 
-                self.__person_amount_estimator.change_picture_file_name(const.people_recognized)
-                self.__person_amount_estimator.start_estimation()
-
                 self.sensing_wrapper.stop_face_detection("detect_face")
                 self.__wait_for_new_customers = False
                 self.speech_wrapper.say(self.__sentences["greeting"])
-                self.speech_wrapper.say(self.__sentences["estimateAmountOfPeople"])
-                self.speech_wrapper.say(self.__sentences["stayInFrontOfMe"])
+                self.__person_amount = self.__count_people()
                 self.__first_person_detected = True
-
-    def __recognize_persons(self):
-        amount = 4
-        if amount == 1:
-            self.speech_wrapper.say(self.__sentences["seeingOnePerson"])
-        else:
-            self.speech_wrapper.say(self.__sentences["seeingMultiplePersons"].format(amount))
-
-        self.__person_amount = amount
-        self.__ask_person_amount_correct()
 
     def __ask_person_amount(self):
         self.__person_amount = None
@@ -133,16 +143,18 @@ class Behavior(object):
 
         self.speech_wrapper.stop_listening()
 
-        if self.__person_amount is None:
-            self.__ask_person_amount()
-        else:
-            if self.__recognized_words_certainty > 0.55:
-                if self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
-                    self.speech_wrapper.say(self.__sentences["noTablesForAmount"])
-                    return
-                self.__search_table()
-            else:
-                self.__ask_person_amount_correct()
+        return self.__person_amount
+
+        # if self.__person_amount is None:
+        #     self.__ask_person_amount()
+        # else:
+        #     if self.__recognized_words_certainty > 0.55:
+        #         if self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
+        #             self.speech_wrapper.say(self.__sentences["noTablesForAmount"])
+        #             return
+        #         self.__search_table()
+        #     else:
+        #         self.__ask_person_amount_correct()
 
     def __on_person_amount_answered(self, message):
         print('Ask Person amount triggered')
@@ -174,17 +186,19 @@ class Behavior(object):
         self.__waiting_for_an_answer = True
         while self.__waiting_for_an_answer:
             time.sleep(1)
-            
+
         self.speech_wrapper.stop_listening()
 
-        if self.__person_amount_correct:
-            print(self.__person_amount)
-            if self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
-                self.speech_wrapper.say(self.__sentences["noTablesForAmount"])
-                return
-            self.__search_table()
-        else:
-            self.__ask_person_amount()
+        return self.__person_amount_correct
+
+        # if self.__person_amount_correct:
+        #     print(self.__person_amount)
+        #     if self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
+        #         self.speech_wrapper.say(self.__sentences["noTablesForAmount"])
+        #         return
+        #     self.__search_table()
+        # else:
+        #     self.__ask_person_amount()
 
     def __on_person_amount_correct_answered(self, message):
         print('Ask Person triggered')
