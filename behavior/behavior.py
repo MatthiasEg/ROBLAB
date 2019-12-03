@@ -46,12 +46,21 @@ class Behavior(object):
 
     def start_behavior(self):
         self.position_movement_wrapper.learn_home()
-        self.__setup_customer_reception()
-        self.__ask_person_amount_correct()
-        self.__person_amount_estimator.clear_results()
+        self.__setup_customer_reception()            
 
-        # self.__get_number_of_faces_from_picture()
-        # self.__recognize_persons()
+        # while not self.__person_amount_correct:
+        #     self.__ask_person_amount()
+
+        # if self.__search_table():
+        #     self.__ask_to_follow()
+        #     self.__go_to_table()
+        #     self.__assign_table()
+        #     self.__return_to_waiting_zone()
+        #     self.__setup_customer_reception()
+        # else:
+        #     self.__say_no_table_available()
+        #     self.__setup_customer_reception()
+
 
     def __setup_customer_reception(self):
         if not self.sensing_wrapper.is_face_detection_enabled():
@@ -111,15 +120,19 @@ class Behavior(object):
         self.__person_amount = None
         self.speech_wrapper.say(self.__sentences["askAmountToSearch"])
         self.speech_wrapper.say(self.__sentences["availableTables"].format(const.min_persons, const.max_persons))
+
         self.speech_wrapper.start_to_listen(
             self.__vocabularies["personAmount"],
             const.speech_recognition_language,
             const.speech_recognition_precision,
             self.__on_person_amount_answered)
+
         self.__waiting_for_an_answer = True
         while self.__waiting_for_an_answer:
             time.sleep(1)
+
         self.speech_wrapper.stop_listening()
+
         if self.__person_amount is None:
             self.__ask_person_amount()
         else:
@@ -157,9 +170,11 @@ class Behavior(object):
             const.speech_recognition_language,
             const.speech_recognition_precision,
             self.__on_person_amount_correct_answered)
+
         self.__waiting_for_an_answer = True
         while self.__waiting_for_an_answer:
             time.sleep(1)
+            
         self.speech_wrapper.stop_listening()
 
         if self.__person_amount_correct:
@@ -216,6 +231,13 @@ class Behavior(object):
         except Exception, e:
             print(e)
             self.position_movement_wrapper.stop_movement()
+
+    def __say_no_table_available(self):
+        self.body_movement_wrapper.enable_autonomous_life(True)
+        self.position_movement_wrapper.move_to(0, 0, 180)
+        self.speech_wrapper.say(self.__sentences["noTableAvailable"])
+        time.sleep(1)
+        self.speech_wrapper.say(self.__sentences["comeBackAnotherDay"])
 
     @staticmethod
     def __is_table_occupied(detected_persons, goal_center):
@@ -300,13 +322,6 @@ class Behavior(object):
         self.speech_wrapper.say(self.__sentences["assignTable"])
         time.sleep(2)
         self.__wait_for_new_customers = True
-        self.__return_to_waiting_zone()
 
     def __return_to_waiting_zone(self):
         self.position_movement_wrapper.go_to_home()
-        if self.__wait_for_new_customers:
-          self.__setup_customer_reception()
-        else:
-            self.__ask_to_follow()
-            # TODO: warum hier zum Tisch gehen?
-            # self.__go_to_table()
