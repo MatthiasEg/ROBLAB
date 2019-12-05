@@ -117,14 +117,14 @@ class Behavior(object):
 
                 self.sensing_wrapper.stop_face_detection("detect_face")
                 self.__wait_for_new_customers = False
-                self.speech_wrapper.say(self.__sentences["greeting"])
+                self.speech_wrapper.animated_say(self.__sentences["greeting"])
                 self.__person_amount = self.__count_people(const.people_counting_time)
                 self.__first_person_detected = True
 
     def __check_person_amount(self):
         while not self.__person_amount_correct or self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
             if self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
-                self.speech_wrapper.say(self.__sentences["noTablesForAmount"])
+                self.speech_wrapper.animated_say(self.__sentences["noTablesForAmount"])
 
             if self.__ask_person_amount() is not None:
                 if self.__recognized_words_certainty > 0.55:
@@ -132,8 +132,8 @@ class Behavior(object):
 
     def __ask_person_amount(self):
         self.__person_amount = None
-        self.speech_wrapper.say(self.__sentences["askAmountToSearch"])
-        self.speech_wrapper.say(self.__sentences["availableTables"].format(const.min_persons, const.max_persons))
+        self.speech_wrapper.animated_say(self.__sentences["askAmountToSearch"])
+        self.speech_wrapper.animated_say(self.__sentences["availableTables"].format(const.min_persons, const.max_persons))
 
         self.speech_wrapper.start_to_listen(
             self.__vocabularies["personAmount"],
@@ -175,11 +175,11 @@ class Behavior(object):
 
     def __ask_person_amount_correct(self):
         if self.__person_amount == 1:
-            self.speech_wrapper.say(self.__sentences["askToSearchTableForOnePerson"])
+            self.speech_wrapper.animated_say(self.__sentences["askToSearchTableForOnePerson"])
         elif self.__person_amount == 0:
             self.__ask_person_amount()
         else:
-            self.speech_wrapper.say(self.__sentences["askToSearchTableForMultiplePersons"].format(self.__person_amount))
+            self.speech_wrapper.animated_say(self.__sentences["askToSearchTableForMultiplePersons"].format(self.__person_amount))
 
         self.speech_wrapper.start_to_listen(
             self.__vocabularies["yes"] + self.__vocabularies["no"],
@@ -265,7 +265,7 @@ class Behavior(object):
         return False
 
     def __ask_to_follow(self):
-        self.speech_wrapper.say(self.__sentences["askToFollow"])
+        self.speech_wrapper.animated_say(self.__sentences["askToFollow"])
 
     def __go_to_table(self, goal_center):
         self.__move_towards_goal_location(goal_center)
@@ -332,7 +332,7 @@ class Behavior(object):
         return False
 
     def __assign_table(self):
-        self.speech_wrapper.say(self.__sentences["assignTable"])
+        self.speech_wrapper.animated_say(self.__sentences["assignTable"])
         time.sleep(2)
         self.__wait_for_new_customers = True
 
@@ -342,6 +342,6 @@ class Behavior(object):
     def __say_no_table_available(self):
         self.body_movement_wrapper.enable_autonomous_life(True)
         self.position_movement_wrapper.move_to(0, 0, 180)
-        self.speech_wrapper.say(self.__sentences["noTableAvailable"])
+        self.speech_wrapper.animated_say(self.__sentences["noTableAvailable"])
         time.sleep(.5)
-        self.speech_wrapper.say(self.__sentences["comeBackAnotherDay"])
+        self.speech_wrapper.animated_say(self.__sentences["comeBackAnotherDay"])
