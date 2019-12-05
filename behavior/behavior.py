@@ -225,7 +225,6 @@ class Behavior(object):
         except Exception, e:
             print(e)
             self.__position_movement_wrapper.stop_movement()
-            self.__sensing_wrapper.stop_sonar_sensors()
             return TableStateError()
 
     @staticmethod
@@ -268,13 +267,10 @@ class Behavior(object):
                         self.__position_movement_wrapper.move(0.7, 0, 0)
                 else:
                     self.__position_movement_wrapper.stop_movement()
-                    self.__sensing_wrapper.stop_sonar_sensors()
                     break
             else:
                 if float(distance_meters) <= 1.0 or self.__position_movement_wrapper.collision_avoided:
                     self.__position_movement_wrapper.stop_movement()
-                    self.__position_movement_wrapper.move_to(0, 0, 180)
-                    self.__sensing_wrapper.stop_sonar_sensors()
                     break
                 else:
                     self.__position_movement_wrapper.move(0.7, 0, 0)
