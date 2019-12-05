@@ -73,7 +73,7 @@ class Behavior(object):
         self.sensing_wrapper.set_maximum_detection_range_in_meters(3)
         self.sensing_wrapper.enable_face_recognition()
         self.sensing_wrapper.enable_face_tracking()
-        self.sensing_wrapper.enable_fast_mode()
+        # self.sensing_wrapper.enable_fast_mode()
 
         self.body_movement_wrapper.enable_autonomous_life(True)
 
