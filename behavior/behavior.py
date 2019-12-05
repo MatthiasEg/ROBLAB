@@ -8,6 +8,7 @@ from robot.body_movement_wrapper import BodyMovementWrapper
 from robot.position_movement_wrapper import PositionMovementWrapper
 from robot.sensing_wrapper import SensingWrapper
 from robot.speech_wrapper import SpeechWrapper
+from robot.tablet_wrapper import TabletWrapper
 from robot.table_search_state import TableFound, TableOccupied, TableNotFound, TableStateError
 
 
@@ -33,6 +34,7 @@ class Behavior(object):
         self.__position_movement_wrapper = PositionMovementWrapper()
         self.__sensing_wrapper = SensingWrapper()
         self.__speech_wrapper = SpeechWrapper()
+        self.__tablet_wrapper = TabletWrapper()
 
     def __load_locales(self):
         with open(os.path.join(os.getcwd(), const.path_to_locale_file), 'r') as f:
@@ -82,6 +84,7 @@ class Behavior(object):
             time.sleep(0.1)
 
         for i in range(const.people_counting_number_of_retries):
+            # self.__tablet_wrapper.showImage(os.path.join(os.getcwd(), const.path_to_pictures, const.img_people_recognized + '.jpg'), 10)
             if self.__person_amount < 1:
                 self.__counter_no_user_interaction += 1
                 self.__speech_wrapper.say(self.__sentences["seeingNoPersons"])
