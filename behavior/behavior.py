@@ -69,7 +69,7 @@ class Behavior(object):
         self.__sensing_wrapper.set_maximum_detection_range_in_meters(3)
         self.__sensing_wrapper.enable_face_recognition()
         self.__sensing_wrapper.enable_face_tracking()
-        self.__sensing_wrapper.enable_fast_mode()
+        self.__sensing_wrapper.enable_<fast>_mode()
 
         self.__body_movement_wrapper.enable_autonomous_life(True)
 
@@ -95,10 +95,10 @@ class Behavior(object):
 
         self.__body_movement_wrapper.enable_autonomous_life(False)
 
-    def __count_people(self, time_to_sleep):
-        person_amount_estimator = PersonAmountEstimator()
+    def __count_people(self, time_to_estimate):
+        person_amount_estimator = PersonAmountEstimator(self.__sensing_wrapper)
         person_amount_estimator.start_estimation()
-        time.sleep(time_to_sleep)
+        time.sleep(time_to_estimate)
         person_amount_estimator.stop_estimation()
         return person_amount_estimator.get_estimated_person_amount()
 
