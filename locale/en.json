@@ -18,6 +18,7 @@
             "Let me try this again."
         ],
         "stayInFrontOfMe": "Please come and stay in front of me.",
+        "seeingNoPersons": "Unfortunately, I don't see any persons",
         "seeingOnePerson": "I am seeing one person",
         "seeingMultiplePersons": "I am seeing {} persons",
         "askAmountToSearch": "For how many people should I search a table?",
