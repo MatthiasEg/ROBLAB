@@ -313,10 +313,12 @@ class Behavior(object):
 
     def __search_for_correct_table(self):
         print("Couldn't find your object. Searching around")
+        max_number_of_tries = 2
+        current_try = 0
         number_of_turns = 0
         max_turns = 9
 
-        while True:
+        while current_try < max_number_of_tries:
             goal_centers = self.sensing_wrapper.get_red_cups_center_position(self.__person_amount)
             if goal_centers is None:
                 if number_of_turns is 0:
@@ -334,8 +336,10 @@ class Behavior(object):
                     time.sleep(2)
                     self.position_movement_wrapper.stop_movement()
                     number_of_turns = 0
+                    current_try = current_try + 1
             else:
-                break
+                return True
+        return False
 
     def __assign_table(self):
         self.speech_wrapper.say(self.__sentences["assignTable"])
