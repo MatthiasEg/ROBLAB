@@ -57,17 +57,23 @@ class Behavior(object):
                 if self.__recognized_words_certainty > 0.55:
                     break
 
-        self.__search_table()
+        goal_location = self.__search_table()
+        if goal_location is not None:
+            self.__ask_to_follow()
+            self.__go_to_table(goal_location)
+            self.body_movement_wrapper.enable_autonomous_life(True)
+            self.position_movement_wrapper.move_to(0, 0, 180)
+            self.__assign_table()
 
-        # if self.__search_table():
-        #     self.__ask_to_follow()
-        #     self.__go_to_table()
-        #     self.__assign_table()
-        #     self.__return_to_waiting_zone()
-        #     self.__setup_customer_reception()
-        # else:
-        #     self.__say_no_table_available()
-        #     self.__setup_customer_reception()
+            # self.__ask_to_follow()
+            # self.__go_to_table()
+            # self.__assign_table()
+            # self.__return_to_waiting_zone()
+            # self.__setup_customer_reception()
+        else:
+
+            self.__say_no_table_available()
+            self.__setup_customer_reception()
 
 
     def __setup_customer_reception(self):
@@ -101,7 +107,6 @@ class Behavior(object):
 
         self.body_movement_wrapper.enable_autonomous_life(False)
 
-
     def __count_people(self, time):
         self.__person_amount_estimator.clear_results()
         self.__person_amount_estimator.change_picture_file_name(const.img_people_recognized)
@@ -111,7 +116,6 @@ class Behavior(object):
         time.sleep(time)
         self.__person_amount_estimator.stop_estimation()
         return self.__person_amount_estimator.get_estimated_person_amount()
-
 
     def __on_human_detected(self, value):
         if value == []:  # empty value when the face disappears
@@ -228,19 +232,19 @@ class Behavior(object):
                     detected_persons = self.sensing_wrapper.get_object_positions("person")
                     table_occupied = self.__is_table_occupied(detected_persons, goal_center)
                     if table_occupied:
-                        self.body_movement_wrapper.enable_autonomous_life(True)
-                        self.position_movement_wrapper.move_to(0, 0, 180)
-                        self.speech_wrapper.say(self.__sentences["noTableAvailable"])
-                        time.sleep(1)
-                        self.speech_wrapper.say(self.__sentences["comeBackAnotherDay"])
-                        break
+                        # self.body_movement_wrapper.enable_autonomous_life(True)
+                        # self.position_movement_wrapper.move_to(0, 0, 180)
+                        # self.speech_wrapper.say(self.__sentences["noTableAvailable"])
+                        # time.sleep(.5)
+                        # self.speech_wrapper.say(self.__sentences["comeBackAnotherDay"])
+                        return None
                     else:
-                        self.__ask_to_follow()
-                        self.__go_to_table(goal_center)
-                        self.body_movement_wrapper.enable_autonomous_life(True)
-                        self.position_movement_wrapper.move_to(0, 0, 180)
-                        self.__assign_table()
-                        break
+                        # self.__ask_to_follow()
+                        # self.__go_to_table(goal_center)
+                        # self.body_movement_wrapper.enable_autonomous_life(True)
+                        # self.position_movement_wrapper.move_to(0, 0, 180)
+                        # self.__assign_table()
+                        return goal_center
                 else:
                     self.__search_for_correct_table()
         except Exception, e:
@@ -340,3 +344,10 @@ class Behavior(object):
 
     def __return_to_waiting_zone(self):
         self.position_movement_wrapper.go_to_home()
+
+    def __say_no_table_available(self):
+        self.body_movement_wrapper.enable_autonomous_life(True)
+        self.position_movement_wrapper.move_to(0, 0, 180)
+        self.speech_wrapper.say(self.__sentences["noTableAvailable"])
+        time.sleep(.5)
+        self.speech_wrapper.say(self.__sentences["comeBackAnotherDay"])
