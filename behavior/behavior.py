@@ -18,6 +18,9 @@ class Behavior(object):
         self.__robot = const.robot
         self.__initialize_wrappers()
         self.__load_locales()
+        self.__init_behavior_state()
+
+    def __init_behavior_state(self):
         self.__wait_for_new_customers = True
         self.__got_face = False
         self.__first_person_detected = False
@@ -37,17 +40,20 @@ class Behavior(object):
         self.__tablet_wrapper = TabletWrapper()
 
     def start_behavior(self):
+        self.__position_movement_wrapper.learn_home()
         while True:
-            self.__position_movement_wrapper.learn_home()
+            print("starting")
             self.__setup_customer_reception()
             self.__check_person_amount()
             search_state = self.__search_table()
             if isinstance(search_state, TableFound):
                 self.__ask_to_follow()
                 self.__go_to_table(search_state.goal_location)
+                time.sleep(.5)
                 self.__position_movement_wrapper.move_to(0, 0, 180)
                 self.body_movement_wrapper.set_head_up(30)
                 self.body_movement_wrapper.set_head_left(0)
+                time.sleep(.5)
                 self.__assign_table()
                 time.sleep(2)
             else:
@@ -57,7 +63,11 @@ class Behavior(object):
                     self.__speech_wrapper.animated_say(self.__sentences["noTablesForAmount"])
                 elif isinstance(search_state, TableStateError):
                     self.__speech_wrapper.animated_say(self.__sentences["error"])
+            self.__init_behavior_state()
             self.__return_to_waiting_zone()
+            while not self.__position_movement_wrapper.is_home():
+                print "is home"
+                continue
 
     def __setup_customer_reception(self):
         if not self.__sensing_wrapper.is_face_detection_enabled():
@@ -205,7 +215,7 @@ class Behavior(object):
         self.__position_movement_wrapper.move_to(0, 0, 180)
         self.body_movement_wrapper.set_head_down(0)
         self.body_movement_wrapper.set_head_right(0)
-        time.sleep(1)
+        time.sleep(3)
 
         try:
             while True:
@@ -248,36 +258,35 @@ class Behavior(object):
             time.sleep(.3)
             time_movement_start = round(time.time() * 1000)
             distance_meters = self.__sensing_wrapper.get_sonar_distance("Front")
-            if float(distance_meters) >= 1.5 and not self.__position_movement_wrapper.collision_avoided:
-                if float(distance_meters) >= 1.0:
+            if float(distance_meters) >= 2.0 and not self.__position_movement_wrapper.collision_avoided:
+                if float(distance_meters) >= 1.5:
                     goal_center = self.__sensing_wrapper.get_red_cups_center_position(self.__person_amount)
-                    if goal_center is None:
-                        goal_center = self.__sensing_wrapper.get_red_cups_center_position(self.__person_amount)
                     if goal_center is not None:
                         self.__move_towards_goal_location(goal_center)
                         now = round(time.time() * 1000)
                         diff = now - time_movement_start
-                        if diff <= 3000:
+                        if diff <= 2000:
                             self.__move_towards_goal_location(goal_center)
                         else:
-                            self.__position_movement_wrapper.move(0.7, 0, 0)
+                            self.__position_movement_wrapper.move(0.5, 0, 0)
                     else:
-                        self.__position_movement_wrapper.move(0.7, 0, 0)
+                        self.__position_movement_wrapper.move(0.5, 0, 0)
                 else:
                     self.__position_movement_wrapper.stop_movement()
                     break
             else:
-                if self.__position_movement_wrapper.collision_avoided or float(distance_meters) <= 1.0:
+                if self.__position_movement_wrapper.collision_avoided or float(distance_meters) <= 0.8:
                     self.__position_movement_wrapper.stop_movement()
+                    print("movement finished")
                     break
                 else:
-                    self.__position_movement_wrapper.move(0.7, 0, 0)
+                    self.__position_movement_wrapper.move(0.5, 0, 0)
 
     def __move_towards_goal_location(self, goal_center):
         pixels_to_move_x = (640 / 2) - goal_center[0]
         degrees_to_move_x = int(round(pixels_to_move_x / 15.0))
         print("table goal position: %s, move_x: %s" % (goal_center, degrees_to_move_x))
-        self.__position_movement_wrapper.move(0.7, 0, degrees_to_move_x)
+        self.__position_movement_wrapper.move(0.5, 0, degrees_to_move_x)
 
     def __search_for_correct_table(self):
         self.__speech_wrapper.say(self.__sentences["moreTimeToSearch"])
@@ -314,6 +323,7 @@ class Behavior(object):
         self.__wait_for_new_customers = True
 
     def __return_to_waiting_zone(self):
+        print("returning home")
         self.__position_movement_wrapper.go_to_home()
 
     def __say_table_occupied(self):

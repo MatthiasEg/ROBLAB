@@ -7,8 +7,6 @@ from robot.object_detection.camera import Camera
 from robot.object_detection.file_transfer import FileTransfer
 from thread import start_new_thread
 
-from robot.object_detection.object_detection import ObjectDetection
-
 
 class PersonAmountEstimator:
     def __init__(self):
@@ -17,7 +15,6 @@ class PersonAmountEstimator:
         self.__picture_names_of_seen_people_amounts = {}
         self.__picture_file_name = const.img_people_recognized
         self.__current_picture_project_path = ""
-        self.__detection = ObjectDetection()
 
     def start_estimation(self):
         print("start estimating")
