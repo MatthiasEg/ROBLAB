@@ -75,7 +75,6 @@ class Behavior(object):
             self.__say_no_table_available()
             self.__setup_customer_reception()
 
-
     def __setup_customer_reception(self):
         if not self.sensing_wrapper.is_face_detection_enabled():
             raise Exception('No Face detection possible with this system!')
@@ -103,7 +102,7 @@ class Behavior(object):
                 self.speech_wrapper.say(self.__sentences["estimateAmountOfPeopleAgain"])
                 self.__person_amount = self.__count_people(const.people_counting_time)
             else:
-                break                
+                break
 
         self.body_movement_wrapper.enable_autonomous_life(False)
 
@@ -246,17 +245,11 @@ class Behavior(object):
                         # self.__assign_table()
                         return goal_center
                 else:
-                    self.__search_for_correct_table()
+                    if not self.__search_for_correct_table():
+                        return None
         except Exception, e:
             print(e)
             self.position_movement_wrapper.stop_movement()
-
-    def __say_no_table_available(self):
-        self.body_movement_wrapper.enable_autonomous_life(True)
-        self.position_movement_wrapper.move_to(0, 0, 180)
-        self.speech_wrapper.say(self.__sentences["noTableAvailable"])
-        time.sleep(1)
-        self.speech_wrapper.say(self.__sentences["comeBackAnotherDay"])
 
     @staticmethod
     def __is_table_occupied(detected_persons, goal_center):
