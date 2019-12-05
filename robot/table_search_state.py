@@ -16,6 +16,7 @@ class TableNotFound:
         pass
 
 
-class TableStateError():
+class TableStateError:
+
     def __init__(self):
         pass
