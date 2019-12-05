@@ -11,14 +11,13 @@ from robot.object_detection.object_detection import ObjectDetection
 
 
 class PersonAmountEstimator:
-    def __init__(self, sensing_wrapper):
+    def __init__(self):
         self.__should_estimate = True
         self.__all_estimations = []
         self.__picture_names_of_seen_people_amounts = {}
         self.__picture_file_name = const.img_people_recognized
         self.__current_picture_project_path = ""
         self.__detection = ObjectDetection()
-        self.__sensing_wrapper = sensing_wrapper
 
     def start_estimation(self):
         print("start estimating")
@@ -31,7 +30,6 @@ class PersonAmountEstimator:
             self.__picture_file_name = self.__picture_file_name + "_" + str(i)
             self.__take_and_store_picture()
             estimated_number = self.__get_number_of_faces_from_picture()
-            # estimated_number = self.__sensing_wrapper.get_person_amount("person", self.__current_picture_project_path)
             print("Estimated number of people: ", estimated_number)
             self.__all_estimations.append(estimated_number)
             self.__picture_names_of_seen_people_amounts[estimated_number] = self.__picture_file_name

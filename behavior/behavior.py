@@ -41,7 +41,7 @@ class Behavior(object):
         self.__vocabularies = data["vocabularies"]
 
     def start_behavior(self):
-        self.__position_movement_wrapper.learn_home()
+        # self.__position_movement_wrapper.learn_home()
         self.__setup_customer_reception()
         self.__check_person_amount()
         search_state = self.__search_table()
@@ -100,7 +100,7 @@ class Behavior(object):
         self.__body_movement_wrapper.enable_autonomous_life(False)
 
     def __count_people(self, time_to_estimate):
-        person_amount_estimator = PersonAmountEstimator(self.__sensing_wrapper)
+        person_amount_estimator = PersonAmountEstimator()
         person_amount_estimator.start_estimation()
         time.sleep(time_to_estimate)
         person_amount_estimator.stop_estimation()
@@ -124,7 +124,8 @@ class Behavior(object):
 
     def __check_person_amount(self):
         while not self.__person_amount_correct or self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
-            if self.__person_amount_correct and (self.__person_amount < const.min_persons or self.__person_amount > const.max_persons):
+            if self.__person_amount_correct and (
+                    self.__person_amount < const.min_persons or self.__person_amount > const.max_persons):
                 self.__speech_wrapper.animated_say(self.__sentences["noTablesForAmount"])
 
             if self.__ask_person_amount() is not None:
@@ -136,7 +137,8 @@ class Behavior(object):
     def __ask_person_amount(self):
         self.__person_amount = None
         self.__speech_wrapper.animated_say(self.__sentences["askAmountToSearch"])
-        self.__speech_wrapper.animated_say(self.__sentences["availableTables"].format(const.min_persons, const.max_persons))
+        self.__speech_wrapper.animated_say(
+            self.__sentences["availableTables"].format(const.min_persons, const.max_persons))
 
         self.__speech_wrapper.start_to_listen(
             self.__vocabularies["personAmount"],
@@ -170,7 +172,8 @@ class Behavior(object):
         elif self.__person_amount == 0:
             return False
         else:
-            self.__speech_wrapper.animated_say(self.__sentences["askToSearchTableForMultiplePersons"].format(self.__person_amount))
+            self.__speech_wrapper.animated_say(
+                self.__sentences["askToSearchTableForMultiplePersons"].format(self.__person_amount))
 
         self.__speech_wrapper.start_to_listen(
             self.__vocabularies["yes"] + self.__vocabularies["no"],
