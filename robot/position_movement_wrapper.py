@@ -41,6 +41,9 @@ class PositionMovementWrapper:
     def go_to_home(self):
         self.__robot.ALLocalization.goToHome()
 
+    def is_home(self):
+        return self.__robot.ALLocalization.isInCurrentHome()
+
     def get_positon(self):
         return self.__robot.ALLocalization.getRobotPosition()
 
