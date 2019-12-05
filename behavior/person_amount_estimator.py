@@ -2,6 +2,7 @@ import cv2
 import statistics as statistics
 
 import const
+from math import ceil
 from robot.object_detection.camera import Camera
 from robot.object_detection.file_transfer import FileTransfer
 from thread import start_new_thread
@@ -49,7 +50,7 @@ class PersonAmountEstimator:
     def __calculate_mean_of_seen_people_amounts(self):
         if len(self.__picture_names_of_seen_people_amounts) is 0:
             return 0
-        return int(round(statistics.mean(self.__picture_names_of_seen_people_amounts), 0))
+        return int(ceil(statistics.mean(self.__picture_names_of_seen_people_amounts)))
 
     def __take_and_store_picture(self):
         self.__camera = Camera(const.robot)
