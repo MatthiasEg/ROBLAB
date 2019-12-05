@@ -44,6 +44,7 @@ class Behavior(object):
         self.position_movement_wrapper.learn_home()
         self.__setup_customer_reception()
         self.__check_person_amount()
+        return
 
         search_state = self.__search_table()
         if isinstance(search_state, TableFound):
@@ -83,6 +84,12 @@ class Behavior(object):
             time.sleep(0.1)
 
         for i in range(const.people_counting_number_of_retries):
+            if self.__person_amount < 1:
+                self.speech_wrapper.say(self.__sentences["seeingNoPersons"])
+                self.speech_wrapper.say(self.__sentences["estimateAmountOfPeopleAgain"])
+                self.__person_amount = self.__count_people(const.people_counting_time)
+                continue
+
             if not self.__ask_person_amount_correct():
                 self.speech_wrapper.say(self.__sentences["estimateAmountOfPeopleAgain"])
                 self.__person_amount = self.__count_people(const.people_counting_time)
@@ -94,8 +101,6 @@ class Behavior(object):
     def __count_people(self, time_to_sleep):
         self.__person_amount_estimator.clear_results()
         self.__person_amount_estimator.start_estimation()
-        self.speech_wrapper.say(self.__sentences["estimateAmountOfPeople"])
-        self.speech_wrapper.say(self.__sentences["stayInFrontOfMe"])
         time.sleep(time_to_sleep)
         self.__person_amount_estimator.stop_estimation()
         return self.__person_amount_estimator.get_estimated_person_amount()
@@ -111,6 +116,8 @@ class Behavior(object):
                 self.sensing_wrapper.stop_face_detection("detect_face")
                 self.__wait_for_new_customers = False
                 self.speech_wrapper.animated_say(self.__sentences["greeting"])
+                self.speech_wrapper.say(self.__sentences["estimateAmountOfPeople"])
+                self.speech_wrapper.say(self.__sentences["stayInFrontOfMe"])
                 self.__person_amount = self.__count_people(const.people_counting_time)
                 self.__first_person_detected = True
 
@@ -170,7 +177,7 @@ class Behavior(object):
         if self.__person_amount == 1:
             self.speech_wrapper.animated_say(self.__sentences["askToSearchTableForOnePerson"])
         elif self.__person_amount == 0:
-            self.__ask_person_amount()
+            return False
         else:
             self.speech_wrapper.animated_say(self.__sentences["askToSearchTableForMultiplePersons"].format(self.__person_amount))
 

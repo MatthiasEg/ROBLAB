@@ -18,6 +18,7 @@
             "Lassen Sie mich das nochmals versuchen."
         ],
         "stayInFrontOfMe": "Bitte stehen Sie alle vor mich hin.",
+        "seeingNoPersons": "Leider habe ich keine Person gefunden",
         "seeingOnePerson": "Ich sehe eine Person",
         "seeingMultiplePersons": "Ich sehe {} Personen",
         "askAmountToSearch": "Für wie viele Personen soll ich einen Tisch suchen?",
