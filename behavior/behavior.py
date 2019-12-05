@@ -53,7 +53,7 @@ class Behavior(object):
             if self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
                 self.speech_wrapper.say(self.__sentences["noTablesForAmount"])
 
-            if self.__ask_person_amount() is not None
+            if self.__ask_person_amount() is not None:
                 if self.__recognized_words_certainty > 0.55:
                     break
 
@@ -104,7 +104,7 @@ class Behavior(object):
 
     def __count_people(self, time):
         self.__person_amount_estimator.clear_results()
-        self.__person_amount_estimator.change_picture_file_name(const.people_recognized)
+        self.__person_amount_estimator.change_picture_file_name(const.img_people_recognized)
         self.__person_amount_estimator.start_estimation()
         self.speech_wrapper.say(self.__sentences["estimateAmountOfPeople"])
         self.speech_wrapper.say(self.__sentences["stayInFrontOfMe"])
