@@ -204,7 +204,7 @@ class Behavior(object):
         self.__position_movement_wrapper.move_to(0, 0, 180)
         self.body_movement_wrapper.set_head_down(0)
         self.body_movement_wrapper.set_head_right(0)
-        time.sleep(1)
+        time.sleep(3)
 
         try:
             while True:
