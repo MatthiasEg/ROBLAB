@@ -37,27 +37,27 @@ class Behavior(object):
         self.__tablet_wrapper = TabletWrapper()
 
     def start_behavior(self):
-        # self.__position_movement_wrapper.learn_home()
-        self.__setup_customer_reception()
-        self.__check_person_amount()
-        search_state = self.__search_table()
-        if isinstance(search_state, TableFound):
-            self.__ask_to_follow()
-            self.__go_to_table(search_state.goal_location)
-            self.__position_movement_wrapper.move_to(0, 0, 180)
-            self.body_movement_wrapper.set_head_up(30)
-            self.body_movement_wrapper.set_head_left(0)
-            self.__assign_table()
-            time.sleep(2)
-        else:
-            if isinstance(search_state, TableOccupied):
-                self.__say_table_occupied()
-            elif isinstance(search_state, TableNotFound):
-                self.__speech_wrapper.animated_say(self.__sentences["noTablesForAmount"])
-            elif isinstance(search_state, TableStateError):
-                self.__speech_wrapper.animated_say(self.__sentences["error"])
-        self.__return_to_waiting_zone()
-        self.__setup_customer_reception()
+        while True:
+            self.__position_movement_wrapper.learn_home()
+            self.__setup_customer_reception()
+            self.__check_person_amount()
+            search_state = self.__search_table()
+            if isinstance(search_state, TableFound):
+                self.__ask_to_follow()
+                self.__go_to_table(search_state.goal_location)
+                self.__position_movement_wrapper.move_to(0, 0, 180)
+                self.body_movement_wrapper.set_head_up(30)
+                self.body_movement_wrapper.set_head_left(0)
+                self.__assign_table()
+                time.sleep(2)
+            else:
+                if isinstance(search_state, TableOccupied):
+                    self.__say_table_occupied()
+                elif isinstance(search_state, TableNotFound):
+                    self.__speech_wrapper.animated_say(self.__sentences["noTablesForAmount"])
+                elif isinstance(search_state, TableStateError):
+                    self.__speech_wrapper.animated_say(self.__sentences["error"])
+            self.__return_to_waiting_zone()
 
     def __setup_customer_reception(self):
         if not self.__sensing_wrapper.is_face_detection_enabled():
