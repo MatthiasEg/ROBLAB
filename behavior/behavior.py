@@ -43,14 +43,14 @@ class Behavior(object):
         self.__vocabularies = data["vocabularies"]
 
     def start_behavior(self):
-        self.position_movement_wrapper.learn_home()
+        # self.position_movement_wrapper.learn_home()
         self.__setup_customer_reception()
         self.__check_person_amount()
 
         search_state = self.__search_table()
         if isinstance(search_state, TableFound):
             self.__ask_to_follow()
-            self.__go_to_table(TableFound(search_state).goal_location)
+            self.__go_to_table(search_state.goal_location)
             self.body_movement_wrapper.enable_autonomous_life(True)
             self.position_movement_wrapper.move_to(0, 0, 180)
             self.__assign_table()
@@ -95,13 +95,13 @@ class Behavior(object):
 
         self.body_movement_wrapper.enable_autonomous_life(False)
 
-    def __count_people(self, time):
+    def __count_people(self, time_to_sleep):
         self.__person_amount_estimator.clear_results()
         self.__person_amount_estimator.change_picture_file_name(const.img_people_recognized)
         self.__person_amount_estimator.start_estimation()
         self.speech_wrapper.say(self.__sentences["estimateAmountOfPeople"])
         self.speech_wrapper.say(self.__sentences["stayInFrontOfMe"])
-        time.sleep(time)
+        time.sleep(time_to_sleep)
         self.__person_amount_estimator.stop_estimation()
         return self.__person_amount_estimator.get_estimated_person_amount()
 
