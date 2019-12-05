@@ -26,6 +26,7 @@ class Behavior(object):
         self.__person_amount_correct = False
         self.__waiting_for_an_answer = False
         self.__recognized_words_certainty = 0
+        self.__counter_no_user_interaction = 0
 
     def __initialize_wrappers(self):
         self.__body_movement_wrapper = BodyMovementWrapper()
@@ -82,6 +83,7 @@ class Behavior(object):
 
         for i in range(const.people_counting_number_of_retries):
             if self.__person_amount < 1:
+                self.__counter_no_user_interaction += 1
                 self.__speech_wrapper.say(self.__sentences["seeingNoPersons"])
                 self.__speech_wrapper.say(self.__sentences["estimateAmountOfPeopleAgain"])
                 self.__person_amount = self.__count_people(const.people_counting_time)
@@ -243,15 +245,17 @@ class Behavior(object):
         self.__sensing_wrapper.start_sonar_sensors()
         self.__move_towards_goal_location(goal_center)
         while True:
+            time.sleep(.3)
             time_movement_start = round(time.time() * 1000)
             distance_meters = self.__sensing_wrapper.get_sonar_distance("Front")
             if float(distance_meters) >= 1.5:
                 if float(distance_meters) >= 1.3:
                     goal_center = self.__sensing_wrapper.get_red_cups_center_position(self.__person_amount)
                     if goal_center is not None:
+                        self.__move_towards_goal_location(goal_center)
                         now = round(time.time() * 1000)
                         diff = now - time_movement_start
-                        if diff <= 2000:
+                        if diff <= 3000:
                             self.__move_towards_goal_location(goal_center)
                         else:
                             self.__position_movement_wrapper.move(0.5, 0, 0)
@@ -308,7 +312,6 @@ class Behavior(object):
 
     def __assign_table(self):
         self.__speech_wrapper.animated_say(self.__sentences["assignTable"])
-        #time.sleep(2)
         self.__wait_for_new_customers = True
 
     def __return_to_waiting_zone(self):

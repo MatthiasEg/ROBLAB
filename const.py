@@ -8,7 +8,7 @@ min_persons = 2
 max_persons = 4
 
 speech_recognition_language = 'German'
-speech_recognition_precision = 0.4
+speech_recognition_precision = 0.7
 
 people_counting_number_of_retries = 3
 people_counting_time = 5
