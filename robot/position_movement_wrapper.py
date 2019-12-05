@@ -11,6 +11,7 @@ class PositionMovementWrapper:
         self.__robot.ALMotion.setSmartStiffnessEnabled(True)
         self.subscriber = self.__robot.ALMemory.subscriber("ALMotion/MoveFailed")
         self.subscriber.signal.connect(self.__on_move_failed)
+        self.collision_avoided = False
 
     def enable_collision_protection(self, enabled):
         self.__robot.ALMotion.setExternalCollisionProtectionEnabled("All", enabled)
@@ -22,8 +23,7 @@ class PositionMovementWrapper:
         print('enabled collision protection: {}'.format(enabled))
 
     def __on_move_failed(self, value):
-        print("move failed!")
-        print(value)
+        self.collision_avoided = True
 
     def move_to(self, x, y, theta):
         self.__robot.ALMotion.moveTo(x, y, theta * math.pi / 180)
