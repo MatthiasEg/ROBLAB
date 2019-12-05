@@ -34,6 +34,9 @@
             "Please stand by. I try to find a wonderful table for you.",
             "Please wait here and let me search a nice table for you."
         ],
+        "moreTimeToSearch": [
+            "I need some more time to find your table. Thanks for your patience."
+        ],
         "noTableAvailable": [
             "Unfortunately, all matching tables are already occupied. We are sorry for the inconvenience."
         ],
