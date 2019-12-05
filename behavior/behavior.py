@@ -43,7 +43,6 @@ class Behavior(object):
         self.__vocabularies = data["vocabularies"]
 
     def start_behavior(self):
-        # self.position_movement_wrapper.move_to(0, 0, 180)
         self.position_movement_wrapper.learn_home()
         self.__setup_customer_reception()
         self.__check_person_amount()
