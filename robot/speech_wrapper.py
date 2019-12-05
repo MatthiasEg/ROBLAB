@@ -7,8 +7,15 @@ class SpeechWrapper:
     def __init__(self):
         self.__robot = const.robot
 
-    def animated_say(self, text):
-        self.__robot.ALAnimatedSpeech.animated_say(text)
+    def animated_say(self, text, configuration= {"bodyLanguageMode":"contextual"}):
+        if (type(text) == list):
+            self.animated_say_random(text)
+            return
+            
+        self.__robot.ALAnimatedSpeech.say2(text, configuration)
+
+    def animated_say_random(self, list):
+        self.animated_say_random(random.choice(list))
 
     def say(self, text):
         if (type(text) == list):
