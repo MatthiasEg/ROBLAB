@@ -2,25 +2,27 @@ import cv2
 import statistics as statistics
 
 import const
+from math import ceil
 from robot.object_detection.camera import Camera
 from robot.object_detection.file_transfer import FileTransfer
 from thread import start_new_thread
 
+from robot.object_detection.object_detection import ObjectDetection
+
 
 class PersonAmountEstimator:
-    def __init__(self):
+    def __init__(self, sensing_wrapper):
         self.__should_estimate = True
         self.__all_estimations = []
         self.__picture_names_of_seen_people_amounts = {}
-        self.__picture_file_name = "default_name"
+        self.__picture_file_name = const.img_people_recognized
         self.__current_picture_project_path = ""
+        self.__detection = ObjectDetection()
+        self.__sensing_wrapper = sensing_wrapper
 
     def start_estimation(self):
         print("start estimating")
         start_new_thread(self.__estimate, ())
-
-    def change_picture_file_name(self, new_name):
-        self.__picture_file_name = new_name
 
     def __estimate(self):
         i = 1
@@ -29,15 +31,12 @@ class PersonAmountEstimator:
             self.__picture_file_name = self.__picture_file_name + "_" + str(i)
             self.__take_and_store_picture()
             estimated_number = self.__get_number_of_faces_from_picture()
+            # estimated_number = self.__sensing_wrapper.get_person_amount("person", self.__current_picture_project_path)
             print("Estimated number of people: ", estimated_number)
             self.__all_estimations.append(estimated_number)
             self.__picture_names_of_seen_people_amounts[estimated_number] = self.__picture_file_name
             self.__picture_file_name = old_picture_name
             i = i + 1
-
-    def clear_results(self):
-        self.__all_estimations = []
-        self.__picture_names_of_seen_people_amounts = {}
 
     def stop_estimation(self):
         self.__should_estimate = False
@@ -52,7 +51,7 @@ class PersonAmountEstimator:
     def __calculate_mean_of_seen_people_amounts(self):
         if len(self.__picture_names_of_seen_people_amounts) is 0:
             return 0
-        return int(round(statistics.mean(self.__picture_names_of_seen_people_amounts), 0))
+        return int(ceil(statistics.mean(self.__picture_names_of_seen_people_amounts)))
 
     def __take_and_store_picture(self):
         self.__camera = Camera(const.robot)
