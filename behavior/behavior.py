@@ -26,6 +26,7 @@ class Behavior(object):
         self.__person_amount_correct = False
         self.__waiting_for_an_answer = False
         self.__recognized_words_certainty = 0
+        self.__counter_no_user_interaction = 0
 
     def __initialize_wrappers(self):
         self.__body_movement_wrapper = BodyMovementWrapper()
@@ -69,7 +70,7 @@ class Behavior(object):
         self.__sensing_wrapper.set_maximum_detection_range_in_meters(3)
         self.__sensing_wrapper.enable_face_recognition()
         self.__sensing_wrapper.enable_face_tracking()
-        self.__sensing_wrapper.enable_<fast>_mode()
+        self.__sensing_wrapper.enable_fast_mode()
 
         self.__body_movement_wrapper.enable_autonomous_life(True)
 
@@ -82,6 +83,7 @@ class Behavior(object):
 
         for i in range(const.people_counting_number_of_retries):
             if self.__person_amount < 1:
+                self.__counter_no_user_interaction += 1
                 self.__speech_wrapper.say(self.__sentences["seeingNoPersons"])
                 self.__speech_wrapper.say(self.__sentences["estimateAmountOfPeopleAgain"])
                 self.__person_amount = self.__count_people(const.people_counting_time)
