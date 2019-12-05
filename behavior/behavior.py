@@ -3,13 +3,11 @@ import os
 import time
 
 import const
-# import PIL  # import used for scipy.misc.imsave
 from person_amount_estimator import PersonAmountEstimator
 from robot.body_movement_wrapper import BodyMovementWrapper
 from robot.position_movement_wrapper import PositionMovementWrapper
 from robot.sensing_wrapper import SensingWrapper
 from robot.speech_wrapper import SpeechWrapper
-# import face_recognition
 from robot.table_search_state import TableFound, TableOccupied, TableNotFound, TableStateError
 
 
