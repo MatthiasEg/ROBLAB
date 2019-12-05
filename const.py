@@ -11,7 +11,7 @@ speech_recognition_language = 'German'
 speech_recognition_precision = 0.4
 
 people_counting_number_of_retries = 3
-people_counting_time = 2
+people_counting_time = 5
 
 path_to_locale_file = 'locale/de-ch.json'
 path_to_pictures = 'pictures/'
