@@ -127,6 +127,7 @@ class Behavior(object):
 
             if self.__ask_person_amount() is not None:
                 if self.__recognized_words_certainty > 0.55:
+                    self.__person_amount_correct = True
                     continue
                 else:
                     self.__ask_person_amount_correct()
