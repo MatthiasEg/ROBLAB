@@ -5,14 +5,12 @@ import time
 import const
 # import PIL  # import used for scipy.misc.imsave
 from person_amount_estimator import PersonAmountEstimator
-from robot.body_movement_wrapper import Actuators
 from robot.body_movement_wrapper import BodyMovementWrapper
 from robot.position_movement_wrapper import PositionMovementWrapper
 from robot.sensing_wrapper import SensingWrapper
 from robot.speech_wrapper import SpeechWrapper
-
-
 # import face_recognition
+from robot.table_search_state import TableFound, TableOccupied, TableNotFound, TableStateError
 
 
 class Behavior(object):
@@ -49,21 +47,22 @@ class Behavior(object):
         self.__setup_customer_reception()
         self.__check_person_amount()
 
-        goal_location = self.__search_table()
-        if goal_location is not None:
+        search_state = self.__search_table()
+
+        if isinstance(search_state, TableFound):
             self.__ask_to_follow()
-            self.__go_to_table(goal_location)
+            self.__go_to_table(TableFound(search_state).goal_location)
             self.body_movement_wrapper.enable_autonomous_life(True)
             self.position_movement_wrapper.move_to(0, 0, 180)
             self.__assign_table()
-
-            # self.__ask_to_follow()
-            # self.__go_to_table()
-            # self.__assign_table()
-            # self.__return_to_waiting_zone()
-            # self.__setup_customer_reception()
-        else:
-            self.__say_no_table_available()
+        elif isinstance(search_state, TableOccupied):
+            self.__say_table_occupied()
+            self.__setup_customer_reception()
+        elif isinstance(search_state, TableNotFound):
+            # TODO: say no table found
+            self.__setup_customer_reception()
+        elif isinstance(search_state, TableStateError):
+            # TODO: say something with error
             self.__setup_customer_reception()
 
     def __setup_customer_reception(self):
@@ -236,20 +235,21 @@ class Behavior(object):
                         # self.speech_wrapper.say(self.__sentences["noTableAvailable"])
                         # time.sleep(.5)
                         # self.speech_wrapper.say(self.__sentences["comeBackAnotherDay"])
-                        return None
+                        return TableOccupied()
                     else:
                         # self.__ask_to_follow()
                         # self.__go_to_table(goal_center)
                         # self.body_movement_wrapper.enable_autonomous_life(True)
                         # self.position_movement_wrapper.move_to(0, 0, 180)
                         # self.__assign_table()
-                        return goal_center
+                        return TableFound(goal_center)
                 else:
                     if not self.__search_for_correct_table():
-                        return None
+                        return TableNotFound()
         except Exception, e:
             print(e)
             self.position_movement_wrapper.stop_movement()
+            return TableStateError()
 
     @staticmethod
     def __is_table_occupied(detected_persons, goal_center):
@@ -339,7 +339,7 @@ class Behavior(object):
     def __return_to_waiting_zone(self):
         self.position_movement_wrapper.go_to_home()
 
-    def __say_no_table_available(self):
+    def __say_table_occupied(self):
         self.body_movement_wrapper.enable_autonomous_life(True)
         self.position_movement_wrapper.move_to(0, 0, 180)
         self.speech_wrapper.say(self.__sentences["noTableAvailable"])
