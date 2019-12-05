@@ -12,15 +12,12 @@ class PersonAmountEstimator:
         self.__should_estimate = True
         self.__all_estimations = []
         self.__picture_names_of_seen_people_amounts = {}
-        self.__picture_file_name = "default_name"
+        self.__picture_file_name = const.img_people_recognized
         self.__current_picture_project_path = ""
 
     def start_estimation(self):
         print("start estimating")
         start_new_thread(self.__estimate, ())
-
-    def change_picture_file_name(self, new_name):
-        self.__picture_file_name = new_name
 
     def __estimate(self):
         i = 1

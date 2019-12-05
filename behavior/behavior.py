@@ -82,8 +82,6 @@ class Behavior(object):
         while not self.__first_person_detected:
             time.sleep(0.1)
 
-        time.sleep(2)
-
         for i in range(const.people_counting_number_of_retries):
             if not self.__ask_person_amount_correct():
                 self.speech_wrapper.say(self.__sentences["estimateAmountOfPeopleAgain"])
@@ -95,7 +93,6 @@ class Behavior(object):
 
     def __count_people(self, time_to_sleep):
         self.__person_amount_estimator.clear_results()
-        self.__person_amount_estimator.change_picture_file_name(const.img_people_recognized)
         self.__person_amount_estimator.start_estimation()
         self.speech_wrapper.say(self.__sentences["estimateAmountOfPeople"])
         self.speech_wrapper.say(self.__sentences["stayInFrontOfMe"])
