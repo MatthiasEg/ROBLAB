@@ -43,7 +43,7 @@ class Behavior(object):
         self.__vocabularies = data["vocabularies"]
 
     def start_behavior(self):
-        # self.position_movement_wrapper.learn_home()
+        self.position_movement_wrapper.learn_home()
         self.__setup_customer_reception()
         self.__check_person_amount()
 
@@ -301,7 +301,7 @@ class Behavior(object):
         self.position_movement_wrapper.move(0.5, 0, degrees_to_move_x)
 
     def __search_for_correct_table(self):
-        print("Couldn't find your object. Searching around")
+        self.speech_wrapper.say(self.__sentences["moreTimeToSearch"])
         max_number_of_tries = 2
         current_try = 0
         number_of_turns = 0
@@ -332,7 +332,7 @@ class Behavior(object):
 
     def __assign_table(self):
         self.speech_wrapper.animated_say(self.__sentences["assignTable"])
-        time.sleep(2)
+        #time.sleep(2)
         self.__wait_for_new_customers = True
 
     def __return_to_waiting_zone(self):
