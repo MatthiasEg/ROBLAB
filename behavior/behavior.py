@@ -69,7 +69,7 @@ class Behavior(object):
         self.sensing_wrapper.set_maximum_detection_range_in_meters(3)
         self.sensing_wrapper.enable_face_recognition()
         self.sensing_wrapper.enable_face_tracking()
-        # self.sensing_wrapper.enable_fast_mode()
+        self.sensing_wrapper.enable_fast_mode()
 
         self.body_movement_wrapper.enable_autonomous_life(True)
 
@@ -84,12 +84,12 @@ class Behavior(object):
             if self.__person_amount < 1:
                 self.speech_wrapper.say(self.__sentences["seeingNoPersons"])
                 self.speech_wrapper.say(self.__sentences["estimateAmountOfPeopleAgain"])
-                self.__person_amount = self.__count_people(const.people_counting_time)
+                self.__person_amount = self.__count_people(const.people_counting_time + i)
                 continue
 
             if not self.__ask_person_amount_correct():
                 self.speech_wrapper.say(self.__sentences["estimateAmountOfPeopleAgain"])
-                self.__person_amount = self.__count_people(const.people_counting_time)
+                self.__person_amount = self.__count_people(const.people_counting_time + i)
             else:
                 break
 
@@ -120,12 +120,13 @@ class Behavior(object):
 
     def __check_person_amount(self):
         while not self.__person_amount_correct or self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
-            if self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
+            if self.__person_amount_correct and (self.__person_amount < const.min_persons or self.__person_amount > const.max_persons):
                 self.speech_wrapper.animated_say(self.__sentences["noTablesForAmount"])
 
             if self.__ask_person_amount() is not None:
                 if self.__recognized_words_certainty > 0.55:
                     return True
+
 
     def __ask_person_amount(self):
         self.__person_amount = None
@@ -146,19 +147,9 @@ class Behavior(object):
 
         return self.__person_amount
 
-        # if self.__person_amount is None:
-        #     self.__ask_person_amount()
-        # else:
-        #     if self.__recognized_words_certainty > 0.55:
-        #         if self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
-        #             self.speech_wrapper.say(self.__sentences["noTablesForAmount"])
-        #             return
-        #         self.__search_table()
-        #     else:
-        #         self.__ask_person_amount_correct()
-
     def __on_person_amount_answered(self, message):
         print('Ask Person amount triggered')
+        print(message)
 
         m = message[0]
         if m != '':
@@ -168,7 +159,6 @@ class Behavior(object):
                 self.__person_amount = self.__vocabularies["personAmount"].index(word_found) + 1
                 self.__waiting_for_an_answer = False
 
-        print(message)
 
     def __ask_person_amount_correct(self):
         if self.__person_amount == 1:
@@ -192,17 +182,9 @@ class Behavior(object):
 
         return self.__person_amount_correct
 
-        # if self.__person_amount_correct:
-        #     print(self.__person_amount)
-        #     if self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
-        #         self.speech_wrapper.say(self.__sentences["noTablesForAmount"])
-        #         return
-        #     self.__search_table()
-        # else:
-        #     self.__ask_person_amount()
-
     def __on_person_amount_correct_answered(self, message):
         print('Ask Person triggered')
+        print(message)
         if message[0] != '':
             msg = message[0].replace('<...>', '').strip()
             if msg in self.__vocabularies["no"]:
@@ -211,7 +193,6 @@ class Behavior(object):
             elif msg in self.__vocabularies["yes"]:
                 self.__person_amount_correct = True
                 self.__waiting_for_an_answer = False
-        print(message)
 
     def __search_table(self):
         self.speech_wrapper.say(self.__sentences["searchTable"])
