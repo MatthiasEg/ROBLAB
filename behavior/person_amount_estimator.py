@@ -33,10 +33,6 @@ class PersonAmountEstimator:
             self.__picture_file_name = old_picture_name
             i = i + 1
 
-    def clear_results(self):
-        self.__all_estimations = []
-        self.__picture_names_of_seen_people_amounts = {}
-
     def stop_estimation(self):
         self.__should_estimate = False
 
