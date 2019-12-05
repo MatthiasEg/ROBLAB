@@ -8,6 +8,7 @@ from robot.body_movement_wrapper import BodyMovementWrapper
 from robot.position_movement_wrapper import PositionMovementWrapper
 from robot.sensing_wrapper import SensingWrapper
 from robot.speech_wrapper import SpeechWrapper
+from robot.tablet_wrapper import TabletWrapper
 from robot.table_search_state import TableFound, TableOccupied, TableNotFound, TableStateError
 
 
@@ -29,10 +30,11 @@ class Behavior(object):
         self.__counter_no_user_interaction = 0
 
     def __initialize_wrappers(self):
-        self.__body_movement_wrapper = BodyMovementWrapper()
+        self.body_movement_wrapper = BodyMovementWrapper()
         self.__position_movement_wrapper = PositionMovementWrapper()
         self.__sensing_wrapper = SensingWrapper()
         self.__speech_wrapper = SpeechWrapper()
+        self.__tablet_wrapper = TabletWrapper()
 
     def __load_locales(self):
         with open(os.path.join(os.getcwd(), const.path_to_locale_file), 'r') as f:
@@ -49,8 +51,8 @@ class Behavior(object):
             self.__ask_to_follow()
             self.__go_to_table(search_state.goal_location)
             self.__position_movement_wrapper.move_to(0, 0, 180)
-            self.__body_movement_wrapper.set_head_up(30)
-            self.__body_movement_wrapper.set_head_left(0)
+            self.body_movement_wrapper.set_head_up(30)
+            self.body_movement_wrapper.set_head_left(0)
             self.__assign_table()
             time.sleep(2)
         else:
@@ -74,7 +76,7 @@ class Behavior(object):
         self.__sensing_wrapper.enable_face_tracking()
         self.__sensing_wrapper.enable_fast_mode()
 
-        self.__body_movement_wrapper.enable_autonomous_life(True)
+        self.body_movement_wrapper.enable_autonomous_life(True)
 
         face_detected_subscriber = self.__sensing_wrapper.get_memory_subscriber("FaceDetected")
         face_detected_subscriber.signal.connect(self.__on_human_detected)
@@ -84,6 +86,7 @@ class Behavior(object):
             time.sleep(0.1)
 
         for i in range(const.people_counting_number_of_retries):
+            # self.__tablet_wrapper.showImage(os.path.join(os.getcwd(), const.path_to_pictures, const.img_people_recognized + '.jpg'), 10)
             if self.__person_amount < 1:
                 self.__counter_no_user_interaction += 1
                 self.__speech_wrapper.say(self.__sentences["seeingNoPersons"])
@@ -97,7 +100,7 @@ class Behavior(object):
             else:
                 break
 
-        self.__body_movement_wrapper.enable_autonomous_life(False)
+        self.body_movement_wrapper.enable_autonomous_life(False)
 
     def __count_people(self, time_to_estimate):
         person_amount_estimator = PersonAmountEstimator()
@@ -203,10 +206,10 @@ class Behavior(object):
 
     def __search_table(self):
         self.__speech_wrapper.say(self.__sentences["searchTable"])
-        self.__body_movement_wrapper.enable_autonomous_life(False)
+        self.body_movement_wrapper.enable_autonomous_life(False)
         self.__position_movement_wrapper.move_to(0, 0, 180)
-        self.__body_movement_wrapper.set_head_down(0)
-        self.__body_movement_wrapper.set_head_right(0)
+        self.body_movement_wrapper.set_head_down(0)
+        self.body_movement_wrapper.set_head_right(0)
         time.sleep(1)
 
         try:
@@ -293,7 +296,7 @@ class Behavior(object):
             if goal_centers is None:
                 if number_of_turns is 0:
                     self.__position_movement_wrapper.stop_movement()
-                    self.__body_movement_wrapper.set_head_down(0)
+                    self.body_movement_wrapper.set_head_down(0)
                     self.__position_movement_wrapper.move_to(0, 0, 90)
 
                 if number_of_turns < max_turns:
@@ -319,7 +322,7 @@ class Behavior(object):
         self.__position_movement_wrapper.go_to_home()
 
     def __say_table_occupied(self):
-        self.__body_movement_wrapper.enable_autonomous_life(True)
+        self.body_movement_wrapper.enable_autonomous_life(True)
         self.__position_movement_wrapper.move_to(0, 0, 180)
         self.__speech_wrapper.animated_say(self.__sentences["noTableAvailable"])
         time.sleep(.5)
