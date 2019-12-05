@@ -26,7 +26,6 @@ class Behavior(object):
         self.__person_amount_correct = False
         self.__waiting_for_an_answer = False
         self.__recognized_words_certainty = 0
-        self.__person_amount_estimator = PersonAmountEstimator()
 
     def __initialize_wrappers(self):
         self.body_movement_wrapper = BodyMovementWrapper()
@@ -44,8 +43,6 @@ class Behavior(object):
         self.position_movement_wrapper.learn_home()
         self.__setup_customer_reception()
         self.__check_person_amount()
-        return
-
         search_state = self.__search_table()
         if isinstance(search_state, TableFound):
             self.__ask_to_follow()
@@ -99,11 +96,11 @@ class Behavior(object):
         self.body_movement_wrapper.enable_autonomous_life(False)
 
     def __count_people(self, time_to_sleep):
-        self.__person_amount_estimator.clear_results()
-        self.__person_amount_estimator.start_estimation()
+        person_amount_estimator = PersonAmountEstimator()
+        person_amount_estimator.start_estimation()
         time.sleep(time_to_sleep)
-        self.__person_amount_estimator.stop_estimation()
-        return self.__person_amount_estimator.get_estimated_person_amount()
+        person_amount_estimator.stop_estimation()
+        return person_amount_estimator.get_estimated_person_amount()
 
     def __on_human_detected(self, value):
         if value == []:  # empty value when the face disappears
