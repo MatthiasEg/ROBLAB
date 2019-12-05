@@ -55,17 +55,6 @@ class SensingWrapper:
     def enable_fast_mode(self):
         return self.__robot.ALPeoplePerception.setFastModeEnabled(True)
 
-    def start_face_tracking(self, faceSize):
-        targetName = "Face"
-        faceWidth = faceSize
-        self.__robot.ALTracker.registerTarget(targetName, faceWidth)
-        self.__robot.ALTracker.track(targetName)
-
-    def stop_face_tracking(self):
-        self.__robot.ALTracker.stopTracker()
-        self.__robot.ALTracker.unregisterAllTargets()
-        self.__robot.ALMotion.rest()
-
     def get_object_positions(self, object_name):
         image_path = "object_detection.jpg"
         self.__take_picture(image_path)
