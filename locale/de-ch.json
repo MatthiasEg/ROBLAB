@@ -40,6 +40,7 @@
             "Gerne heissen wir Sie an einem anderen Tag wieder herzlich in unserem Restaurant dinner for one willkommen!"
         ],
         "askToFollow": "Danke für Ihre Geduld! Bitte folgen Sie mir zu Ihrem Tisch.",
-        "assignTable": "Hier ist Ihr Tisch. Sie können sich bereits setzen. Ein menschlicher Mitarbeiter wird sie gleich bedienen. Geniessen Sie Ihren Aufenthalt!"
+        "assignTable": "Hier ist Ihr Tisch. Sie können sich bereits setzen. Ein menschlicher Mitarbeiter wird sie gleich bedienen. Geniessen Sie Ihren Aufenthalt!",
+        "error": "Leider ist etwas schiefgelaufen. Ich werde noch einmal neu starten."
     }
 }

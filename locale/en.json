@@ -40,6 +40,7 @@
             "We would love to welcome you on another day at the dinner for one restaurant!"
         ],
         "askToFollow": "Thank you for your patience. Please follow me to your table.",
-        "assignTable": "This is your table. Please wait. A human employee will be serving you shortly. Enjoy your stay."
+        "assignTable": "This is your table. Please wait. A human employee will be serving you shortly. Enjoy your stay.",
+        "error": "Unfortunately, something went wrong. I'll try to restart."
     }
 }

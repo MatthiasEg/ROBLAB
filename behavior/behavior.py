@@ -58,11 +58,9 @@ class Behavior(object):
             if isinstance(search_state, TableOccupied):
                 self.__say_table_occupied()
             elif isinstance(search_state, TableNotFound):
-                # TODO: say no table found
-                pass
+                self.speech_wrapper.animated_say(self.__sentences["noTablesForAmount"])
             elif isinstance(search_state, TableStateError):
-                # TODO: say something with error
-                pass
+                self.speech_wrapper.animated_say(self.__sentences["error"])
         self.__return_to_waiting_zone()
         self.__setup_customer_reception()
 
