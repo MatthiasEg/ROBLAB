@@ -36,12 +36,6 @@ class Behavior(object):
         self.__speech_wrapper = SpeechWrapper()
         self.__tablet_wrapper = TabletWrapper()
 
-    def __load_locales(self):
-        with open(os.path.join(os.getcwd(), const.path_to_locale_file), 'r') as f:
-            data = json.load(f)
-        self.__sentences = data["sentences"]
-        self.__vocabularies = data["vocabularies"]
-
     def start_behavior(self):
         # self.__position_movement_wrapper.learn_home()
         self.__setup_customer_reception()
@@ -327,3 +321,9 @@ class Behavior(object):
         self.__speech_wrapper.animated_say(self.__sentences["noTableAvailable"])
         time.sleep(.5)
         self.__speech_wrapper.animated_say(self.__sentences["comeBackAnotherDay"])
+
+    def __load_locales(self):
+        with open(os.path.join(os.getcwd(), const.path_to_locale_file), 'r') as f:
+            data = json.load(f)
+        self.__sentences = data["sentences"]
+        self.__vocabularies = data["vocabularies"]
