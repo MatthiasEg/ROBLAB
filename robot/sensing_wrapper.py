@@ -61,9 +61,6 @@ class SensingWrapper:
 
         return self.__detection.get_object_positions(image_path, object_name, 0.4)
 
-    def get_person_amount(self, object_name, image_path):
-        return len(self.__detection.get_object_positions(image_path, object_name, 0.4))
-
     def get_red_cups_center_position(self, cup_goal):
         image_path = "cup_detection.jpg"
         self.__take_picture(image_path)
