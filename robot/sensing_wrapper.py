@@ -61,6 +61,9 @@ class SensingWrapper:
 
         return self.__detection.get_object_positions(image_path, object_name, 0.4)
 
+    def get_person_amount(self, object_name, image_path):
+        return len(self.__detection.get_object_positions(image_path, object_name, 0.4))
+
     def get_red_cups_center_position(self, cup_goal):
         image_path = "cup_detection.jpg"
         self.__take_picture(image_path)
@@ -90,7 +93,8 @@ class SensingWrapper:
             current_index = 0
             center_goals = []
             while current_index <= (len(keypoint_sizes) - cup_goal):
-                goal_series, goal_keypoints = self.__build_goal_params(cup_goal, keypoint_sizes, keypoints, current_index)
+                goal_series, goal_keypoints = self.__build_goal_params(cup_goal, keypoint_sizes, keypoints,
+                                                                       current_index)
                 center_goal = self.__calculate_centers(goal_series, goal_keypoints)
                 if center_goal is not None:
                     center_goals.append(center_goal)
@@ -186,6 +190,3 @@ class SensingWrapper:
             self.stop_sonar_sensors()
         except Exception, ex:
             print(ex)
-
-
-
