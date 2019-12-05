@@ -63,7 +63,8 @@ class Behavior(object):
             elif isinstance(search_state, TableStateError):
                 # TODO: say something with error
                 pass
-            self.__setup_customer_reception()
+        self.__return_to_waiting_zone()
+        self.__setup_customer_reception()
 
     def __setup_customer_reception(self):
         if not self.sensing_wrapper.is_face_detection_enabled():
