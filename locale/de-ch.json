@@ -33,6 +33,9 @@
             "Einen Moment bitte. Ich versuche einen idealen Platz für Sie zu finden!",
             "Bitte warten Sie, ich finde einen netten Tisch für Sie!"
         ],
+        "moreTimeToSearch": [
+            "Ich brauche ein bisschen mehr Zeit um den passendne Platz zu finden. Vielen Dank für die Geduld."
+        ],
         "noTableAvailable": [
             "Leider sind alle passenden Tische bereits belegt. Wir entschuldigen uns für die Unannehmlichkeiten."
         ],
