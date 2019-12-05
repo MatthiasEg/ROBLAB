@@ -1,8 +1,8 @@
 from pandas import Series
 
 import const
-from robot.object_detection.Camera import Camera
-from robot.object_detection.FileTransfer import FileTransfer
+from robot.object_detection.camera import Camera
+from robot.object_detection.file_transfer import FileTransfer
 from robot.object_detection.object_detection import ObjectDetection
 
 
@@ -185,7 +185,7 @@ class SensingWrapper:
 
     def __take_picture(self, file_name):
         remote_folder_path = "/home/nao/recordings/cameras/"
-        self.__camera.take_picture(remote_folder_path, file_name)
+        self.__camera.camera(remote_folder_path, file_name)
         local = file_name
         remote = remote_folder_path + file_name
 

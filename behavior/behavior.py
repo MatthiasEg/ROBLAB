@@ -53,7 +53,7 @@ class Behavior(object):
             if self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
                 self.speech_wrapper.say(self.__sentences["noTablesForAmount"])
 
-            if self.__ask_person_amount() is not None
+            if self.__ask_person_amount() is not None:
                 if self.__recognized_words_certainty > 0.55:
                     break
 
