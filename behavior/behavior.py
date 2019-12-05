@@ -48,9 +48,11 @@ class Behavior(object):
         if isinstance(search_state, TableFound):
             self.__ask_to_follow()
             self.__go_to_table(search_state.goal_location)
-            self.__body_movement_wrapper.enable_autonomous_life(True)
             self.__position_movement_wrapper.move_to(0, 0, 180)
+            self.__body_movement_wrapper.set_head_up(30)
+            self.__body_movement_wrapper.set_head_left(0)
             self.__assign_table()
+            time.sleep(2)
         else:
             if isinstance(search_state, TableOccupied):
                 self.__say_table_occupied()
@@ -201,8 +203,8 @@ class Behavior(object):
 
     def __search_table(self):
         self.__speech_wrapper.say(self.__sentences["searchTable"])
-        self.__position_movement_wrapper.move_to(0, 0, 180)
         self.__body_movement_wrapper.enable_autonomous_life(False)
+        self.__position_movement_wrapper.move_to(0, 0, 180)
         self.__body_movement_wrapper.set_head_down(0)
         self.__body_movement_wrapper.set_head_right(0)
         time.sleep(1)
@@ -250,8 +252,10 @@ class Behavior(object):
             time_movement_start = round(time.time() * 1000)
             distance_meters = self.__sensing_wrapper.get_sonar_distance("Front")
             if float(distance_meters) >= 1.5:
-                if float(distance_meters) >= 1.3:
+                if float(distance_meters) >= 1.0:
                     goal_center = self.__sensing_wrapper.get_red_cups_center_position(self.__person_amount)
+                    if goal_center is None:
+                        goal_center = self.__sensing_wrapper.get_red_cups_center_position(self.__person_amount)
                     if goal_center is not None:
                         self.__move_towards_goal_location(goal_center)
                         now = round(time.time() * 1000)
@@ -259,27 +263,27 @@ class Behavior(object):
                         if diff <= 3000:
                             self.__move_towards_goal_location(goal_center)
                         else:
-                            self.__position_movement_wrapper.move(0.5, 0, 0)
+                            self.__position_movement_wrapper.move(0.7, 0, 0)
                     else:
-                        self.__position_movement_wrapper.move(0.5, 0, 0)
+                        self.__position_movement_wrapper.move(0.7, 0, 0)
                 else:
                     self.__position_movement_wrapper.stop_movement()
                     self.__sensing_wrapper.stop_sonar_sensors()
                     break
             else:
-                if float(distance_meters) <= .8:
+                if float(distance_meters) <= 1.0:
                     self.__position_movement_wrapper.stop_movement()
                     self.__position_movement_wrapper.move_to(0, 0, 180)
                     self.__sensing_wrapper.stop_sonar_sensors()
                     break
                 else:
-                    self.__position_movement_wrapper.move(0.5, 0, 0)
+                    self.__position_movement_wrapper.move(0.7, 0, 0)
 
     def __move_towards_goal_location(self, goal_center):
         pixels_to_move_x = (640 / 2) - goal_center[0]
         degrees_to_move_x = int(round(pixels_to_move_x / 15.0))
         print("table goal position: %s, move_x: %s" % (goal_center, degrees_to_move_x))
-        self.__position_movement_wrapper.move(0.5, 0, degrees_to_move_x)
+        self.__position_movement_wrapper.move(0.7, 0, degrees_to_move_x)
 
     def __search_for_correct_table(self):
         self.__speech_wrapper.say(self.__sentences["moreTimeToSearch"])
