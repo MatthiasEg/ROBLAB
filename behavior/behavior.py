@@ -40,7 +40,7 @@ class Behavior(object):
         self.__vocabularies = data["vocabularies"]
 
     def start_behavior(self):
-        self.position_movement_wrapper.learn_home()
+        # self.position_movement_wrapper.learn_home()
         self.__setup_customer_reception()
         self.__check_person_amount()
         search_state = self.__search_table()
@@ -69,7 +69,7 @@ class Behavior(object):
         self.sensing_wrapper.set_maximum_detection_range_in_meters(3)
         self.sensing_wrapper.enable_face_recognition()
         self.sensing_wrapper.enable_face_tracking()
-        # self.sensing_wrapper.enable_fast_mode()
+        self.sensing_wrapper.enable_fast_mode()
 
         self.body_movement_wrapper.enable_autonomous_life(True)
 
