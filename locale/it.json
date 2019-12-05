@@ -1,0 +1,86 @@
+{
+    "vocabularies": {
+        "personAmount": ["one", "two", "three", "four", "five", "six", "seven", "aight", "nine", "ten"],
+        "yes": ["yes", "yep", "yeah", "sure", "ok", "alright", "correct", "ja"],
+        "no": ["no", "nope", "nein", "niet", "not", "don't"]
+    },
+    "sentences": {
+        "hello": "Buongiorno",
+        "greeting": [
+            "Buongiorno, bibbedi babbedi!",
+            "Buongiorno, babbedi bubbedi!"
+        ],
+        "estimateAmountOfPeople": [
+            "bibbedi babbedi",
+            "babbedi bubbedi"
+        ],
+        "estimateAmountOfPeopleAgain": [
+            "bibbedi babbedi",
+            "babbedi bubbedi"
+        ],
+        "stayInFrontOfMe": [
+            "bibbedi babbedi",
+            "babbedi bubbedi"
+        ],
+        "seeingNoPersons": [
+            "bibbedi babbedi",
+            "babbedi bubbedi"
+        ],
+        "seeingOnePerson": [
+            "bibbedi babbedi",
+            "babbedi bubbedi"
+        ],
+        "seeingMultiplePersons": [
+            "bibbedi babbedi",
+            "babbedi bubbedi"
+        ],
+        "askAmountToSearch": [
+            "bibbedi babbedi",
+            "babbedi bubbedi"
+        ],
+        "availableTables": [
+            "bibbedi babbedi",
+            "babbedi bubbedi"
+        ],
+        "askToSearchTableForOnePerson": [
+            "bibbedi babbedi",
+            "babbedi bubbedi"
+        ],
+        "askToSearchTableForMultiplePersons": [
+            "bibbedi babbedi",
+            "babbedi bubbedi"
+        ],
+        "noTablesForAmount": [
+            "bibbedi babbedi",
+            "babbedi bubbedi"
+        ],
+        "searchTable": [
+            "bibbedi babbedi",
+            "babbedi bubbedi"
+        ],
+        "moreTimeToSearch": [
+            "bibbedi babbedi",
+            "babbedi bubbedi"
+        ],
+        "noTableAvailable": [
+            "bibbedi babbedi",
+            "babbedi bubbedi"
+        ],
+        "comeBackAnotherDay": [
+            "bibbedi babbedi",
+            "babbedi bubbedi"
+        ],
+        "askToFollow": [
+            "bibbedi babbedi",
+            "babbedi bubbedi"
+        ],
+        "assignTable": [
+            "bibbedi babbedi",
+            "babbedi bubbedi"
+        ],
+        "error": [
+            "bibbedi babbedi",
+            "babbedi bubbedi"
+        ]
+    }
+}
