@@ -268,7 +268,7 @@ class Behavior(object):
                     self.__sensing_wrapper.stop_sonar_sensors()
                     break
             else:
-                if float(distance_meters) <= 1.0:
+                if float(distance_meters) <= 1.0 or self.__position_movement_wrapper.collision_avoided:
                     self.__position_movement_wrapper.stop_movement()
                     self.__position_movement_wrapper.move_to(0, 0, 180)
                     self.__sensing_wrapper.stop_sonar_sensors()
