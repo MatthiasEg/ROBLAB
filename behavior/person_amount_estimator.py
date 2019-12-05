@@ -76,8 +76,8 @@ class PersonAmountEstimator:
         # Detect faces in the image
         faces = face_cascade.detectMultiScale(
             gray,
-            scaleFactor=1.1,
-            minNeighbors=5,
+            scaleFactor=1.05,
+            minNeighbors=4,
             minSize=(30, 30),
             flags=cv2.CASCADE_SCALE_IMAGE
         )
