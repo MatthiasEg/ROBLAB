@@ -48,9 +48,11 @@ class Behavior(object):
         if isinstance(search_state, TableFound):
             self.__ask_to_follow()
             self.__go_to_table(search_state.goal_location)
-            self.__body_movement_wrapper.enable_autonomous_life(True)
             self.__position_movement_wrapper.move_to(0, 0, 180)
+            self.__body_movement_wrapper.set_head_up(30)
+            self.__body_movement_wrapper.set_head_left(0)
             self.__assign_table()
+            time.sleep(2)
         else:
             if isinstance(search_state, TableOccupied):
                 self.__say_table_occupied()
