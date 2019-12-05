@@ -44,5 +44,5 @@ class Camera:
         self.__al_photo.setResolution(resolution)
         self.__al_photo.setPictureFormat(format)
 
-    def take_picture(self, path, file_name):
+    def camera(self, path, file_name):
         self.__al_photo.takePicture(path, file_name)

@@ -2,8 +2,8 @@ import cv2
 import statistics as statistics
 
 import const
-from robot.object_detection.Camera import Camera
-from robot.object_detection.FileTransfer import FileTransfer
+from robot.object_detection.camera import Camera
+from robot.object_detection.file_transfer import FileTransfer
 from thread import start_new_thread
 
 
@@ -62,7 +62,7 @@ class PersonAmountEstimator:
 
         remote_folder_path = "/home/nao/recordings/cameras/"
         file_name = self.__picture_file_name + ".jpg"
-        self.__camera.take_picture(remote_folder_path, file_name)
+        self.__camera.camera(remote_folder_path, file_name)
         local_project_path = const.path_to_pictures + file_name
         self.__current_picture_project_path = local_project_path
         remote = remote_folder_path + file_name
