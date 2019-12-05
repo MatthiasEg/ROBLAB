@@ -217,7 +217,7 @@ class Behavior(object):
     def __search_table(self):
         self.speech_wrapper.say(self.__sentences["searchTable"])
         self.body_movement_wrapper.enable_autonomous_life(False)
-        # self.position_movement_wrapper.move_to(0, 0, 180)
+        self.position_movement_wrapper.move_to(0, 0, 180)
         self.body_movement_wrapper.set_head_down(0)
         self.body_movement_wrapper.set_head_right(0)
         time.sleep(2)
