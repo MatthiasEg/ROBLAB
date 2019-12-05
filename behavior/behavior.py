@@ -28,10 +28,10 @@ class Behavior(object):
         self.__recognized_words_certainty = 0
 
     def __initialize_wrappers(self):
-        self.body_movement_wrapper = BodyMovementWrapper()
-        self.position_movement_wrapper = PositionMovementWrapper()
-        self.sensing_wrapper = SensingWrapper()
-        self.speech_wrapper = SpeechWrapper()
+        self.__body_movement_wrapper = BodyMovementWrapper()
+        self.__position_movement_wrapper = PositionMovementWrapper()
+        self.__sensing_wrapper = SensingWrapper()
+        self.__speech_wrapper = SpeechWrapper()
 
     def __load_locales(self):
         with open(os.path.join(os.getcwd(), const.path_to_locale_file), 'r') as f:
@@ -40,60 +40,60 @@ class Behavior(object):
         self.__vocabularies = data["vocabularies"]
 
     def start_behavior(self):
-        self.position_movement_wrapper.learn_home()
+        self.__position_movement_wrapper.learn_home()
         self.__setup_customer_reception()
         self.__check_person_amount()
         search_state = self.__search_table()
         if isinstance(search_state, TableFound):
             self.__ask_to_follow()
             self.__go_to_table(search_state.goal_location)
-            self.body_movement_wrapper.enable_autonomous_life(True)
-            self.position_movement_wrapper.move_to(0, 0, 180)
+            self.__body_movement_wrapper.enable_autonomous_life(True)
+            self.__position_movement_wrapper.move_to(0, 0, 180)
             self.__assign_table()
         else:
             if isinstance(search_state, TableOccupied):
                 self.__say_table_occupied()
             elif isinstance(search_state, TableNotFound):
-                self.speech_wrapper.animated_say(self.__sentences["noTablesForAmount"])
+                self.__speech_wrapper.animated_say(self.__sentences["noTablesForAmount"])
             elif isinstance(search_state, TableStateError):
-                self.speech_wrapper.animated_say(self.__sentences["error"])
+                self.__speech_wrapper.animated_say(self.__sentences["error"])
         self.__return_to_waiting_zone()
         self.__setup_customer_reception()
 
     def __setup_customer_reception(self):
-        if not self.sensing_wrapper.is_face_detection_enabled():
+        if not self.__sensing_wrapper.is_face_detection_enabled():
             raise Exception('No Face detection possible with this system!')
 
-        self.sensing_wrapper.reset_population()
+        self.__sensing_wrapper.reset_population()
 
-        self.sensing_wrapper.set_maximum_detection_range_in_meters(3)
-        self.sensing_wrapper.enable_face_recognition()
-        self.sensing_wrapper.enable_face_tracking()
-        self.sensing_wrapper.enable_fast_mode()
+        self.__sensing_wrapper.set_maximum_detection_range_in_meters(3)
+        self.__sensing_wrapper.enable_face_recognition()
+        self.__sensing_wrapper.enable_face_tracking()
+        self.__sensing_wrapper.enable_fast_mode()
 
-        self.body_movement_wrapper.enable_autonomous_life(True)
+        self.__body_movement_wrapper.enable_autonomous_life(True)
 
-        face_detected_subscriber = self.sensing_wrapper.get_memory_subscriber("FaceDetected")
+        face_detected_subscriber = self.__sensing_wrapper.get_memory_subscriber("FaceDetected")
         face_detected_subscriber.signal.connect(self.__on_human_detected)
-        self.sensing_wrapper.start_face_detection("detect_face")
+        self.__sensing_wrapper.start_face_detection("detect_face")
 
         while not self.__first_person_detected:
             time.sleep(0.1)
 
         for i in range(const.people_counting_number_of_retries):
             if self.__person_amount < 1:
-                self.speech_wrapper.say(self.__sentences["seeingNoPersons"])
-                self.speech_wrapper.say(self.__sentences["estimateAmountOfPeopleAgain"])
+                self.__speech_wrapper.say(self.__sentences["seeingNoPersons"])
+                self.__speech_wrapper.say(self.__sentences["estimateAmountOfPeopleAgain"])
                 self.__person_amount = self.__count_people(const.people_counting_time)
                 continue
 
             if not self.__ask_person_amount_correct():
-                self.speech_wrapper.say(self.__sentences["estimateAmountOfPeopleAgain"])
+                self.__speech_wrapper.say(self.__sentences["estimateAmountOfPeopleAgain"])
                 self.__person_amount = self.__count_people(const.people_counting_time)
             else:
                 break
 
-        self.body_movement_wrapper.enable_autonomous_life(False)
+        self.__body_movement_wrapper.enable_autonomous_life(False)
 
     def __count_people(self, time_to_sleep):
         person_amount_estimator = PersonAmountEstimator()
@@ -110,18 +110,18 @@ class Behavior(object):
             if self.__first_to_enter_callback:
                 self.__first_to_enter_callback = False
 
-                self.sensing_wrapper.stop_face_detection("detect_face")
+                self.__sensing_wrapper.stop_face_detection("detect_face")
                 self.__wait_for_new_customers = False
-                self.speech_wrapper.animated_say(self.__sentences["greeting"])
-                self.speech_wrapper.say(self.__sentences["estimateAmountOfPeople"])
-                self.speech_wrapper.say(self.__sentences["stayInFrontOfMe"])
+                self.__speech_wrapper.animated_say(self.__sentences["greeting"])
+                self.__speech_wrapper.say(self.__sentences["estimateAmountOfPeople"])
+                self.__speech_wrapper.say(self.__sentences["stayInFrontOfMe"])
                 self.__person_amount = self.__count_people(const.people_counting_time)
                 self.__first_person_detected = True
 
     def __check_person_amount(self):
         while not self.__person_amount_correct or self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
             if self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
-                self.speech_wrapper.animated_say(self.__sentences["noTablesForAmount"])
+                self.__speech_wrapper.animated_say(self.__sentences["noTablesForAmount"])
 
             if self.__ask_person_amount() is not None:
                 if self.__recognized_words_certainty > 0.55:
@@ -129,10 +129,10 @@ class Behavior(object):
 
     def __ask_person_amount(self):
         self.__person_amount = None
-        self.speech_wrapper.animated_say(self.__sentences["askAmountToSearch"])
-        self.speech_wrapper.animated_say(self.__sentences["availableTables"].format(const.min_persons, const.max_persons))
+        self.__speech_wrapper.animated_say(self.__sentences["askAmountToSearch"])
+        self.__speech_wrapper.animated_say(self.__sentences["availableTables"].format(const.min_persons, const.max_persons))
 
-        self.speech_wrapper.start_to_listen(
+        self.__speech_wrapper.start_to_listen(
             self.__vocabularies["personAmount"],
             const.speech_recognition_language,
             const.speech_recognition_precision,
@@ -142,7 +142,7 @@ class Behavior(object):
         while self.__waiting_for_an_answer:
             time.sleep(1)
 
-        self.speech_wrapper.stop_listening()
+        self.__speech_wrapper.stop_listening()
 
         return self.__person_amount
 
@@ -172,13 +172,13 @@ class Behavior(object):
 
     def __ask_person_amount_correct(self):
         if self.__person_amount == 1:
-            self.speech_wrapper.animated_say(self.__sentences["askToSearchTableForOnePerson"])
+            self.__speech_wrapper.animated_say(self.__sentences["askToSearchTableForOnePerson"])
         elif self.__person_amount == 0:
             return False
         else:
-            self.speech_wrapper.animated_say(self.__sentences["askToSearchTableForMultiplePersons"].format(self.__person_amount))
+            self.__speech_wrapper.animated_say(self.__sentences["askToSearchTableForMultiplePersons"].format(self.__person_amount))
 
-        self.speech_wrapper.start_to_listen(
+        self.__speech_wrapper.start_to_listen(
             self.__vocabularies["yes"] + self.__vocabularies["no"],
             const.speech_recognition_language,
             const.speech_recognition_precision,
@@ -188,7 +188,7 @@ class Behavior(object):
         while self.__waiting_for_an_answer:
             time.sleep(1)
 
-        self.speech_wrapper.stop_listening()
+        self.__speech_wrapper.stop_listening()
 
         return self.__person_amount_correct
 
@@ -214,18 +214,18 @@ class Behavior(object):
         print(message)
 
     def __search_table(self):
-        self.speech_wrapper.say(self.__sentences["searchTable"])
-        self.position_movement_wrapper.move_to(0, 0, 180)
-        self.body_movement_wrapper.enable_autonomous_life(False)
-        self.body_movement_wrapper.set_head_down(0)
-        self.body_movement_wrapper.set_head_right(0)
+        self.__speech_wrapper.say(self.__sentences["searchTable"])
+        self.__position_movement_wrapper.move_to(0, 0, 180)
+        self.__body_movement_wrapper.enable_autonomous_life(False)
+        self.__body_movement_wrapper.set_head_down(0)
+        self.__body_movement_wrapper.set_head_right(0)
         time.sleep(1)
 
         try:
             while True:
-                goal_center = self.sensing_wrapper.get_red_cups_center_position(self.__person_amount)
+                goal_center = self.__sensing_wrapper.get_red_cups_center_position(self.__person_amount)
                 if goal_center is not None:
-                    detected_persons = self.sensing_wrapper.get_object_positions("person")
+                    detected_persons = self.__sensing_wrapper.get_object_positions("person")
                     table_occupied = self.__is_table_occupied(detected_persons, goal_center)
                     if table_occupied:
                         return TableOccupied()
@@ -236,8 +236,8 @@ class Behavior(object):
                         return TableNotFound()
         except Exception, e:
             print(e)
-            self.position_movement_wrapper.stop_movement()
-            self.sensing_wrapper.stop_sonar_sensors()
+            self.__position_movement_wrapper.stop_movement()
+            self.__sensing_wrapper.stop_sonar_sensors()
             return TableStateError()
 
     @staticmethod
@@ -254,69 +254,69 @@ class Behavior(object):
         return False
 
     def __ask_to_follow(self):
-        self.speech_wrapper.animated_say(self.__sentences["askToFollow"])
+        self.__speech_wrapper.animated_say(self.__sentences["askToFollow"])
 
     def __go_to_table(self, goal_center):
-        self.sensing_wrapper.start_sonar_sensors()
+        self.__sensing_wrapper.start_sonar_sensors()
         self.__move_towards_goal_location(goal_center)
         while True:
             time_movement_start = round(time.time() * 1000)
-            distance_meters = self.sensing_wrapper.get_sonar_distance("Front")
+            distance_meters = self.__sensing_wrapper.get_sonar_distance("Front")
             if float(distance_meters) >= 1.5:
                 if float(distance_meters) >= 1.3:
-                    goal_center = self.sensing_wrapper.get_red_cups_center_position(self.__person_amount)
+                    goal_center = self.__sensing_wrapper.get_red_cups_center_position(self.__person_amount)
                     if goal_center is not None:
                         now = round(time.time() * 1000)
                         diff = now - time_movement_start
                         if diff <= 2000:
                             self.__move_towards_goal_location(goal_center)
                         else:
-                            self.position_movement_wrapper.move(0.5, 0, 0)
+                            self.__position_movement_wrapper.move(0.5, 0, 0)
                     else:
-                        self.position_movement_wrapper.move(0.5, 0, 0)
+                        self.__position_movement_wrapper.move(0.5, 0, 0)
                 else:
-                    self.position_movement_wrapper.stop_movement()
-                    self.sensing_wrapper.stop_sonar_sensors()
+                    self.__position_movement_wrapper.stop_movement()
+                    self.__sensing_wrapper.stop_sonar_sensors()
                     break
             else:
                 if float(distance_meters) <= .8:
-                    self.position_movement_wrapper.stop_movement()
-                    self.position_movement_wrapper.move_to(0, 0, 180)
-                    self.sensing_wrapper.stop_sonar_sensors()
+                    self.__position_movement_wrapper.stop_movement()
+                    self.__position_movement_wrapper.move_to(0, 0, 180)
+                    self.__sensing_wrapper.stop_sonar_sensors()
                     break
                 else:
-                    self.position_movement_wrapper.move(0.5, 0, 0)
+                    self.__position_movement_wrapper.move(0.5, 0, 0)
 
     def __move_towards_goal_location(self, goal_center):
         pixels_to_move_x = (640 / 2) - goal_center[0]
         degrees_to_move_x = int(round(pixels_to_move_x / 15.0))
         print("table goal position: %s, move_x: %s" % (goal_center, degrees_to_move_x))
-        self.position_movement_wrapper.move(0.5, 0, degrees_to_move_x)
+        self.__position_movement_wrapper.move(0.5, 0, degrees_to_move_x)
 
     def __search_for_correct_table(self):
-        self.speech_wrapper.say(self.__sentences["moreTimeToSearch"])
+        self.__speech_wrapper.say(self.__sentences["moreTimeToSearch"])
         max_number_of_tries = 2
         current_try = 0
         number_of_turns = 0
         max_turns = 9
 
         while current_try < max_number_of_tries:
-            goal_centers = self.sensing_wrapper.get_red_cups_center_position(self.__person_amount)
+            goal_centers = self.__sensing_wrapper.get_red_cups_center_position(self.__person_amount)
             if goal_centers is None:
                 if number_of_turns is 0:
-                    self.position_movement_wrapper.stop_movement()
-                    self.body_movement_wrapper.set_head_down(0)
-                    self.position_movement_wrapper.move_to(0, 0, 90)
+                    self.__position_movement_wrapper.stop_movement()
+                    self.__body_movement_wrapper.set_head_down(0)
+                    self.__position_movement_wrapper.move_to(0, 0, 90)
 
                 if number_of_turns < max_turns:
-                    self.position_movement_wrapper.move_to(0, 0, -20)
+                    self.__position_movement_wrapper.move_to(0, 0, -20)
                     time.sleep(.5)
                     number_of_turns = number_of_turns + 1
                 else:
-                    self.position_movement_wrapper.move_to(0, 0, 90)
-                    self.position_movement_wrapper.move(.5, 0, 0)
+                    self.__position_movement_wrapper.move_to(0, 0, 90)
+                    self.__position_movement_wrapper.move(.5, 0, 0)
                     time.sleep(2)
-                    self.position_movement_wrapper.stop_movement()
+                    self.__position_movement_wrapper.stop_movement()
                     number_of_turns = 0
                     current_try = current_try + 1
             else:
@@ -324,16 +324,16 @@ class Behavior(object):
         return False
 
     def __assign_table(self):
-        self.speech_wrapper.animated_say(self.__sentences["assignTable"])
+        self.__speech_wrapper.animated_say(self.__sentences["assignTable"])
         #time.sleep(2)
         self.__wait_for_new_customers = True
 
     def __return_to_waiting_zone(self):
-        self.position_movement_wrapper.go_to_home()
+        self.__position_movement_wrapper.go_to_home()
 
     def __say_table_occupied(self):
-        self.body_movement_wrapper.enable_autonomous_life(True)
-        self.position_movement_wrapper.move_to(0, 0, 180)
-        self.speech_wrapper.animated_say(self.__sentences["noTableAvailable"])
+        self.__body_movement_wrapper.enable_autonomous_life(True)
+        self.__position_movement_wrapper.move_to(0, 0, 180)
+        self.__speech_wrapper.animated_say(self.__sentences["noTableAvailable"])
         time.sleep(.5)
-        self.speech_wrapper.animated_say(self.__sentences["comeBackAnotherDay"])
+        self.__speech_wrapper.animated_say(self.__sentences["comeBackAnotherDay"])
