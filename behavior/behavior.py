@@ -43,6 +43,7 @@ class Behavior(object):
         self.__vocabularies = data["vocabularies"]
 
     def start_behavior(self):
+        # self.position_movement_wrapper.move_to(0, 0, 180)
         self.position_movement_wrapper.learn_home()
         self.__setup_customer_reception()
         self.__check_person_amount()
@@ -229,18 +230,8 @@ class Behavior(object):
                     detected_persons = self.sensing_wrapper.get_object_positions("person")
                     table_occupied = self.__is_table_occupied(detected_persons, goal_center)
                     if table_occupied:
-                        # self.body_movement_wrapper.enable_autonomous_life(True)
-                        # self.position_movement_wrapper.move_to(0, 0, 180)
-                        # self.speech_wrapper.say(self.__sentences["noTableAvailable"])
-                        # time.sleep(.5)
-                        # self.speech_wrapper.say(self.__sentences["comeBackAnotherDay"])
                         return TableOccupied()
                     else:
-                        # self.__ask_to_follow()
-                        # self.__go_to_table(goal_center)
-                        # self.body_movement_wrapper.enable_autonomous_life(True)
-                        # self.position_movement_wrapper.move_to(0, 0, 180)
-                        # self.__assign_table()
                         return TableFound(goal_center)
                 else:
                     if not self.__search_for_correct_table():
@@ -248,6 +239,7 @@ class Behavior(object):
         except Exception, e:
             print(e)
             self.position_movement_wrapper.stop_movement()
+            self.sensing_wrapper.stop_sonar_sensors()
             return TableStateError()
 
     @staticmethod
@@ -267,12 +259,13 @@ class Behavior(object):
         self.speech_wrapper.animated_say(self.__sentences["askToFollow"])
 
     def __go_to_table(self, goal_center):
+        self.sensing_wrapper.start_sonar_sensors()
         self.__move_towards_goal_location(goal_center)
         while True:
             time_movement_start = round(time.time() * 1000)
             distance_meters = self.sensing_wrapper.get_sonar_distance("Front")
             if float(distance_meters) >= 1.5:
-                if float(distance_meters) >= 1.0:
+                if float(distance_meters) >= 1.3:
                     goal_center = self.sensing_wrapper.get_red_cups_center_position(self.__person_amount)
                     if goal_center is not None:
                         now = round(time.time() * 1000)
@@ -285,11 +278,13 @@ class Behavior(object):
                         self.position_movement_wrapper.move(0.5, 0, 0)
                 else:
                     self.position_movement_wrapper.stop_movement()
+                    self.sensing_wrapper.stop_sonar_sensors()
                     break
             else:
                 if float(distance_meters) <= .8:
                     self.position_movement_wrapper.stop_movement()
                     self.position_movement_wrapper.move_to(0, 0, 180)
+                    self.sensing_wrapper.stop_sonar_sensors()
                     break
                 else:
                     self.position_movement_wrapper.move(0.5, 0, 0)
