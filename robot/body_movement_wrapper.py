@@ -30,13 +30,13 @@ class BodyMovementWrapper:
         self.armJointNamesL = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
         self.armJointNamesR = ["RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
 
-    def enableMoveArms(self, enabled):
+    def enable_move_arms(self, enabled):
         self.motion_service.setMoveArmsEnabled(enabled, enabled)
 
-    def moveArmsThread(self):
-        self.setArmsUp(Actuators.BOTH, 90)
-        self.setElbowLeft(Actuators.RArm, 45)
-        self.setElbowRight(Actuators.LArm, 45)
+    def move_arms_thread(self):
+        self.set_arms_up(Actuators.BOTH, 90)
+        self.set_elbow_left(Actuators.RArm, 45)
+        self.set_elbow_right(Actuators.LArm, 45)
         time.sleep(0.1)
 
         self.motion_service.angleInterpolation('RElbowRoll',[math.radians(-1)],[0.2],False)
@@ -45,17 +45,17 @@ class BodyMovementWrapper:
         self.motion_service.angleInterpolation('RElbowRoll',[math.radians(1)],[0.2],False)
         self.motion_service.angleInterpolation('LElbowRoll',[math.radians(1)],[0.2],False)
 
-    def moveArmsBackThread(self):
-         self.setArmsUp(Actuators.BOTH, 70)
+    def move_arms_back_thread(self):
+         self.set_arms_up(Actuators.BOTH, 70)
          time.sleep(0.1)
 
-    def dropArmsThread(self):
-        self.moveArmsDown(Actuators.BOTH, 40)
+    def drop_arms_thread(self):
+        self.move_arms_down(Actuators.BOTH, 40)
         time.sleep(2)
-        self.moveElbowRight(Actuators.RArm, 50)
-        self.moveElbowLeft(Actuators.LArm, 50)
+        self.move_elbow_right(Actuators.RArm, 50)
+        self.move_elbow_left(Actuators.LArm, 50)
 
-    def moveArms(self, actuator, armArr):
+    def move_arms(self, actuator, armArr):
         # Arm Right (for left arm mirror the movement)
         # [   arm             { - : up, + : down } | Range: -119.5 to 119.5
         #     shoulder        { - : right side horizontal movement, + : left side horizontal movement } | Range: -89.5 to -0.5
@@ -96,37 +96,37 @@ class BodyMovementWrapper:
                 # Move right hand without compromising last position
                 self.motion_service.setAngles(self.armJointNamesR[index], math.radians(deg), self.fractionMaxSpeed)
 
-    def setArmsUp(self, actuator, deg):
+    def set_arms_up(self, actuator, deg):
         self.__setArms_intern(actuator, -deg, 0)
 
-    def moveArmsUp(self, actuator, deg):
+    def move_arms_up(self, actuator, deg):
         self.__moveArms_intern(actuator, -deg, 0)
 
-    def moveArmsDown(self, actuator, deg):
+    def move_arms_down(self, actuator, deg):
         self.__moveArms_intern(actuator, deg, 0)
 
-    def moveShoulderRight(self, actuator, deg):
+    def move_shoulder_right(self, actuator, deg):
         self.__moveArms_intern(actuator, -deg, 1)
 
-    def moveShoulderLeft(self, actuator, deg):
+    def move_shoulder_left(self, actuator, deg):
         self.__moveArms_intern(actuator, deg, 1)
 
-    def setElbowLeft(self, actuator, deg):
+    def set_elbow_left(self, actuator, deg):
         self.__setArms_intern(actuator, deg, 3)
 
-    def setElbowRight(self, actuator, deg):
+    def set_elbow_right(self, actuator, deg):
         self.__setArms_intern(actuator, -deg, 3)
 
-    def moveElbowLeft(self, actuator, deg):
+    def move_elbow_left(self, actuator, deg):
         self.__moveArms_intern(actuator, deg, 3)
 
-    def moveElbowRight(self, actuator, deg):
+    def move_elbow_right(self, actuator, deg):
         self.__moveArms_intern(actuator, -deg, 3)
 
-    def rotateElbowRight(self, actuator, deg):
+    def rotate_elbow_right(self, actuator, deg):
         self.__moveArms_intern(actuator, deg, 2)
 
-    def rotateElbowLeft(self, actuator, deg):
+    def rotate_elbow_left(self, actuator, deg):
         self.__moveArms_intern(actuator, -deg, 2)
         self.enable_autonomous_life(False)
         self.enable_move_arms(False)
@@ -142,9 +142,6 @@ class BodyMovementWrapper:
         self.__robot.ALMotion.setBreathEnabled('Body', enabled)
 
         print('enabled autonomous life: {}'.format(enabled))
-
-    def enable_move_arms(self, enabled):
-        self.__robot.ALMotion.setMoveArmsEnabled(enabled, enabled)
 
     def initial_position(self):
         self.__robot.ALRobotPosture.goToPosture("StandInit", self.fractionMaxSpeed)
