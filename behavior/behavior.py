@@ -47,16 +47,7 @@ class Behavior(object):
     def start_behavior(self):
         self.position_movement_wrapper.learn_home()
         self.__setup_customer_reception()
-
-        while not self.__person_amount_correct or self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
-
-            if self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
-                self.speech_wrapper.say(self.__sentences["noTablesForAmount"])
-
-            if self.__ask_person_amount() is not None:
-                if self.__recognized_words_certainty > 0.55:
-                    break
-
+        self.__check_person_amount()
         self.__search_table()
 
         # if self.__search_table():
@@ -126,6 +117,15 @@ class Behavior(object):
                 self.speech_wrapper.say(self.__sentences["greeting"])
                 self.__person_amount = self.__count_people(const.people_counting_time)
                 self.__first_person_detected = True
+
+    def __check_person_amount(self):
+        while not self.__person_amount_correct or self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
+            if self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
+                self.speech_wrapper.say(self.__sentences["noTablesForAmount"])
+
+            if self.__ask_person_amount() is not None:
+                if self.__recognized_words_certainty > 0.55:
+                    return True
 
     def __ask_person_amount(self):
         self.__person_amount = None
