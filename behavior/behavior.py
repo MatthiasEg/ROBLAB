@@ -250,7 +250,7 @@ class Behavior(object):
             time.sleep(.3)
             time_movement_start = round(time.time() * 1000)
             distance_meters = self.__sensing_wrapper.get_sonar_distance("Front")
-            if float(distance_meters) >= 1.5:
+            if float(distance_meters) >= 1.5 and not self.__position_movement_wrapper.collision_avoided:
                 if float(distance_meters) >= 1.0:
                     goal_center = self.__sensing_wrapper.get_red_cups_center_position(self.__person_amount)
                     if goal_center is None:
@@ -269,7 +269,7 @@ class Behavior(object):
                     self.__position_movement_wrapper.stop_movement()
                     break
             else:
-                if float(distance_meters) <= 1.0 or self.__position_movement_wrapper.collision_avoided:
+                if self.__position_movement_wrapper.collision_avoided or float(distance_meters) <= 1.0:
                     self.__position_movement_wrapper.stop_movement()
                     break
                 else:
