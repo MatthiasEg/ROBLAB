@@ -120,12 +120,15 @@ class Behavior(object):
 
     def __check_person_amount(self):
         while not self.__person_amount_correct or self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
-            if self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
+            if self.__person_amount_correct and (self.__person_amount < const.min_persons or self.__person_amount > const.max_persons):
                 self.__speech_wrapper.animated_say(self.__sentences["noTablesForAmount"])
 
             if self.__ask_person_amount() is not None:
                 if self.__recognized_words_certainty > 0.55:
-                    return True
+                    continue
+                else:
+                    self.__ask_person_amount_correct()
+
 
     def __ask_person_amount(self):
         self.__person_amount = None
@@ -146,29 +149,18 @@ class Behavior(object):
 
         return self.__person_amount
 
-        # if self.__person_amount is None:
-        #     self.__ask_person_amount()
-        # else:
-        #     if self.__recognized_words_certainty > 0.55:
-        #         if self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
-        #             self.speech_wrapper.say(self.__sentences["noTablesForAmount"])
-        #             return
-        #         self.__search_table()
-        #     else:
-        #         self.__ask_person_amount_correct()
-
     def __on_person_amount_answered(self, message):
         print('Ask Person amount triggered')
+        print(message)
 
         m = message[0]
         if m != '':
-            word_found = next((x for x in self.__vocabularies["personAmount"] if x in m), None)
+            word_found = next((x for x in self.__vocabularies["personAmount"] if x in m.decode('utf-8')), None)
             if word_found is not None:
                 self.__recognized_words_certainty = message[1]
                 self.__person_amount = self.__vocabularies["personAmount"].index(word_found) + 1
                 self.__waiting_for_an_answer = False
 
-        print(message)
 
     def __ask_person_amount_correct(self):
         if self.__person_amount == 1:
@@ -192,17 +184,9 @@ class Behavior(object):
 
         return self.__person_amount_correct
 
-        # if self.__person_amount_correct:
-        #     print(self.__person_amount)
-        #     if self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
-        #         self.speech_wrapper.say(self.__sentences["noTablesForAmount"])
-        #         return
-        #     self.__search_table()
-        # else:
-        #     self.__ask_person_amount()
-
     def __on_person_amount_correct_answered(self, message):
         print('Ask Person triggered')
+        print(message)
         if message[0] != '':
             msg = message[0].replace('<...>', '').strip()
             if msg in self.__vocabularies["no"]:
@@ -211,7 +195,6 @@ class Behavior(object):
             elif msg in self.__vocabularies["yes"]:
                 self.__person_amount_correct = True
                 self.__waiting_for_an_answer = False
-        print(message)
 
     def __search_table(self):
         self.__speech_wrapper.say(self.__sentences["searchTable"])
