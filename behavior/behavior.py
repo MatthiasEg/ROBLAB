@@ -125,7 +125,9 @@ class Behavior(object):
 
             if self.__ask_person_amount() is not None:
                 if self.__recognized_words_certainty > 0.55:
-                    return True
+                    continue
+                else:
+                    self.__ask_person_amount_correct()
 
 
     def __ask_person_amount(self):
@@ -153,7 +155,7 @@ class Behavior(object):
 
         m = message[0]
         if m != '':
-            word_found = next((x for x in self.__vocabularies["personAmount"] if x in m), None)
+            word_found = next((x for x in self.__vocabularies["personAmount"] if x in m.decode('utf-8')), None)
             if word_found is not None:
                 self.__recognized_words_certainty = message[1]
                 self.__person_amount = self.__vocabularies["personAmount"].index(word_found) + 1
