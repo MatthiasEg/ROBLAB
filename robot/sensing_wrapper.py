@@ -61,9 +61,6 @@ class SensingWrapper:
 
         return self.__detection.get_object_positions(image_path, object_name, 0.4)
 
-    def get_person_amount(self, object_name, image_path):
-        return len(self.__detection.get_object_positions(image_path, object_name, 0.4))
-
     def get_red_cups_center_position(self, cup_goal):
         image_path = "cup_detection.jpg"
         self.__take_picture(image_path)
@@ -77,6 +74,8 @@ class SensingWrapper:
 
     def __get_cup_group_center_position(self, cup_goal, keypoints):
         cup_goal = int(cup_goal)
+        if cup_goal == 1:
+            cup_goal = 2
         keypoints.sort(key=lambda x: x["x"])
         sizes = map(lambda r: r["size"], keypoints)
 
@@ -119,9 +118,8 @@ class SensingWrapper:
             x_values = map(lambda r: r["x"], keypoints)
             x_min = float(min(x_values))
             x_max = float(max(x_values))
-            # if ((x_max / self.MAX_IMAGE_WIDTH) - (x_min / self.MAX_IMAGE_WIDTH)) <= 0.5:
             size_mean = keypoint_sizes.mean()
-            if ((x_max * size_mean) - (x_min * size_mean)) <= 1500:
+            if ((x_max * size_mean) - (x_min * size_mean)) <= 100*size_mean:
                 y_values = map(lambda r: r["y"], keypoints)
                 center_y = self.__calculate_axis_center(y_values)
                 center_x = self.__calculate_axis_center(x_values)
@@ -150,13 +148,13 @@ class SensingWrapper:
                     indexes_to_remove.add(i)
                     indexes_to_remove.add(i + 1)
 
-        bla = center_goals[:]
+        real_goal_positions = center_goals[:]
         for num, name in enumerate(center_goals):
             if num in indexes_to_remove:
-                bla.remove(name)
+                real_goal_positions.remove(name)
 
-        if len(bla) >= 1:
-            return bla[0]["x"], bla[0]["y"]
+        if len(real_goal_positions) >= 1:
+            return real_goal_positions[0]["x"], real_goal_positions[0]["y"]
         return None
 
     def start_sonar_sensors(self):
