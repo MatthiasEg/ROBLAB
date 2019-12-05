@@ -269,9 +269,6 @@ class Behavior(object):
 
     def __ask_to_follow(self):
         self.speech_wrapper.say(self.__sentences["askToFollow"])
-        self.body_movement_wrapper.moveArmsUp(Actuators.RArm, 120)
-        time.sleep(1)
-        self.body_movement_wrapper.moveArmsDown(Actuators.RArm, 160)
 
     def __go_to_table(self, goal_center):
         self.__move_towards_goal_location(goal_center)
