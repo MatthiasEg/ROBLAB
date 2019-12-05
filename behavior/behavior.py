@@ -47,15 +47,7 @@ class Behavior(object):
     def start_behavior(self):
         self.position_movement_wrapper.learn_home()
         self.__setup_customer_reception()
-
-        while not self.__person_amount_correct or self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
-
-            if self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
-                self.speech_wrapper.say(self.__sentences["noTablesForAmount"])
-
-            if self.__ask_person_amount() is not None:
-                if self.__recognized_words_certainty > 0.55:
-                    break
+        self.__check_person_amount()
 
         goal_location = self.__search_table()
         if goal_location is not None:
@@ -71,7 +63,6 @@ class Behavior(object):
             # self.__return_to_waiting_zone()
             # self.__setup_customer_reception()
         else:
-
             self.__say_no_table_available()
             self.__setup_customer_reception()
 
@@ -129,6 +120,15 @@ class Behavior(object):
                 self.speech_wrapper.say(self.__sentences["greeting"])
                 self.__person_amount = self.__count_people(const.people_counting_time)
                 self.__first_person_detected = True
+
+    def __check_person_amount(self):
+        while not self.__person_amount_correct or self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
+            if self.__person_amount < const.min_persons or self.__person_amount > const.max_persons:
+                self.speech_wrapper.say(self.__sentences["noTablesForAmount"])
+
+            if self.__ask_person_amount() is not None:
+                if self.__recognized_words_certainty > 0.55:
+                    return True
 
     def __ask_person_amount(self):
         self.__person_amount = None
@@ -266,9 +266,6 @@ class Behavior(object):
 
     def __ask_to_follow(self):
         self.speech_wrapper.say(self.__sentences["askToFollow"])
-        self.body_movement_wrapper.moveArmsUp(Actuators.RArm, 120)
-        time.sleep(1)
-        self.body_movement_wrapper.moveArmsDown(Actuators.RArm, 160)
 
     def __go_to_table(self, goal_center):
         self.__move_towards_goal_location(goal_center)
