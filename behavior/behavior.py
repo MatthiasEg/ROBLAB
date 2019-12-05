@@ -48,21 +48,21 @@ class Behavior(object):
         self.__check_person_amount()
 
         search_state = self.__search_table()
-
         if isinstance(search_state, TableFound):
             self.__ask_to_follow()
             self.__go_to_table(TableFound(search_state).goal_location)
             self.body_movement_wrapper.enable_autonomous_life(True)
             self.position_movement_wrapper.move_to(0, 0, 180)
             self.__assign_table()
-        elif isinstance(search_state, TableOccupied):
-            self.__say_table_occupied()
-            self.__setup_customer_reception()
-        elif isinstance(search_state, TableNotFound):
-            # TODO: say no table found
-            self.__setup_customer_reception()
-        elif isinstance(search_state, TableStateError):
-            # TODO: say something with error
+        else:
+            if isinstance(search_state, TableOccupied):
+                self.__say_table_occupied()
+            elif isinstance(search_state, TableNotFound):
+                # TODO: say no table found
+                pass
+            elif isinstance(search_state, TableStateError):
+                # TODO: say something with error
+                pass
             self.__setup_customer_reception()
 
     def __setup_customer_reception(self):
