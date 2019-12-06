@@ -23,6 +23,7 @@ class PositionMovementWrapper:
         print('enabled collision protection: {}'.format(enabled))
 
     def __on_move_failed(self, value):
+        print("collision avoided")
         self.collision_avoided = True
 
     def move_to(self, x, y, theta):

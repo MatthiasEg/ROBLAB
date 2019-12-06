@@ -10,7 +10,7 @@ max_persons = 4
 speech_recognition_language = 'English'
 speech_recognition_precision = 0.7
 
-people_counting_number_of_retries = 2
+people_counting_number_of_retries = 1
 people_counting_time = 5
 
 path_to_locale_file = 'locale/en.json'
