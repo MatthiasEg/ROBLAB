@@ -21,6 +21,7 @@ class Behavior(object):
         self.__init_behavior_state()
 
     def __init_behavior_state(self):
+        self.__person_amount_estimator = PersonAmountEstimator()
         self.__wait_for_new_customers = True
         self.__got_face = False
         self.__first_person_detected = False
@@ -107,11 +108,10 @@ class Behavior(object):
         self.body_movement_wrapper.enable_autonomous_life(False)
 
     def __count_people(self, time_to_estimate):
-        person_amount_estimator = PersonAmountEstimator()
-        person_amount_estimator.start_estimation()
+        self.__person_amount_estimator.start_estimation()
         time.sleep(time_to_estimate)
-        person_amount_estimator.stop_estimation()
-        return person_amount_estimator.get_estimated_person_amount()
+        self.__person_amount_estimator.stop_estimation()
+        return self.__person_amount_estimator.get_estimated_person_amount()
 
     def __on_human_detected(self, value):
         if value == []:  # empty value when the face disappears
@@ -123,10 +123,13 @@ class Behavior(object):
 
                 self.__sensing_wrapper.stop_face_detection("detect_face")
                 self.__wait_for_new_customers = False
+                self.__person_amount_estimator.start_estimation()
                 self.__speech_wrapper.animated_say(self.__sentences["greeting"])
                 self.__speech_wrapper.say(self.__sentences["estimateAmountOfPeople"])
                 self.__speech_wrapper.say(self.__sentences["stayInFrontOfMe"])
-                self.__person_amount = self.__count_people(const.people_counting_time)
+                time.sleep(2)
+                self.__person_amount_estimator.stop_estimation()
+                self.__person_amount = self.__person_amount_estimator.get_estimated_person_amount()
                 self.__first_person_detected = True
 
     def __check_person_amount(self):
