@@ -8,8 +8,9 @@ from robot.body_movement_wrapper import BodyMovementWrapper
 from robot.position_movement_wrapper import PositionMovementWrapper
 from robot.sensing_wrapper import SensingWrapper
 from robot.speech_wrapper import SpeechWrapper
-from robot.tablet_wrapper import TabletWrapper
+from robot.table_goal_position_state import GoalTableFound, MultipleTableGoalsFound
 from robot.table_search_state import TableFound, TableOccupied, TableNotFound, TableStateError
+from robot.tablet_wrapper import TabletWrapper
 
 
 class Behavior(object):
@@ -222,15 +223,19 @@ class Behavior(object):
 
         try:
             while True:
-                goal_center = self.__sensing_wrapper.get_red_cups_center_position(self.__person_amount)
-                if goal_center is not None:
+                goal_state = self.__sensing_wrapper.get_red_cups_center_position(self.__person_amount)
+                if isinstance(goal_state, GoalTableFound):
+                    goal_location = goal_state.goal_location
                     detected_persons = self.__sensing_wrapper.get_object_positions("person")
-                    table_occupied = self.__is_table_occupied(detected_persons, goal_center)
+                    table_occupied = self.__is_table_occupied(detected_persons, goal_location)
                     if table_occupied:
                         return TableOccupied()
                     else:
-                        return TableFound(goal_center)
+                        return TableFound(goal_location)
                 else:
+                    if isinstance(goal_state, MultipleTableGoalsFound):
+                        self.__speech_wrapper.say(
+                            "Leider habe ich den richtigen Tisch aus den Augen verloren. Lass mich noch einmal danach umsehen.")
                     if not self.__search_for_correct_table():
                         return TableNotFound()
         except Exception, e:
