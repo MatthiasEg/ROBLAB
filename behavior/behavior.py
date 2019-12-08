@@ -47,17 +47,20 @@ class Behavior(object):
             print("starting")
             self.__setup_customer_reception()
             self.__check_person_amount()
+
             search_state = self.__search_table()
             if isinstance(search_state, TableFound):
                 self.__ask_to_follow()
                 self.__go_to_table(search_state.goal_location)
-                time.sleep(.5)
+                time.sleep(3)
                 self.__position_movement_wrapper.move_to(0, 0, 180)
                 self.body_movement_wrapper.set_head_up(30)
                 self.body_movement_wrapper.set_head_left(0)
+                self.body_movement_wrapper.enable_autonomous_life(True)
                 time.sleep(.5)
                 self.__assign_table()
                 time.sleep(2)
+                self.body_movement_wrapper.enable_autonomous_life(False)
             else:
                 if isinstance(search_state, TableOccupied):
                     self.__say_table_occupied()
@@ -65,6 +68,7 @@ class Behavior(object):
                     self.__speech_wrapper.animated_say(self.__sentences["noTablesForAmount"])
                 elif isinstance(search_state, TableStateError):
                     self.__speech_wrapper.animated_say(self.__sentences["error"])
+
             self.__init_behavior_state()
             self.__return_to_waiting_zone()
             while not self.__position_movement_wrapper.is_home():
@@ -236,7 +240,7 @@ class Behavior(object):
                     if isinstance(goal_state, MultipleTableGoalsFound):
                         self.__speech_wrapper.say(
                             "Leider habe ich den richtigen Tisch aus den Augen verloren. Lass mich noch einmal danach umsehen.")
-                    if not self.__search_for_correct_table():
+                    if not self.__search_for_correct_table(goal_state.previous_goal_location):
                         return TableNotFound()
         except Exception, e:
             print(e)
@@ -284,6 +288,7 @@ class Behavior(object):
                     break
             else:
                 if self.__position_movement_wrapper.collision_avoided or float(distance_meters) <= 0.8:
+                    self.__position_movement_wrapper.collision_avoided = False
                     self.__position_movement_wrapper.stop_movement()
                     print("movement finished")
                     break
@@ -296,32 +301,25 @@ class Behavior(object):
         print("table goal position: %s, move_x: %s" % (goal_center, degrees_to_move_x))
         self.__position_movement_wrapper.move(0.5, 0, degrees_to_move_x)
 
-    def __search_for_correct_table(self):
+    def __search_for_correct_table(self, previous_goal_location):
         self.__speech_wrapper.say(self.__sentences["moreTimeToSearch"])
-        max_number_of_tries = 2
-        current_try = 0
-        number_of_turns = 0
-        max_turns = 9
+        direction_multiplier = 1  # left
+        if previous_goal_location is not None and previous_goal_location[0] > (640 / 2):
+            direction_multiplier = -1   # right
 
-        while current_try < max_number_of_tries:
+        degrees_per_step = 20
+        max_turns = int(round(360 / degrees_per_step))
+        number_of_turns = 0
+
+        self.__position_movement_wrapper.stop_movement()
+        self.body_movement_wrapper.set_head_down(0)
+
+        while number_of_turns < max_turns:
             goal_centers = self.__sensing_wrapper.get_red_cups_center_position(self.__person_amount)
             if goal_centers is None:
-                if number_of_turns is 0:
-                    self.__position_movement_wrapper.stop_movement()
-                    self.body_movement_wrapper.set_head_down(0)
-                    self.__position_movement_wrapper.move_to(0, 0, 90)
-
-                if number_of_turns < max_turns:
-                    self.__position_movement_wrapper.move_to(0, 0, -20)
-                    time.sleep(.5)
-                    number_of_turns = number_of_turns + 1
-                else:
-                    self.__position_movement_wrapper.move_to(0, 0, 90)
-                    self.__position_movement_wrapper.move(.5, 0, 0)
-                    time.sleep(2)
-                    self.__position_movement_wrapper.stop_movement()
-                    number_of_turns = 0
-                    current_try = current_try + 1
+                self.__position_movement_wrapper.move_to(0, 0, degrees_per_step*direction_multiplier)
+                time.sleep(.5)
+                number_of_turns = number_of_turns + 1
             else:
                 return True
         return False
