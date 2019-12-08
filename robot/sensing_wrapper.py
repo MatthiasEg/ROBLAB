@@ -67,7 +67,7 @@ class SensingWrapper:
         self.__take_picture(image_path)
 
         keypoints = self.__detection.get_red_cup_keypoints(image_path)
-        center_goals = GoalTableNotFound()
+        center_goals = GoalTableNotFound(self.__previous_table_goal)
         if len(keypoints) > 0:
             center_goals = self.__get_cup_group_center_position(cup_goal, keypoints)
 
@@ -83,12 +83,12 @@ class SensingWrapper:
         keypoint_sizes = Series(sizes)
         keypoint_sizes.sort_values(ascending=True)
         if len(keypoint_sizes) < cup_goal:
-            return GoalTableNotFound()
+            return GoalTableNotFound(self.__previous_table_goal)
         elif len(keypoint_sizes) is cup_goal:
             center = self.__calculate_centers(keypoint_sizes, keypoints)
             if center is not None:
                 return GoalTableFound((center["x"], center["y"]))
-            return GoalTableNotFound()
+            return GoalTableNotFound(self.__previous_table_goal)
         elif len(keypoint_sizes) <= const.max_cups_on_image:
             current_index = 0
             center_goals = []
@@ -101,7 +101,7 @@ class SensingWrapper:
                 current_index = current_index + 1
 
             return self.__filter_goal_positions(center_goals)
-        return GoalTableNotFound()
+        return GoalTableNotFound(self.__previous_table_goal)
 
     @staticmethod
     def __build_goal_params(cup_goal, keypoint_sizes, keypoints, current_index):
@@ -162,8 +162,8 @@ class SensingWrapper:
                 filtered_goal = self.__get_coordinates_closest_to_previous(real_goal_positions)
                 if filtered_goal is not None:
                     return GoalTableFound((filtered_goal["x"], filtered_goal["y"]))
-            return MultipleTableGoalsFound()
-        return GoalTableNotFound()
+            return MultipleTableGoalsFound(self.__previous_table_goal)
+        return GoalTableNotFound(self.__previous_table_goal)
 
     def __get_coordinates_closest_to_previous(self, goal_positions):
         min_threshold = self.__previous_table_goal["x"] - 100
