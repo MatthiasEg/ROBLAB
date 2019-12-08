@@ -19,6 +19,7 @@ class PersonAmountEstimator:
     def start_estimation(self):
         print("start estimating")
         start_new_thread(self.__estimate, ())
+        start_new_thread(self.__estimate, ())
 
     def __estimate(self):
         i = 1
