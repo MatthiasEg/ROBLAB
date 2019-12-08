@@ -19,8 +19,9 @@ class SensingWrapper:
         self.__detection = ObjectDetection()
         self.__frontSonarMemoryPath = "Device/SubDeviceList/Platform/Front/Sonar/Sensor/Value"
         self.__backSonarMemoryPath = "Device/SubDeviceList/Platform/Back/Sonar/Sensor/Value"
-
         self.start_sonar_sensors()
+
+        self.__previous_table_goal = None
 
     def is_face_detection_enabled(self):
         return self.__robot.ALPeoplePerception.isFaceDetectionEnabled()
@@ -119,7 +120,7 @@ class SensingWrapper:
             x_min = float(min(x_values))
             x_max = float(max(x_values))
             size_mean = keypoint_sizes.mean()
-            if ((x_max * size_mean) - (x_min * size_mean)) <= 100*size_mean:
+            if ((x_max * size_mean) - (x_min * size_mean)) <= 100 * size_mean:
                 y_values = map(lambda r: r["y"], keypoints)
                 center_y = self.__calculate_axis_center(y_values)
                 center_x = self.__calculate_axis_center(x_values)
@@ -139,8 +140,7 @@ class SensingWrapper:
         distance_between_x = center_max - center_min
         return center_max - (distance_between_x / 2)
 
-    @staticmethod
-    def __filter_goal_positions(center_goals):
+    def __filter_goal_positions(self, center_goals):
         indexes_to_remove = set()
         for i in range(len(center_goals)):
             if i < len(center_goals) - 1:
@@ -149,15 +149,29 @@ class SensingWrapper:
                     indexes_to_remove.add(i + 1)
 
         real_goal_positions = center_goals[:]
-        for num, name in enumerate(center_goals):
+        for num, goal in enumerate(center_goals):
             if num in indexes_to_remove:
-                real_goal_positions.remove(name)
+                real_goal_positions.remove(goal)
 
         if len(real_goal_positions) == 1:
-            return GoalTableFound((real_goal_positions[0]["x"], real_goal_positions[0]["y"]))
+            self.__previous_table_goal = real_goal_positions[0]
+            goal_coordinates = (real_goal_positions[0]["x"], real_goal_positions[0]["y"])
+            return GoalTableFound(goal_coordinates)
         elif len(real_goal_positions) >= 1:
+            if self.__previous_table_goal is not None:
+                filtered_goal = self.__get_coordinates_closest_to_previous(real_goal_positions)
+                if filtered_goal is not None:
+                    return GoalTableFound((filtered_goal["x"], filtered_goal["y"]))
             return MultipleTableGoalsFound()
         return GoalTableNotFound()
+
+    def __get_coordinates_closest_to_previous(self, goal_positions):
+        min_threshold = self.__previous_table_goal["x"] - 100
+        max_threshold = self.__previous_table_goal["x"] + 100
+        for _, goal in enumerate(goal_positions):
+            if min_threshold <= goal["x"] <= max_threshold:
+                return goal
+        return None
 
     def start_sonar_sensors(self):
         # subscriber name, refresh period( in milliseconds), precision of the extractor
