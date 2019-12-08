@@ -4,6 +4,7 @@ import const
 from robot.object_detection.camera import Camera
 from robot.object_detection.file_transfer import FileTransfer
 from robot.object_detection.object_detection import ObjectDetection
+from robot.table_goal_position_state import GoalTableNotFound, GoalTableFound, MultipleTableGoalsFound
 
 
 class SensingWrapper:
@@ -65,7 +66,7 @@ class SensingWrapper:
         self.__take_picture(image_path)
 
         keypoints = self.__detection.get_red_cup_keypoints(image_path)
-        center_goals = None
+        center_goals = GoalTableNotFound()
         if len(keypoints) > 0:
             center_goals = self.__get_cup_group_center_position(cup_goal, keypoints)
 
@@ -81,12 +82,12 @@ class SensingWrapper:
         keypoint_sizes = Series(sizes)
         keypoint_sizes.sort_values(ascending=True)
         if len(keypoint_sizes) < cup_goal:
-            return None
+            return GoalTableNotFound()
         elif len(keypoint_sizes) is cup_goal:
             center = self.__calculate_centers(keypoint_sizes, keypoints)
             if center is not None:
-                return center["x"], center["y"]
-            return None
+                return GoalTableFound((center["x"], center["y"]))
+            return GoalTableNotFound()
         elif len(keypoint_sizes) <= const.max_cups_on_image:
             current_index = 0
             center_goals = []
@@ -99,7 +100,7 @@ class SensingWrapper:
                 current_index = current_index + 1
 
             return self.__filter_goal_positions(center_goals)
-        return None
+        return GoalTableNotFound()
 
     @staticmethod
     def __build_goal_params(cup_goal, keypoint_sizes, keypoints, current_index):
@@ -152,9 +153,11 @@ class SensingWrapper:
             if num in indexes_to_remove:
                 real_goal_positions.remove(name)
 
-        if len(real_goal_positions) >= 1:
-            return real_goal_positions[0]["x"], real_goal_positions[0]["y"]
-        return None
+        if len(real_goal_positions) == 1:
+            return GoalTableFound((real_goal_positions[0]["x"], real_goal_positions[0]["y"]))
+        elif len(real_goal_positions) >= 1:
+            return MultipleTableGoalsFound()
+        return GoalTableNotFound()
 
     def start_sonar_sensors(self):
         # subscriber name, refresh period( in milliseconds), precision of the extractor
