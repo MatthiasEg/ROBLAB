@@ -7,7 +7,6 @@ from robot.object_detection.object_detection import ObjectDetection
 
 
 class SensingWrapper:
-    __MAX_CUPS_ON_IMAGE = 9.0
     __MAX_IMAGE_WIDTH = 640.0
 
     def __init__(self):
@@ -88,7 +87,7 @@ class SensingWrapper:
             if center is not None:
                 return center["x"], center["y"]
             return None
-        elif len(keypoint_sizes) <= self.__MAX_CUPS_ON_IMAGE:
+        elif len(keypoint_sizes) <= const.max_cups_on_image:
             current_index = 0
             center_goals = []
             while current_index <= (len(keypoint_sizes) - cup_goal):

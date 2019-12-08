@@ -16,3 +16,5 @@ people_counting_time = 5
 path_to_locale_file = 'locale/en.json'
 path_to_pictures = 'pictures/'
 img_people_recognized = 'people_recognized'
+
+max_cups_on_image = 9.0
