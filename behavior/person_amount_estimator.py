@@ -47,7 +47,7 @@ class PersonAmountEstimator:
     def __calculate_mean_of_seen_people_amounts(self):
         if len(self.__picture_names_of_seen_people_amounts) is 0:
             return 0
-        return int(round(statistics.mean(self.__picture_names_of_seen_people_amounts), 0))
+        return int(round(statistics.mean(self.__picture_names_of_seen_people_amounts)))
 
     def __take_and_store_picture(self):
         self.__camera = Camera(const.robot)
