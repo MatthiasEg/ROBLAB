@@ -113,6 +113,7 @@ class Behavior(object):
         self.body_movement_wrapper.enable_autonomous_life(False)
 
     def __count_people(self, time_to_estimate):
+        self.__person_amount_estimator = PersonAmountEstimator()
         self.__person_amount_estimator.start_estimation()
         time.sleep(time_to_estimate)
         self.__person_amount_estimator.stop_estimation()
@@ -132,6 +133,7 @@ class Behavior(object):
                 self.__speech_wrapper.animated_say(self.__sentences["greeting"])
                 self.__speech_wrapper.say(self.__sentences["estimateAmountOfPeople"])
                 self.__speech_wrapper.say(self.__sentences["stayInFrontOfMe"])
+                self.body_movement_wrapper.enable_autonomous_life(False)
                 time.sleep(2)
                 self.__person_amount_estimator.stop_estimation()
                 self.__person_amount = self.__person_amount_estimator.get_estimated_person_amount()
