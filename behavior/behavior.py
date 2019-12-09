@@ -67,6 +67,7 @@ class Behavior(object):
                     self.body_movement_wrapper.set_head_left(0)
                     self.body_movement_wrapper.enable_autonomous_life(True)
                     time.sleep(.5)
+                    self.sound_wrapper.stop_all()
                     self.__assign_table()
                     time.sleep(2)
                     self.body_movement_wrapper.enable_autonomous_life(False)
@@ -93,7 +94,7 @@ class Behavior(object):
         self.__sensing_wrapper.set_maximum_detection_range_in_meters(5)
         self.__sensing_wrapper.enable_face_recognition()
         self.__sensing_wrapper.enable_face_tracking()
-        self.__sensing_wrapper.enable_fast_mode()
+        # self.__sensing_wrapper.enable_fast_mode()
 
         self.body_movement_wrapper.enable_autonomous_life(True)
 
@@ -105,6 +106,7 @@ class Behavior(object):
             time.sleep(0.1)
 
         for i in range(const.people_counting_number_of_retries):
+            self.body_movement_wrapper.enable_autonomous_life(True)
             # self.__tablet_wrapper.showImage(os.path.join(os.getcwd(), const.path_to_pictures, const.img_people_recognized + '.jpg'), 10)
             if self.__person_amount < 1:
                 self.__counter_no_user_interaction += 1
@@ -292,14 +294,16 @@ class Behavior(object):
         self.body_movement_wrapper.set_head_up(0)
         self.body_movement_wrapper.set_hip_pitch(-5)
         self.body_movement_wrapper.set_hip_roll(0)
+        not_found_tries = 0
         if goal_center is not None:
             self.__move_towards_goal_location(goal_center)
         while True:
             time_movement_start = round(time.time() * 1000)
             distance_meters = self.__sensing_wrapper.get_sonar_distance("Front")
-            if float(distance_meters) >= 2.0 and not self.__position_movement_wrapper.collision_avoided:
-                if float(distance_meters) >= 1.6:
-                    goal_state = self.__sensing_wrapper.get_red_cups_center_position(self.__person_amount) if not is_home \
+            if float(distance_meters) >= 1.8:
+                if float(distance_meters) >= 1.5:
+                    goal_state = self.__sensing_wrapper.get_red_cups_center_position(
+                        self.__person_amount) if not is_home \
                         else self.__sensing_wrapper.get_starting_red_cup_position()
                     if isinstance(goal_state, GoalTableFound):
                         goal_location = goal_state.goal_location
@@ -310,19 +314,22 @@ class Behavior(object):
                         else:
                             self.__position_movement_wrapper.move(0.5, 0, 0)
                     elif isinstance(goal_state, MultipleTableGoalsFound) or isinstance(goal_state, GoalTableNotFound):
-                        self.__position_movement_wrapper.stop_movement()
-                        self.body_movement_wrapper.initial_position()
-                        self.__speech_wrapper.say(
-                            "Unfortunately, I lost track of the right table. Let me have another look around.")
-                        if not self.__search_for_correct_table(goal_state.previous_goal_location):
-                            break
+                        if not_found_tries < 2:
+                            not_found_tries += 1
+                        else:
+                            self.__position_movement_wrapper.stop_movement()
+                            self.body_movement_wrapper.initial_position()
+                            if self.__search_for_correct_table(goal_state.previous_goal_location):
+                                continue
+                            else:
+                                break
                     else:
                         self.__position_movement_wrapper.move(0.5, 0, 0)
                 else:
                     self.__position_movement_wrapper.stop_movement()
                     break
             else:
-                if float(distance_meters) <= 1.0 if not is_home else 0.8:
+                if float(distance_meters) <= (1.0 if not is_home else 0.8):
                     self.__position_movement_wrapper.collision_avoided = False
                     self.__position_movement_wrapper.stop_movement()
                     print("movement finished")
