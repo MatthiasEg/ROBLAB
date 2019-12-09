@@ -53,11 +53,11 @@ class Behavior(object):
             self.__check_person_amount()
             self.__speech_wrapper.say(self.__sentences["searchTable"])
             self.__position_movement_wrapper.move_to(0, 0, 180)
+            self.sound_wrapper.start_playing_sound(const.path_to_waiting_music)
             while True:
-                self.sound_wrapper.start_playing_sound(const.path_to_waiting_music)
                 search_state = self.__search_table()
-                self.sound_wrapper.stop_all()
                 if isinstance(search_state, TableFound):
+                    self.sound_wrapper.stop_all()
                     self.__ask_to_follow()
                     self.sound_wrapper.start_playing_sound(const.path_to_waiting_music)
                     self.__go_to_table(search_state.goal_location)
@@ -106,7 +106,6 @@ class Behavior(object):
             time.sleep(0.1)
 
         for i in range(const.people_counting_number_of_retries):
-            self.body_movement_wrapper.enable_autonomous_life(True)
             # self.__tablet_wrapper.showImage(os.path.join(os.getcwd(), const.path_to_pictures, const.img_people_recognized + '.jpg'), 10)
             if self.__person_amount < 1:
                 self.__counter_no_user_interaction += 1
@@ -127,6 +126,7 @@ class Behavior(object):
         self.body_movement_wrapper.enable_autonomous_life(False)
 
     def __count_people(self, time_to_estimate):
+        self.body_movement_wrapper.enable_autonomous_life(True)
         self.__person_amount_estimator = PersonAmountEstimator()
         self.__person_amount_estimator.start_estimation()
         time.sleep(time_to_estimate)
@@ -143,10 +143,10 @@ class Behavior(object):
 
                 self.__sensing_wrapper.stop_face_detection("detect_face")
                 self.__wait_for_new_customers = False
-                self.body_movement_wrapper.enable_autonomous_life(False)
                 self.__person_amount_estimator.start_estimation()
                 self.__speech_wrapper.animated_say(self.__sentences["greeting"])
                 self.__speech_wrapper.say(self.__sentences["estimateAmountOfPeople"])
+                self.body_movement_wrapper.enable_autonomous_life(False)
                 self.__speech_wrapper.say(self.__sentences["stayInFrontOfMe"])
                 self.__person_amount_estimator.stop_estimation()
                 self.__person_amount = self.__person_amount_estimator.get_estimated_person_amount()
@@ -251,8 +251,13 @@ class Behavior(object):
                         return TableFound(goal_location)
                 else:
                     self.__speech_wrapper.say(self.__sentences["moreTimeToSearch"])
-                    if not self.__search_for_correct_table(goal_state.previous_goal_location):
-                        return TableNotFound()
+                    if goal_state is not None:
+                        if not self.__search_for_correct_table(goal_state.previous_goal_location):
+                            return TableNotFound()
+                    else:
+                        if not self.__search_for_correct_table(None):
+                            return TableNotFound()
+
         except Exception, e:
             print(e)
             self.__position_movement_wrapper.stop_movement()
@@ -279,6 +284,7 @@ class Behavior(object):
         self.body_movement_wrapper.set_head_up(0)
         self.body_movement_wrapper.set_hip_pitch(-5)
         self.body_movement_wrapper.set_hip_roll(0)
+        time.sleep(3)
         while True:
             goal_state = self.__sensing_wrapper.get_starting_red_cup_position()
             if isinstance(goal_state, GoalTableFound):
@@ -286,8 +292,10 @@ class Behavior(object):
                 self.__go_to_table(goal_location, True)
                 break
             else:
-                if not self.__search_for_correct_table(goal_state.previous_goal_location, True):
-                    return TableNotFound()
+                if goal_state is not None:
+                    self.__search_for_correct_table(goal_state.previous_goal_location, True)
+                else:
+                    self.__search_for_correct_table(None, True)
 
     def __go_to_table(self, goal_center, is_home=False):
         self.body_movement_wrapper.set_head_left(0)
@@ -295,8 +303,8 @@ class Behavior(object):
         self.body_movement_wrapper.set_hip_pitch(-5)
         self.body_movement_wrapper.set_hip_roll(0)
         not_found_tries = 0
-        if goal_center is not None:
-            self.__move_towards_goal_location(goal_center)
+        # if goal_center is not None:
+        #     self.__move_towards_goal_location(goal_center)
         while True:
             time_movement_start = round(time.time() * 1000)
             distance_meters = self.__sensing_wrapper.get_sonar_distance("Front")
@@ -306,6 +314,7 @@ class Behavior(object):
                         self.__person_amount) if not is_home \
                         else self.__sensing_wrapper.get_starting_red_cup_position()
                     if isinstance(goal_state, GoalTableFound):
+                        not_found_tries = 0
                         goal_location = goal_state.goal_location
                         now = round(time.time() * 1000)
                         diff = now - time_movement_start
@@ -314,15 +323,22 @@ class Behavior(object):
                         else:
                             self.__position_movement_wrapper.move(0.5, 0, 0)
                     elif isinstance(goal_state, MultipleTableGoalsFound) or isinstance(goal_state, GoalTableNotFound):
-                        if not_found_tries < 2:
+                        if not_found_tries < 4:
                             not_found_tries += 1
                         else:
                             self.__position_movement_wrapper.stop_movement()
                             self.body_movement_wrapper.initial_position()
-                            if self.__search_for_correct_table(goal_state.previous_goal_location):
-                                continue
+
+                            if goal_state is not None:
+                                if self.__search_for_correct_table(goal_state.previous_goal_location):
+                                    continue
+                                else:
+                                    break
                             else:
-                                break
+                                if self.__search_for_correct_table(None):
+                                    continue
+                                else:
+                                    break
                     else:
                         self.__position_movement_wrapper.move(0.5, 0, 0)
                 else:
@@ -344,10 +360,11 @@ class Behavior(object):
         self.__position_movement_wrapper.move(0.5, 0, degrees_to_move_x)
 
     def __search_for_correct_table(self, previous_goal_location, is_home=False):
-        direction_multiplier = 1  # left
+        direction_multiplier = -1  # left
         if previous_goal_location is not None:
-            if previous_goal_location[0] > (640 / 2):
-                direction_multiplier = -1  # right
+            print(previous_goal_location)
+            # if previous_goal_location["x"] > (640 / 2):
+            #     direction_multiplier = -1  # right
 
         degrees_per_step = 20
         max_turns = int(round(360 / degrees_per_step))
