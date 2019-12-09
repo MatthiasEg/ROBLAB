@@ -307,8 +307,9 @@ class Behavior(object):
                             self.__move_towards_goal_location(goal_location)
                         else:
                             self.__position_movement_wrapper.move(0.5, 0, 0)
-                    elif isinstance(goal_state, MultipleTableGoalsFound):
+                    elif isinstance(goal_state, MultipleTableGoalsFound) or isinstance(goal_state, GoalTableNotFound):
                         self.__position_movement_wrapper.stop_movement()
+                        self.body_movement_wrapper.initial_position()
                         self.__speech_wrapper.say(
                             "Unfortunately, I lost track of the right table. Let me have another look around.")
                         self.__search_table()
