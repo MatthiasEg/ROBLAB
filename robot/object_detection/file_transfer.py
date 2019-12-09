@@ -15,5 +15,10 @@ class FileTransfer:
         sftp.remove(remote)
         sftp.close()
 
+    def save_to_robot(self, local_path, remote_path):
+        sftp = self.ssh.open_sftp()
+        sftp.put(local_path, remote_path)
+        sftp.close()
+
     def close(self):
         self.ssh.close()
