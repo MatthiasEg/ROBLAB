@@ -11,8 +11,6 @@ class SpeechWrapper:
         if (type(text) == list):
             self.animated_say_random(text)
             return
-            
-        # self.__robot.ALAnimatedSpeech.say2(text, configuration)
         self.__robot.ALAnimatedSpeech.say(text)
 
     def animated_say_random(self, list):
@@ -22,7 +20,6 @@ class SpeechWrapper:
         if (type(text) == list):
             self.say_random(text)
             return
-            
         self.__robot.ALTextToSpeech.say(text)
 
     def say_random(self, list):
