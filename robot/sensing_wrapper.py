@@ -203,3 +203,27 @@ class SensingWrapper:
             self.__file_transfer.close()
         except Exception, ex:
             print(ex)
+
+    def explore(self, radius):
+        return self.__robot.ALNavigation.explore(radius)
+
+    def save_exploration_to_robot(self):
+        return self.__robot.ALNavigation.saveExploration()
+
+    def load_exploration_from_robot(self, path):
+        return self.__robot.ALNavigation.loadExploration(path)
+
+    def start_localization(self):
+        return self.__robot.ALNavigation.startLocalization()
+
+    def stop_localization(self):
+        return self.__robot.ALNavigation.stopLocalization()
+
+    def get_metrical_map(self):
+        return self.__robot.ALNavigation.getMetricalMap()
+
+    def get_robot_position_in_map(self):
+        return self.__robot.ALNavigation.getRobotPositionInMap()
+
+
+

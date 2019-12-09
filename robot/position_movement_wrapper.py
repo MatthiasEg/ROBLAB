@@ -1,6 +1,7 @@
 import math
 
 import const
+from robot.object_detection.file_transfer import FileTransfer
 
 
 class PositionMovementWrapper:
@@ -9,8 +10,8 @@ class PositionMovementWrapper:
         self.__robot = const.robot
         self.enable_collision_protection(True)
         self.__robot.ALMotion.setSmartStiffnessEnabled(True)
-        self.subscriber = self.__robot.ALMemory.subscriber("ALMotion/MoveFailed")
-        self.subscriber.signal.connect(self.__on_move_failed)
+        # self.subscriber = self.__robot.ALMemory.subscriber("ALMotion/MoveFailed")
+        # self.subscriber.signal.connect(self.__on_move_failed)
         self.collision_avoided = False
 
     def enable_collision_protection(self, enabled):
@@ -23,8 +24,8 @@ class PositionMovementWrapper:
         print('enabled collision protection: {}'.format(enabled))
 
     def __on_move_failed(self, value):
-        print("collision avoided")
-        self.collision_avoided = True
+        if not self.collision_avoided:
+            self.collision_avoided = True
 
     def move_to(self, x, y, theta):
         self.__robot.ALMotion.moveTo(x, y, theta * math.pi / 180)
@@ -50,9 +51,18 @@ class PositionMovementWrapper:
 
     def go_to_position(self, position):
         self.__robot.ALLocalization.goToPosition(position)
-        
+
     def navigate_to_coordinate_on_map(self, coordinate_vector):
         self.__robot.ALNavigation.navigateToInMap(coordinate_vector)
 
-    def relocalize_in_map(self, vectorPosition):
-        self.__robot.ALNavigation.relocalizeInMap(vectorPosition)
+    def navigate_back_to_reception(self):
+        # file_transfer = FileTransfer(const.robot)
+        # file_transfer.push("../maps/2014-04-04T035759.612Z.explo", "/home/nao/2014-04-04T035759.612Z.explo")
+        # self.__robot.ALNavigation.stopLocalization()
+        # self.__robot.ALNavigation.stopLocalization()
+        self.__robot.ALNavigation.loadExploration("/home/nao/maps_2014-04-04T035759.612Z.explo")
+        self.__robot.ALNavigation.startLocalization()
+        self.__robot.ALNavigation.relocalizeInMap([0., 0., 0.])
+        # self.move_to(-10, 0, 0)
+        self.__robot.ALNavigation.navigateToInMap([0., 0., 0.])
+        self.__robot.ALNavigation.stopLocalization()

@@ -218,3 +218,4 @@ class BodyMovementWrapper:
 
     def get_head_angle_horizontal(self):
         return self.__robot.ALMotion.getAngles(self.headJointNames[0], False)
+

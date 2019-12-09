@@ -5,10 +5,10 @@ from behavior.behavior import Behavior
 def main():
     try:
         Behavior().start_behavior()
-    except Exception:
+    except Exception, e:
         robot = const.robot
         Behavior().body_movement_wrapper.enable_autonomous_life(False)
-        print(Exception.message)
+        print(e.message)
         return
 
 
