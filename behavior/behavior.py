@@ -48,10 +48,10 @@ class Behavior(object):
         self.__sound_wrapper = SoundWrapper()
 
     def start_behavior(self):
-        self.__robot.ALNavigation.stopLocalization()
-        self.__robot.ALNavigation.loadExploration("/home/nao/2019-12-09T180032.136Z.explo")
-        self.__robot.ALNavigation.relocalizeInMap([0., 0., 0.])
-        self.__robot.ALNavigation.startLocalization()
+        # self.__robot.ALNavigation.stopLocalization()
+        # self.__robot.ALNavigation.loadExploration("/home/nao/2019-12-09T180032.136Z.explo")
+        # self.__robot.ALNavigation.relocalizeInMap([0., 0., 0.])
+        # self.__robot.ALNavigation.startLocalization()
 
         while True:
             print("starting")
@@ -88,18 +88,17 @@ class Behavior(object):
                             self.__speech_wrapper.animated_say(self.__sentences["error"])
                         break
             self.__init_behavior_state()
-            self.__robot.ALNavigation.navigateToInMap([0., 0., 0.])
+            self._go_home_by_cup()
+            # self.__robot.ALNavigation.navigateToInMap([0., 0., 0.])
 
     def __setup_customer_reception(self):
         if not self.__sensing_wrapper.is_face_detection_enabled():
             raise Exception('No Face detection possible with this system!')
 
-        self.__sensing_wrapper.reset_population()
-
-        self.__sensing_wrapper.set_maximum_detection_range_in_meters(3)
+        self.__sensing_wrapper.set_maximum_detection_range_in_meters(5)
         self.__sensing_wrapper.enable_face_recognition()
         self.__sensing_wrapper.enable_face_tracking()
-        self.__sensing_wrapper.enable_fast_mode()
+        # self.__sensing_wrapper.enable_fast_mode()
 
         self.body_movement_wrapper.enable_autonomous_life(True)
 
@@ -281,20 +280,30 @@ class Behavior(object):
         self.body_movement_wrapper.set_head_up(0)
         self.body_movement_wrapper.set_hip_pitch(-5)
         self.body_movement_wrapper.set_hip_roll(0)
-        self.__go_to_table(None, True)
+        while True:
+            goal_state = self.__sensing_wrapper.get_starting_red_cup_position()
+            if isinstance(goal_state, GoalTableFound):
+                goal_location = goal_state.goal_location
+                self.__go_to_table(goal_location, True)
+                break
+            else:
+                if not self.__search_for_correct_table(goal_state.previous_goal_location, True):
+                    return TableNotFound()
 
     def __go_to_table(self, goal_center, is_home=False):
         self.body_movement_wrapper.set_head_left(0)
         self.body_movement_wrapper.set_head_up(0)
         self.body_movement_wrapper.set_hip_pitch(-5)
         self.body_movement_wrapper.set_hip_roll(0)
-        # self.__move_towards_goal_location(goal_center)
+        if goal_center is not None:
+            self.__move_towards_goal_location(goal_center)
         while True:
             time_movement_start = round(time.time() * 1000)
             distance_meters = self.__sensing_wrapper.get_sonar_distance("Front")
             if float(distance_meters) >= 2.0 and not self.__position_movement_wrapper.collision_avoided:
-                if float(distance_meters) >= 1.5:
-                    goal_state = self.__sensing_wrapper.get_red_cups_center_position(self.__person_amount)
+                if float(distance_meters) >= 1.3:
+                    goal_state = self.__sensing_wrapper.get_red_cups_center_position(self.__person_amount) if not is_home \
+                        else self.__sensing_wrapper.get_starting_red_cup_position()
                     if isinstance(goal_state, GoalTableFound):
                         goal_location = goal_state.goal_location
                         now = round(time.time() * 1000)
@@ -314,7 +323,7 @@ class Behavior(object):
                     self.__position_movement_wrapper.stop_movement()
                     break
             else:
-                if float(distance_meters) <= 1.1:
+                if float(distance_meters) <= 1.0:
                     self.__position_movement_wrapper.collision_avoided = False
                     self.__position_movement_wrapper.stop_movement()
                     print("movement finished")
@@ -331,8 +340,9 @@ class Behavior(object):
     def __search_for_correct_table(self, previous_goal_location, is_home=False):
         self.__speech_wrapper.say(self.__sentences["moreTimeToSearch"])
         direction_multiplier = 1  # left
-        if previous_goal_location is not None and previous_goal_location[0] > (640 / 2):
-            direction_multiplier = -1  # right
+        if previous_goal_location is not None:
+            if previous_goal_location[0] > (640 / 2):
+                direction_multiplier = -1  # right
 
         degrees_per_step = 20
         max_turns = int(round(360 / degrees_per_step))
@@ -342,8 +352,9 @@ class Behavior(object):
         self.body_movement_wrapper.set_head_down(0)
 
         while number_of_turns < max_turns:
-            goal_state = self.__sensing_wrapper.get_red_cups_center_position(self.__person_amount)
-            if isinstance(goal_state, GoalTableNotFound):
+            goal_state = self.__sensing_wrapper.get_red_cups_center_position(self.__person_amount) if not is_home else \
+                self.__sensing_wrapper.get_starting_red_cup_position()
+            if isinstance(goal_state, GoalTableNotFound) or isinstance(goal_state, MultipleTableGoalsFound):
                 self.__position_movement_wrapper.move_to(0, 0, degrees_per_step * direction_multiplier)
                 time.sleep(.5)
                 number_of_turns = number_of_turns + 1
