@@ -217,8 +217,12 @@ class Behavior(object):
                 self.__person_amount_correct = True
                 self.__waiting_for_an_answer = False
 
-    def __search_table(self):
-        self.__speech_wrapper.say(self.__sentences["searchTable"])
+    def __search_table(self, second_try=False):
+        if not second_try:
+            self.__speech_wrapper.say(self.__sentences["searchTable"])
+        else:
+            self.__speech_wrapper.say("Unfortunately, I lost track of the right table. Let me have another look around.")
+
         self.body_movement_wrapper.enable_autonomous_life(False)
         self.__position_movement_wrapper.move_to(0, 0, 180)
         self.body_movement_wrapper.set_head_down(0)
