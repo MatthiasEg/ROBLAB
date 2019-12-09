@@ -15,8 +15,6 @@ from robot.table_search_state import TableFound, TableOccupied, TableNotFound, T
 from robot.tablet_wrapper import TabletWrapper
 from robot.sound_wrapper import SoundWrapper
 
-from threading import Thread
-
 
 class Behavior(object):
 
@@ -48,11 +46,6 @@ class Behavior(object):
         self.__sound_wrapper = SoundWrapper()
 
     def start_behavior(self):
-        # self.__robot.ALNavigation.stopLocalization()
-        # self.__robot.ALNavigation.loadExploration("/home/nao/2019-12-09T180032.136Z.explo")
-        # self.__robot.ALNavigation.relocalizeInMap([0., 0., 0.])
-        # self.__robot.ALNavigation.startLocalization()
-
         while True:
             print("starting")
             self.body_movement_wrapper.initial_position()
