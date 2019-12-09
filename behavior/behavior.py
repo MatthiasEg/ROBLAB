@@ -314,7 +314,8 @@ class Behavior(object):
                         self.body_movement_wrapper.initial_position()
                         self.__speech_wrapper.say(
                             "Unfortunately, I lost track of the right table. Let me have another look around.")
-                        self.__search_table()
+                        if not self.__search_for_correct_table(goal_state.previous_goal_location):
+                            break
                     else:
                         self.__position_movement_wrapper.move(0.5, 0, 0)
                 else:
