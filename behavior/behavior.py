@@ -8,7 +8,7 @@ from robot.body_movement_wrapper import BodyMovementWrapper
 from robot.position_movement_wrapper import PositionMovementWrapper
 from robot.sensing_wrapper import SensingWrapper
 from robot.speech_wrapper import SpeechWrapper
-from robot.table_goal_position_state import GoalTableFound, MultipleTableGoalsFound
+from robot.table_goal_position_state import GoalTableFound, MultipleTableGoalsFound, GoalTableNotFound
 from robot.table_search_state import TableFound, TableOccupied, TableNotFound, TableStateError
 from robot.tablet_wrapper import TabletWrapper
 
@@ -45,30 +45,39 @@ class Behavior(object):
         self.__position_movement_wrapper.learn_home()
         while True:
             print("starting")
+            self.body_movement_wrapper.initial_position()
             self.__setup_customer_reception()
             self.__check_person_amount()
 
-            search_state = self.__search_table()
-            if isinstance(search_state, TableFound):
-                self.__ask_to_follow()
-                self.__go_to_table(search_state.goal_location)
-                time.sleep(3)
-                self.__position_movement_wrapper.move_to(0, 0, 180)
-                self.body_movement_wrapper.set_head_up(30)
-                self.body_movement_wrapper.set_head_left(0)
-                self.body_movement_wrapper.enable_autonomous_life(True)
-                time.sleep(.5)
-                self.__assign_table()
-                time.sleep(2)
-                self.body_movement_wrapper.enable_autonomous_life(False)
-            else:
-                if isinstance(search_state, TableOccupied):
-                    self.__say_table_occupied()
-                elif isinstance(search_state, TableNotFound):
-                    self.__speech_wrapper.animated_say(self.__sentences["noTablesForAmount"])
-                elif isinstance(search_state, TableStateError):
-                    self.__speech_wrapper.animated_say(self.__sentences["error"])
-
+            self.__speech_wrapper.say(self.__sentences["searchTable"])
+            self.__position_movement_wrapper.move_to(0, 0, 180)
+            while True:
+                search_state = self.__search_table()
+                if isinstance(search_state, TableFound):
+                    self.__ask_to_follow()
+                    self.__go_to_table(search_state.goal_location)
+                    time.sleep(3)
+                    self.__position_movement_wrapper.move_to(0, 0, 180)
+                    self.body_movement_wrapper.set_head_up(30)
+                    self.body_movement_wrapper.set_head_left(0)
+                    self.body_movement_wrapper.enable_autonomous_life(True)
+                    time.sleep(.5)
+                    self.__assign_table()
+                    time.sleep(2)
+                    self.body_movement_wrapper.enable_autonomous_life(False)
+                    break
+                else:
+                    if self.__person_amount < const.max_persons:
+                        self.__person_amount += 1
+                        continue
+                    else:
+                        if isinstance(search_state, TableOccupied):
+                            self.__say_table_occupied()
+                        elif isinstance(search_state, TableNotFound):
+                            self.__speech_wrapper.animated_say(self.__sentences["noTablesForAmount"])
+                        elif isinstance(search_state, TableStateError):
+                            self.__speech_wrapper.animated_say(self.__sentences["error"])
+                        break
             self.__init_behavior_state()
             self.__return_to_waiting_zone()
             while not self.__position_movement_wrapper.is_home():
@@ -220,9 +229,7 @@ class Behavior(object):
                 self.__waiting_for_an_answer = False
 
     def __search_table(self):
-        self.__speech_wrapper.say(self.__sentences["searchTable"])
         self.body_movement_wrapper.enable_autonomous_life(False)
-        self.__position_movement_wrapper.move_to(0, 0, 180)
         self.body_movement_wrapper.set_head_down(0)
         self.body_movement_wrapper.set_head_right(0)
         time.sleep(3)
@@ -239,9 +246,6 @@ class Behavior(object):
                     else:
                         return TableFound(goal_location)
                 else:
-                    if isinstance(goal_state, MultipleTableGoalsFound):
-                        self.__speech_wrapper.say(
-                            "Leider habe ich den richtigen Tisch aus den Augen verloren. Lass mich noch einmal danach umsehen.")
                     if not self.__search_for_correct_table(goal_state.previous_goal_location):
                         return TableNotFound()
         except Exception, e:
@@ -266,7 +270,6 @@ class Behavior(object):
         self.__speech_wrapper.animated_say(self.__sentences["askToFollow"])
 
     def __go_to_table(self, goal_center):
-        self.__sensing_wrapper.start_sonar_sensors()
         self.__move_towards_goal_location(goal_center)
         while True:
             time.sleep(.3)
@@ -274,15 +277,20 @@ class Behavior(object):
             distance_meters = self.__sensing_wrapper.get_sonar_distance("Front")
             if float(distance_meters) >= 2.0 and not self.__position_movement_wrapper.collision_avoided:
                 if float(distance_meters) >= 1.5:
-                    goal_center = self.__sensing_wrapper.get_red_cups_center_position(self.__person_amount)
-                    if goal_center is not None:
-                        self.__move_towards_goal_location(goal_center)
+                    goal_state = self.__sensing_wrapper.get_red_cups_center_position(self.__person_amount)
+                    if isinstance(goal_state, GoalTableFound):
+                        goal_location = goal_state.goal_location
                         now = round(time.time() * 1000)
                         diff = now - time_movement_start
-                        if diff <= 2000:
-                            self.__move_towards_goal_location(goal_center)
+                        if diff <= 1000:
+                            self.__move_towards_goal_location(goal_location)
                         else:
                             self.__position_movement_wrapper.move(0.5, 0, 0)
+                    elif isinstance(goal_state, MultipleTableGoalsFound):
+                            self.__position_movement_wrapper.stop_movement()
+                            self.__speech_wrapper.say(
+                                "Unfortunately, I lost track of the right table. Let me have another look around.")
+                            self.__search_table()
                     else:
                         self.__position_movement_wrapper.move(0.5, 0, 0)
                 else:
@@ -317,8 +325,8 @@ class Behavior(object):
         self.body_movement_wrapper.set_head_down(0)
 
         while number_of_turns < max_turns:
-            goal_centers = self.__sensing_wrapper.get_red_cups_center_position(self.__person_amount)
-            if goal_centers is None:
+            goal_state = self.__sensing_wrapper.get_red_cups_center_position(self.__person_amount)
+            if isinstance(goal_state, GoalTableNotFound):
                 self.__position_movement_wrapper.move_to(0, 0, degrees_per_step*direction_multiplier)
                 time.sleep(.5)
                 number_of_turns = number_of_turns + 1

@@ -201,6 +201,5 @@ class SensingWrapper:
     def __del__(self):
         try:
             self.__file_transfer.close()
-            self.stop_sonar_sensors()
         except Exception, ex:
             print(ex)
