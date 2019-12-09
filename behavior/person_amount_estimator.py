@@ -1,53 +1,54 @@
 import cv2
+import time
+import const
+
+from math import ceil
+from thread import start_new_thread
+
 import statistics as statistics
 
-import const
-from math import ceil
 from robot.object_detection.camera import Camera
 from robot.object_detection.file_transfer import FileTransfer
-from thread import start_new_thread
+
+# import face_recognition
 
 
 class PersonAmountEstimator:
     def __init__(self):
         self.__should_estimate = True
-        self.__all_estimations = []
-        self.__picture_names_of_seen_people_amounts = {}
+        self.__taking_pictures = False
         self.__picture_file_name = const.img_people_recognized
-        self.__current_picture_project_path = ""
+        self.__taken_picture_paths_local = []
+        self.__taken_picture_paths_remote = []
 
     def start_estimation(self):
         print("start estimating")
         start_new_thread(self.__estimate, ())
-        start_new_thread(self.__estimate, ())
 
     def __estimate(self):
-        i = 1
+        self.__taking_pictures = True
         while self.__should_estimate:
-            old_picture_name = self.__picture_file_name
-            self.__picture_file_name = self.__picture_file_name + "_" + str(i)
+            print(time.time())
             self.__take_and_store_picture()
-            estimated_number = self.__get_number_of_faces_from_picture()
-            print("Estimated number of people: ", estimated_number)
-            self.__all_estimations.append(estimated_number)
-            self.__picture_names_of_seen_people_amounts[estimated_number] = self.__picture_file_name
-            self.__picture_file_name = old_picture_name
-            i = i + 1
+            print(time.time())
+
+        self.__taking_pictures = False
 
     def stop_estimation(self):
+        print("stop estimating")
         self.__should_estimate = False
 
-    def get_picture_path_of_highest_amount_of_seen_people(self):
-        return self.__picture_names_of_seen_people_amounts[max(self.__all_estimations)]
-
     def get_estimated_person_amount(self):
-        print("All estimations: ", self.__all_estimations)
+        self.__get_remote_pictures()
         return self.__calculate_mean_of_seen_people_amounts()
 
     def __calculate_mean_of_seen_people_amounts(self):
-        if len(self.__picture_names_of_seen_people_amounts) is 0:
-            return 0
-        return int(round(statistics.mean(self.__picture_names_of_seen_people_amounts)))
+        seen_faces = []
+        for pic in self.__taken_picture_paths_local:
+            print(pic)
+            seen_faces.append(self.__get_number_of_faces_from_picture(pic))
+
+        return int(round(statistics.mean(seen_faces)))
 
     def __take_and_store_picture(self):
         self.__camera = Camera(const.robot)
@@ -55,18 +56,29 @@ class PersonAmountEstimator:
                                        self.__camera.formats["jpg"])
         self.__file_transfer = FileTransfer(const.robot)
 
-        remote_folder_path = "/home/nao/recordings/cameras/"
-        file_name = self.__picture_file_name + ".jpg"
-        self.__camera.camera(remote_folder_path, file_name)
-        local_project_path = const.path_to_pictures + file_name
-        self.__current_picture_project_path = local_project_path
-        remote = remote_folder_path + file_name
-        self.__file_transfer.get(remote, local_project_path)
+        file_names = self.__camera.take_pictures(10, "/home/nao/recordings/cameras/", 'people_recognized' + str(time.time()) + '.jpg')
+        self.__taken_picture_paths_remote += file_names[0]
 
-    def __get_number_of_faces_from_picture(self):
+    def __get_remote_pictures(self):
+        while self.__taking_pictures:
+            time.sleep(0.2)
+        local_file_names = []
+        for remote in self.__taken_picture_paths_remote:
+            file_name = self.__picture_file_name + str(time.time()) + ".jpg"
+            local_project_path = const.path_to_pictures + file_name
+            local_file_names.append(local_project_path)
+            self.__file_transfer.get(remote, local_project_path)
+        self.__taken_picture_paths_local += local_file_names
+
+    def __get_number_of_faces_from_picture(self, picture_path):
+        # image = face_recognition.load_image_file(picture_path)
+        # faces = face_recognition.face_locations(image)
+        # print(len(faces))
+
+        # return len(faces)
         # Create the haar cascade
         face_cascade = cv2.CascadeClassifier("data/haarcascade_frontalface_default.xml")
-        image = cv2.imread(self.__current_picture_project_path)
+        image = cv2.imread(picture_path)
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
         # Detect faces in the image

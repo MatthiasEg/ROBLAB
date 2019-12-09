@@ -46,3 +46,6 @@ class Camera:
 
     def camera(self, path, file_name):
         self.__al_photo.takePicture(path, file_name)
+
+    def take_pictures(self, amount, path, file_name):
+        return self.__al_photo.takePictures(amount, path, file_name)
