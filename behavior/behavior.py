@@ -11,6 +11,9 @@ from robot.speech_wrapper import SpeechWrapper
 from robot.table_goal_position_state import GoalTableFound, MultipleTableGoalsFound, GoalTableNotFound
 from robot.table_search_state import TableFound, TableOccupied, TableNotFound, TableStateError
 from robot.tablet_wrapper import TabletWrapper
+from robot.sound_wrapper import SoundWrapper
+
+from threading import Thread
 
 
 class Behavior(object):
@@ -40,6 +43,7 @@ class Behavior(object):
         self.__sensing_wrapper = SensingWrapper()
         self.__speech_wrapper = SpeechWrapper()
         self.__tablet_wrapper = TabletWrapper()
+        self.__sound_wrapper = SoundWrapper()
 
     def start_behavior(self):
         self.__position_movement_wrapper.learn_home()
@@ -119,6 +123,9 @@ class Behavior(object):
             else:
                 break
 
+        if not self.__person_amount_correct:
+            self.__ask_person_amount_correct()
+
         self.body_movement_wrapper.enable_autonomous_life(False)
 
     def __count_people(self, time_to_estimate):
@@ -142,8 +149,6 @@ class Behavior(object):
                 self.__speech_wrapper.animated_say(self.__sentences["greeting"])
                 self.__speech_wrapper.say(self.__sentences["estimateAmountOfPeople"])
                 self.__speech_wrapper.say(self.__sentences["stayInFrontOfMe"])
-                self.body_movement_wrapper.enable_autonomous_life(False)
-                time.sleep(2)
                 self.__person_amount_estimator.stop_estimation()
                 self.__person_amount = self.__person_amount_estimator.get_estimated_person_amount()
                 self.__first_person_detected = True

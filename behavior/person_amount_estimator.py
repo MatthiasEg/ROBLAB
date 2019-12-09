@@ -27,10 +27,11 @@ class PersonAmountEstimator:
 
     def __estimate(self):
         self.__taking_pictures = True
-        while self.__should_estimate:
-            print(time.time())
-            self.__take_and_store_picture()
-            print(time.time())
+        self.__take_and_store_picture(10)
+        # while self.__should_estimate:
+        #     print(time.time())
+        #     self.__take_and_store_picture()
+        #     print(time.time())
 
         self.__taking_pictures = False
 
@@ -50,13 +51,13 @@ class PersonAmountEstimator:
 
         return int(round(statistics.mean(seen_faces)))
 
-    def __take_and_store_picture(self):
+    def __take_and_store_picture(self, amount):
         self.__camera = Camera(const.robot)
         self.__camera.configure_camera(self.__camera.cameras["top"], self.__camera.resolutions["640x480"],
                                        self.__camera.formats["jpg"])
         self.__file_transfer = FileTransfer(const.robot)
 
-        file_names = self.__camera.take_pictures(10, "/home/nao/recordings/cameras/", 'people_recognized' + str(time.time()) + '.jpg')
+        file_names = self.__camera.take_pictures(amount, "/home/nao/recordings/cameras/", 'people_recognized' + str(time.time()) + '.jpg')
         self.__taken_picture_paths_remote += file_names[0]
 
     def __get_remote_pictures(self):
