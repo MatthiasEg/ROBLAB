@@ -15,8 +15,6 @@ from robot.table_search_state import TableFound, TableOccupied, TableNotFound, T
 from robot.tablet_wrapper import TabletWrapper
 from robot.sound_wrapper import SoundWrapper
 
-from threading import Thread
-
 
 class Behavior(object):
 
