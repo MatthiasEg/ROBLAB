@@ -10,8 +10,9 @@ class TabletWrapper:
     def showImage(self, path_or_url, duration=3):
         print(path_or_url)
         try:
-            self.tabletService.showImage("http://192.168.1.101/img/people_recognized_1.jpg")
-            time.sleep(duration)
+            # self.tabletService.image_show_local("http://192.168.1.102/dinner_for_one/html/img/demo.jpg")
+            self.tabletService.showImage("http://192.168.1.102/opt/aldebaran/var/www/apps/dinner_for_one/html/img/demo.jpg")
+            time.sleep(10)
             self.tabletService.hideImage()
         except Exception, e:
             print "Error was: ", e
