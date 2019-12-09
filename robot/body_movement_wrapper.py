@@ -1,12 +1,8 @@
 import math
-
 import time
-import motion
-import const
 
-from tools.Robot import Robot
+import motion
 from enum import Enum
-from tools import Robot
 
 import const
 
@@ -24,6 +20,7 @@ class BodyMovementWrapper:
     def __init__(self):
         self.__robot = const.robot
         self.headJointNames = ["HeadYaw", "HeadPitch"]
+        self.hipJointNames = ["HipRoll", "HipPitch"]
         # Using 10% of maximum joint speed
         self.fractionMaxSpeed = 0.1
         self.motion_service = self.__robot.session.service("ALMotion")
@@ -209,6 +206,12 @@ class BodyMovementWrapper:
         deg = self.__calculate_degree_from_percentage(119.5, percentage)
         self.__set_head_intern(deg, 0)
 
+    def set_hip_roll(self, deg):
+        self.__set_hip_intern(deg, 0)
+
+    def set_hip_pitch(self, deg):
+        self.__set_hip_intern(deg, 1)
+
     @staticmethod
     def __calculate_degree_from_percentage(max_degree, percentage):
         return max_degree * (float(percentage) / 100.0)
@@ -218,3 +221,6 @@ class BodyMovementWrapper:
 
     def get_head_angle_horizontal(self):
         return self.__robot.ALMotion.getAngles(self.headJointNames[0], False)
+
+    def __set_hip_intern(self, deg, index):
+        self.__robot.ALMotion.setAngles(self.hipJointNames[index], math.radians(deg), self.fractionMaxSpeed)
