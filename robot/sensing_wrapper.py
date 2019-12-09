@@ -62,12 +62,24 @@ class SensingWrapper:
 
         return self.__detection.get_object_positions(image_path, object_name, 0.4)
 
+    def get_starting_red_cup_position(self):
+        image_path = "start_cup_detection.jpg"
+        self.__take_picture(image_path)
+
+        keypoints = self.__detection.get_red_cup_keypoints(image_path)
+        center_goals = GoalTableNotFound()
+        if len(keypoints) == 1:
+            return GoalTableFound((keypoints[0]["x"], keypoints[0]["y"]))
+        return center_goals
+
     def get_red_cups_center_position(self, cup_goal):
         image_path = "cup_detection.jpg"
         self.__take_picture(image_path)
 
         keypoints = self.__detection.get_red_cup_keypoints(image_path)
         center_goals = GoalTableNotFound(self.__previous_table_goal)
+        if cup_goal == 1:
+            cup_goal = 2
         if len(keypoints) > 0:
             center_goals = self.__get_cup_group_center_position(cup_goal, keypoints)
 
@@ -75,8 +87,6 @@ class SensingWrapper:
 
     def __get_cup_group_center_position(self, cup_goal, keypoints):
         cup_goal = int(cup_goal)
-        if cup_goal == 1:
-            cup_goal = 2
         keypoints.sort(key=lambda x: x["x"])
         sizes = map(lambda r: r["size"], keypoints)
 
@@ -203,3 +213,27 @@ class SensingWrapper:
             self.__file_transfer.close()
         except Exception, ex:
             print(ex)
+
+    def explore(self, radius):
+        return self.__robot.ALNavigation.explore(radius)
+
+    def save_exploration_to_robot(self):
+        return self.__robot.ALNavigation.saveExploration()
+
+    def load_exploration_from_robot(self, path):
+        return self.__robot.ALNavigation.loadExploration(path)
+
+    def start_localization(self):
+        return self.__robot.ALNavigation.startLocalization()
+
+    def stop_localization(self):
+        return self.__robot.ALNavigation.stopLocalization()
+
+    def get_metrical_map(self):
+        return self.__robot.ALNavigation.getMetricalMap()
+
+    def get_robot_position_in_map(self):
+        return self.__robot.ALNavigation.getRobotPositionInMap()
+
+
+

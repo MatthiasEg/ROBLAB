@@ -1,7 +1,7 @@
 from tools.PepperConfiguration import PepperConfiguration
 from tools.Robot import Robot
 
-config = PepperConfiguration("Porter")
+config = PepperConfiguration("Amber")
 robot = Robot(config)
 
 min_persons = 1

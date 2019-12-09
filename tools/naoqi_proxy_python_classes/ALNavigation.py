@@ -176,7 +176,7 @@ class ALNavigation(object):
 
     def relocalizeInMap(self, estimation):
         if not self.proxy:
-            self.proxy = self.session.service("AlNavigation")
+            self.proxy = self.session.service("ALNavigation")
         return self.proxy.relocalizeInMap(estimation)
 
     def ping(self):
@@ -200,17 +200,17 @@ class ALNavigation(object):
 
     def startLocalization(self,):
         if not self.proxy:
-            self.proxy = self.session.service("AlNavigation")
+            self.proxy = self.session.service("ALNavigation")
         return self.proxy.startLocalization()
 
     def stopLocalization(self,):
         if not self.proxy:
-            self.proxy = self.session.service("AlNavigation")
+            self.proxy = self.session.service("ALNavigation")
         return self.proxy.stopLocalization()
 
     def getMetricalMap(self):
         if not self.proxy:
-            self.proxy = self.session.service("AlNavigation")
+            self.proxy = self.session.service("ALNavigation")
         return self.proxy.getMetricalMap()
 
     
