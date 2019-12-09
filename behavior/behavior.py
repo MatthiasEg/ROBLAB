@@ -48,11 +48,6 @@ class Behavior(object):
         self.__sound_wrapper = SoundWrapper()
 
     def start_behavior(self):
-        # self.__robot.ALNavigation.stopLocalization()
-        # self.__robot.ALNavigation.loadExploration("/home/nao/2019-12-09T180032.136Z.explo")
-        # self.__robot.ALNavigation.relocalizeInMap([0., 0., 0.])
-        # self.__robot.ALNavigation.startLocalization()
-
         while True:
             print("starting")
             self.body_movement_wrapper.initial_position()
@@ -89,7 +84,6 @@ class Behavior(object):
                         break
             self.__init_behavior_state()
             self._go_home_by_cup()
-            # self.__robot.ALNavigation.navigateToInMap([0., 0., 0.])
 
     def __setup_customer_reception(self):
         if not self.__sensing_wrapper.is_face_detection_enabled():
@@ -252,6 +246,7 @@ class Behavior(object):
                     else:
                         return TableFound(goal_location)
                 else:
+                    self.__speech_wrapper.say(self.__sentences["moreTimeToSearch"])
                     if not self.__search_for_correct_table(goal_state.previous_goal_location):
                         return TableNotFound()
         except Exception, e:
@@ -301,7 +296,7 @@ class Behavior(object):
             time_movement_start = round(time.time() * 1000)
             distance_meters = self.__sensing_wrapper.get_sonar_distance("Front")
             if float(distance_meters) >= 2.0 and not self.__position_movement_wrapper.collision_avoided:
-                if float(distance_meters) >= 1.3:
+                if float(distance_meters) >= 1.6:
                     goal_state = self.__sensing_wrapper.get_red_cups_center_position(self.__person_amount) if not is_home \
                         else self.__sensing_wrapper.get_starting_red_cup_position()
                     if isinstance(goal_state, GoalTableFound):
@@ -323,7 +318,7 @@ class Behavior(object):
                     self.__position_movement_wrapper.stop_movement()
                     break
             else:
-                if float(distance_meters) <= 1.0:
+                if float(distance_meters) <= 1.0 if not is_home else 0.8:
                     self.__position_movement_wrapper.collision_avoided = False
                     self.__position_movement_wrapper.stop_movement()
                     print("movement finished")
@@ -338,7 +333,6 @@ class Behavior(object):
         self.__position_movement_wrapper.move(0.5, 0, degrees_to_move_x)
 
     def __search_for_correct_table(self, previous_goal_location, is_home=False):
-        self.__speech_wrapper.say(self.__sentences["moreTimeToSearch"])
         direction_multiplier = 1  # left
         if previous_goal_location is not None:
             if previous_goal_location[0] > (640 / 2):
