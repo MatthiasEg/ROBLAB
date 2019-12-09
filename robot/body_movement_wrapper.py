@@ -147,7 +147,7 @@ class BodyMovementWrapper:
 
     def initial_position(self):
         self.__robot.ALRobotPosture.goToPosture("StandInit", self.fractionMaxSpeed)
-        self.set_head_down(0)
+        self.set_head_down(20)
 
     def initial_position_stand(self):
         self.__robot.ALRobotPosture.goToPosture("Stand", self.fractionMaxSpeed)
