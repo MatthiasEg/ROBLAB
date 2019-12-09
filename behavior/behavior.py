@@ -267,15 +267,26 @@ class Behavior(object):
     def __ask_to_follow(self):
         self.__speech_wrapper.animated_say(self.__sentences["askToFollow"])
 
-    def __go_to_table(self, goal_center):
-        self.__move_towards_goal_location(goal_center)
+    def _go_home_by_cup(self):
+        self.body_movement_wrapper.set_head_left(0)
+        self.body_movement_wrapper.set_head_up(0)
+        self.body_movement_wrapper.set_hip_pitch(-5)
+        self.body_movement_wrapper.set_hip_roll(0)
+        self.__go_to_table(None, True)
+
+    def __go_to_table(self, goal_center, is_home=False):
+        self.body_movement_wrapper.set_head_left(0)
+        self.body_movement_wrapper.set_head_up(0)
+        self.body_movement_wrapper.set_hip_pitch(-5)
+        self.body_movement_wrapper.set_hip_roll(0)
+        # self.__move_towards_goal_location(goal_center)
         while True:
-            time.sleep(.3)
             time_movement_start = round(time.time() * 1000)
             distance_meters = self.__sensing_wrapper.get_sonar_distance("Front")
             if float(distance_meters) >= 2.0 and not self.__position_movement_wrapper.collision_avoided:
                 if float(distance_meters) >= 1.5:
-                    goal_state = self.__sensing_wrapper.get_red_cups_center_position(self.__person_amount)
+                    goal_state = self.__sensing_wrapper.get_starting_red_cup_position() if is_home \
+                        else self.__sensing_wrapper.get_red_cups_center_position(self.__person_amount)
                     if isinstance(goal_state, GoalTableFound):
                         goal_location = goal_state.goal_location
                         now = round(time.time() * 1000)
@@ -285,10 +296,10 @@ class Behavior(object):
                         else:
                             self.__position_movement_wrapper.move(0.5, 0, 0)
                     elif isinstance(goal_state, MultipleTableGoalsFound):
-                            self.__position_movement_wrapper.stop_movement()
-                            self.__speech_wrapper.say(
-                                "Unfortunately, I lost track of the right table. Let me have another look around.")
-                            self.__search_table()
+                        self.__position_movement_wrapper.stop_movement()
+                        self.__speech_wrapper.say(
+                            "Unfortunately, I lost track of the right table. Let me have another look around.")
+                        self.__search_table()
                     else:
                         self.__position_movement_wrapper.move(0.5, 0, 0)
                 else:
@@ -309,11 +320,11 @@ class Behavior(object):
         print("table goal position: %s, move_x: %s" % (goal_center, degrees_to_move_x))
         self.__position_movement_wrapper.move(0.5, 0, degrees_to_move_x)
 
-    def __search_for_correct_table(self, previous_goal_location):
+    def __search_for_correct_table(self, previous_goal_location, is_home=False):
         self.__speech_wrapper.say(self.__sentences["moreTimeToSearch"])
         direction_multiplier = 1  # left
         if previous_goal_location is not None and previous_goal_location[0] > (640 / 2):
-            direction_multiplier = -1   # right
+            direction_multiplier = -1  # right
 
         degrees_per_step = 20
         max_turns = int(round(360 / degrees_per_step))
@@ -323,9 +334,10 @@ class Behavior(object):
         self.body_movement_wrapper.set_head_down(0)
 
         while number_of_turns < max_turns:
-            goal_state = self.__sensing_wrapper.get_red_cups_center_position(self.__person_amount)
+            goal_state = self.__sensing_wrapper.get_starting_red_cup_position() if is_home else\
+                self.__sensing_wrapper.get_red_cups_center_position(self.__person_amount)
             if isinstance(goal_state, GoalTableNotFound):
-                self.__position_movement_wrapper.move_to(0, 0, degrees_per_step*direction_multiplier)
+                self.__position_movement_wrapper.move_to(0, 0, degrees_per_step * direction_multiplier)
                 time.sleep(.5)
                 number_of_turns = number_of_turns + 1
             else:
