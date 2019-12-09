@@ -45,8 +45,7 @@ class Behavior(object):
         self.__position_movement_wrapper.learn_home()
         while True:
             print("starting")
-            self.__setup_customer_reception()
-            self.__check_person_amount()
+            self.body_movement_wrapper.initial_position()
 
             search_state = self.__search_table()
             if isinstance(search_state, TableFound):
