@@ -287,8 +287,7 @@ class Behavior(object):
             distance_meters = self.__sensing_wrapper.get_sonar_distance("Front")
             if float(distance_meters) >= 2.0 and not self.__position_movement_wrapper.collision_avoided:
                 if float(distance_meters) >= 1.5:
-                    goal_state = self.__sensing_wrapper.get_starting_red_cup_position() if is_home \
-                        else self.__sensing_wrapper.get_red_cups_center_position(self.__person_amount)
+                    goal_state = self.__sensing_wrapper.get_red_cups_center_position(self.__person_amount)
                     if isinstance(goal_state, GoalTableFound):
                         goal_location = goal_state.goal_location
                         now = round(time.time() * 1000)
@@ -336,8 +335,7 @@ class Behavior(object):
         self.body_movement_wrapper.set_head_down(0)
 
         while number_of_turns < max_turns:
-            goal_state = self.__sensing_wrapper.get_starting_red_cup_position() if is_home else\
-                self.__sensing_wrapper.get_red_cups_center_position(self.__person_amount)
+            goal_state = self.__sensing_wrapper.get_red_cups_center_position(self.__person_amount)
             if isinstance(goal_state, GoalTableNotFound):
                 self.__position_movement_wrapper.move_to(0, 0, degrees_per_step * direction_multiplier)
                 time.sleep(.5)
