@@ -4,10 +4,11 @@ from behavior.behavior import Behavior
 
 def main():
     try:
-        Behavior().start_behavior()
+        behavior = Behavior()
+        behavior.start_behavior()
     except Exception, e:
-        robot = const.robot
-        Behavior().body_movement_wrapper.enable_autonomous_life(False)
+        behavior.body_movement_wrapper.enable_autonomous_life(False)
+        behavior.sound_wrapper.stop_all()
         print(e.message)
         return
 

@@ -43,7 +43,7 @@ class Behavior(object):
         self.__sensing_wrapper = SensingWrapper()
         self.__speech_wrapper = SpeechWrapper()
         self.__tablet_wrapper = TabletWrapper()
-        self.__sound_wrapper = SoundWrapper()
+        self.sound_wrapper = SoundWrapper()
 
     def start_behavior(self):
         while True:
@@ -54,9 +54,12 @@ class Behavior(object):
             self.__speech_wrapper.say(self.__sentences["searchTable"])
             self.__position_movement_wrapper.move_to(0, 0, 180)
             while True:
+                self.sound_wrapper.start_playing_sound(const.path_to_waiting_music)
                 search_state = self.__search_table()
+                self.sound_wrapper.stop_all()
                 if isinstance(search_state, TableFound):
                     self.__ask_to_follow()
+                    self.sound_wrapper.start_playing_sound(const.path_to_waiting_music)
                     self.__go_to_table(search_state.goal_location)
                     time.sleep(3)
                     self.__position_movement_wrapper.move_to(0, 0, 180)
@@ -90,7 +93,7 @@ class Behavior(object):
         self.__sensing_wrapper.set_maximum_detection_range_in_meters(5)
         self.__sensing_wrapper.enable_face_recognition()
         self.__sensing_wrapper.enable_face_tracking()
-        # self.__sensing_wrapper.enable_fast_mode()
+        self.__sensing_wrapper.enable_fast_mode()
 
         self.body_movement_wrapper.enable_autonomous_life(True)
 
@@ -138,6 +141,7 @@ class Behavior(object):
 
                 self.__sensing_wrapper.stop_face_detection("detect_face")
                 self.__wait_for_new_customers = False
+                self.body_movement_wrapper.enable_autonomous_life(False)
                 self.__person_amount_estimator.start_estimation()
                 self.__speech_wrapper.animated_say(self.__sentences["greeting"])
                 self.__speech_wrapper.say(self.__sentences["estimateAmountOfPeople"])

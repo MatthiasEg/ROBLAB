@@ -13,7 +13,7 @@ speech_recognition_precision = 0.7
 people_counting_number_of_retries = 1
 people_counting_time = 3
 
-path_to_waiting_music = '/home/nao/recordings/mp3/Wartemusik.mp3'
+path_to_waiting_music = '/home/nao/recordings/mp3/Wartemusik2.mp3'
 path_to_locale_file = 'locale/en.json'
 path_to_pictures = 'pictures/'
 img_people_recognized = 'people_recognized'
