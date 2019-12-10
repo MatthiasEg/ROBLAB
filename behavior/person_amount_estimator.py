@@ -2,13 +2,12 @@ import cv2
 import time
 import const
 
-from math import ceil
 from thread import start_new_thread
 
 import statistics as statistics
 
-from pepper_waiter.object_detection.camera import Camera
-from pepper_waiter.object_detection.file_transfer import FileTransfer
+from pepper_waiter.utilities.object_detection.camera import Camera
+from pepper_waiter.utilities.object_detection.file_transfer import FileTransfer
 
 # import face_recognition
 

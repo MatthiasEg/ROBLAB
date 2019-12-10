@@ -1,9 +1,9 @@
 from pandas import Series
 
 import const
-from pepper_waiter.object_detection.camera import Camera
-from pepper_waiter.object_detection.file_transfer import FileTransfer
-from pepper_waiter.object_detection.object_detection import ObjectDetector
+from pepper_waiter.utilities.object_detection.camera import Camera
+from pepper_waiter.utilities.object_detection.file_transfer import FileTransfer
+from pepper_waiter.utilities.object_detection.object_detection import ObjectDetector
 from pepper_waiter.table_goal_position_state import GoalTableNotFound, GoalTableFound, MultipleTableGoalsFound
 
 
