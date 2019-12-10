@@ -54,7 +54,7 @@ class ALPanoramaCompass(object):
         return self.proxy.getCurrentPanoramaDescriptor()
 
     def getCurrentPosition(self):
-        """Return the current orientation of the robot in the current panorama.
+        """Return the current orientation of the pepper_waiter in the current panorama.
 
         :returns AL::ALValue: 
         """
@@ -83,7 +83,7 @@ class ALPanoramaCompass(object):
         return self.proxy.isDataAvailable()
 
     def isInPanorama(self):
-        """Check if the robot is in the current Panorama.
+        """Check if the pepper_waiter is in the current Panorama.
 
         :returns int: Error status.
         """
@@ -92,7 +92,7 @@ class ALPanoramaCompass(object):
         return self.proxy.isInPanorama()
 
     def isInPanorama2(self, arg1):
-        """Check if the robot is in the current Panorama.
+        """Check if the pepper_waiter is in the current Panorama.
 
         :param int arg1: arg
         :returns int: Error status.
@@ -121,7 +121,7 @@ class ALPanoramaCompass(object):
         return self.proxy.loadPanorama(id)
 
     def localize(self):
-        """Localize the robot using the scan.
+        """Localize the pepper_waiter using the scan.
 
         :returns std::vector<float>: 
         """
@@ -130,7 +130,7 @@ class ALPanoramaCompass(object):
         return self.proxy.localize()
 
     def localize2(self, pMode):
-        """Localize the robot using the scan.
+        """Localize the pepper_waiter using the scan.
 
         :param bool pMode: Localization mode
         :returns std::vector<float>: 
@@ -140,7 +140,7 @@ class ALPanoramaCompass(object):
         return self.proxy.localize(pMode)
 
     def localize3(self, pMode):
-        """Localize the robot using the scan.
+        """Localize the pepper_waiter using the scan.
 
         :param int pMode: Localization mode
         :returns std::vector<float>: 
@@ -150,7 +150,7 @@ class ALPanoramaCompass(object):
         return self.proxy.localize(pMode)
 
     def localize4(self, pMode, arg2):
-        """Localize the robot using the scan.
+        """Localize the pepper_waiter using the scan.
 
         :param int pMode: Localization mode
         :param bool arg2: arg
@@ -161,7 +161,7 @@ class ALPanoramaCompass(object):
         return self.proxy.localize(pMode, arg2)
 
     def localizeNoHint(self):
-        """Localize the robot using the scan,without hint.
+        """Localize the pepper_waiter using the scan,without hint.
 
         :returns std::vector<float>: 
         """

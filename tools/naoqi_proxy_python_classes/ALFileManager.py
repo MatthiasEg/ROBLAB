@@ -16,7 +16,7 @@ class ALFileManager(object):
         self.proxy = self.session.service("ALFileManager")
 
     def dataFileExists(self, fileName):
-        """Try to find if this file does exist on robot or not.
+        """Try to find if this file does exist on pepper_waiter or not.
 
         :param str fileName: Name of the module associate to the preference.
         :returns bool: True upon success
@@ -26,7 +26,7 @@ class ALFileManager(object):
         return self.proxy.dataFileExists(fileName)
 
     def fileExists(self, fileName):
-        """Try to find if this file does exist on robot or not.
+        """Try to find if this file does exist on pepper_waiter or not.
 
         :param str fileName: Name of the module associate to the preference.
         :returns bool: True upon success

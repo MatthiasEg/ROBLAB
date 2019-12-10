@@ -16,7 +16,7 @@ class ALRobotPosture(object):
         self.proxy = self.session.service("ALRobotPosture")
 
     def applyPosture(self, postureName, maxSpeedFraction):
-        """Set the angle of the joints of the  robot to the choosen posture.
+        """Set the angle of the joints of the  pepper_waiter to the choosen posture.
 
         :param str postureName: Name of the desired posture. Use getPostureList to get the list of posture name available.
         :param float maxSpeedFraction: A fraction.
@@ -63,7 +63,7 @@ class ALRobotPosture(object):
         return self.proxy.getPostureList()
 
     def goToPosture(self, postureName, maxSpeedFraction):
-        """Make the robot go to the choosenposture.
+        """Make the pepper_waiter go to the choosenposture.
 
         :param str postureName: Name of the desired posture. Use getPostureList to get the list of posture name available.
         :param float maxSpeedFraction: A fraction.

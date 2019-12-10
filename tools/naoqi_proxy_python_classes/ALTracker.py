@@ -135,7 +135,7 @@ class ALTracker(object):
         return self.proxy.getRegisteredTargets()
 
     def getRelativePosition(self):
-        """Get the robot position relative to target in Move mode.
+        """Get the pepper_waiter position relative to target in Move mode.
 
         :returns AL::ALValue: The final goal of the tracking. Could be [distance, thresholdX, thresholdY] or with LandMarks target name [coordX, coordY, coordWz, thresholdX, thresholdY, thresholdWz].
         """
@@ -144,9 +144,9 @@ class ALTracker(object):
         return self.proxy.getRelativePosition()
 
     def getRobotPosition(self):
-        """Only work with LandMarks target name. Returns the [x, y, z, wx, wy, wz] position of the robot in coordinate system setted with setMap API. This is done assuming an average target size, so it might not be very accurate.
+        """Only work with LandMarks target name. Returns the [x, y, z, wx, wy, wz] position of the pepper_waiter in coordinate system setted with setMap API. This is done assuming an average target size, so it might not be very accurate.
 
-        :returns std::vector<float>: Vector of 6 floats corresponding to the robot position 6D.
+        :returns std::vector<float>: Vector of 6 floats corresponding to the pepper_waiter position 6D.
         """
         if not self.proxy:
             self.proxy = self.session.service("ALTracker")
@@ -423,7 +423,7 @@ class ALTracker(object):
         return self.proxy.setMoveConfig(config)
 
     def setRelativePosition(self, target):
-        """Set the robot position relative to target in Move mode.
+        """Set the pepper_waiter position relative to target in Move mode.
 
         :param AL::ALValue target: Set the final goal of the tracking. Could be [distance, thresholdX, thresholdY] or with LandMarks target name [coordX, coordY, coordWz, thresholdX, thresholdY, thresholdWz].
         """
@@ -468,7 +468,7 @@ class ALTracker(object):
     def toggleSearch(self, pSearch):
         """Enables/disables the target search process. Target search process occurs only when the target is lost.
 
-        :param bool pSearch: If true and if the target is lost, the robot moves the head in order to find the target. If false and if the target is lost the robot does not move.
+        :param bool pSearch: If true and if the target is lost, the pepper_waiter moves the head in order to find the target. If false and if the target is lost the pepper_waiter does not move.
         """
         if not self.proxy:
             self.proxy = self.session.service("ALTracker")

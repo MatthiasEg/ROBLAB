@@ -16,7 +16,7 @@ class ALLauncher(object):
         self.proxy = self.session.service("ALLauncher")
 
     def getGlobalModuleList(self):
-        """get the list of modules loaded on the robot and connected on the robot
+        """get the list of modules loaded on the pepper_waiter and connected on the pepper_waiter
 
         :returns std::vector<std::string>: array of present modules
         """

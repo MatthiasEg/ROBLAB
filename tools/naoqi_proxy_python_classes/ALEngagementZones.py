@@ -28,11 +28,11 @@ class ALEngagementZones(object):
         return self.proxy.computeEngagementZone(x, y, z)
 
     def computeEngagementZone2(self, xAngle, yAngle, distance, cameraPositionRobot):
-        """Computes the engagement zone in which an object is from its anglular position in the camera image, its distance from the robot, and the position of the camera in FRAME_ROBOT
+        """Computes the engagement zone in which an object is from its anglular position in the camera image, its distance from the pepper_waiter, and the position of the camera in FRAME_ROBOT
 
         :param float xAngle: X angular coordinate of the object in the image
         :param float yAngle: Y angular coordinate of the object in the image
-        :param float distance: distance of the object from the robot
+        :param float distance: distance of the object from the pepper_waiter
         :param AL::ALValue cameraPositionRobot: camera position in FRAME_ROBOT
         :returns int: Engagement zone of the object
         """

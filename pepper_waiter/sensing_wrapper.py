@@ -1,10 +1,10 @@
 from pandas import Series
 
 import const
-from robot.object_detection.camera import Camera
-from robot.object_detection.file_transfer import FileTransfer
-from robot.object_detection.object_detection import ObjectDetector
-from robot.table_goal_position_state import GoalTableNotFound, GoalTableFound, MultipleTableGoalsFound
+from pepper_waiter.object_detection.camera import Camera
+from pepper_waiter.object_detection.file_transfer import FileTransfer
+from pepper_waiter.object_detection.object_detection import ObjectDetector
+from pepper_waiter.table_goal_position_state import GoalTableNotFound, GoalTableFound, MultipleTableGoalsFound
 
 
 class SensingWrapper:

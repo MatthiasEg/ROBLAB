@@ -162,7 +162,7 @@ class ALVisualCompass(object):
         return self.proxy.isProcessing()
 
     def moveStraightTo(self, x):
-        """Move along the robot X axis.
+        """Move along the pepper_waiter X axis.
 
         :param float x: Algebric distance along the X axis in meters.
         :returns bool: 
@@ -172,7 +172,7 @@ class ALVisualCompass(object):
         return self.proxy.moveStraightTo(x)
 
     def moveTo(self, x, y, theta):
-        """Go to input pose (in robot referential).
+        """Go to input pose (in pepper_waiter referential).
 
         :param float x: Distance along the X axis in meters.
         :param float y: Distance along the Y axis in meters.

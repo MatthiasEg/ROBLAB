@@ -18,4 +18,4 @@ path_to_locale_file = 'locale/de-ch.json'
 path_to_pictures = 'pictures/'
 img_people_recognized = 'people_recognized'
 
-max_cups_on_image = 9.0
+max_cups_on_image = 9

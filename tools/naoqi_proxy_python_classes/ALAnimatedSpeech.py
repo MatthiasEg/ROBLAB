@@ -107,7 +107,7 @@ class ALAnimatedSpeech(object):
         return self.proxy.animated_say(text, configuration)
 
     def setBodyLanguageEnabled(self, enable):
-        """DEPRECATED since 1.22: use setBodyLanguageMode instead.Enable or disable the automatic body language on the speech.If it is enabled, anywhere you have not annotate your text with animation,the robot will fill the gap with automatically calculated gestures.If it is disabled, the robot will move only where you annotate it withanimations.
+        """DEPRECATED since 1.22: use setBodyLanguageMode instead.Enable or disable the automatic body language on the speech.If it is enabled, anywhere you have not annotate your text with animation,the pepper_waiter will fill the gap with automatically calculated gestures.If it is disabled, the pepper_waiter will move only where you annotate it withanimations.
 
         :param bool enable: The boolean value: true to enable, false to disable.
         """
@@ -134,7 +134,7 @@ class ALAnimatedSpeech(object):
         return self.proxy.setBodyLanguageModeFromStr(stringBodyLanguageMode)
 
     def setBodyTalkEnabled(self, enable):
-        """DEPRECATED since 1.18: use setBodyLanguageMode instead.Enable or disable the automatic body talk on the speech.If it is enabled, anywhere you have not annotate your text with animation,the robot will fill the gap with automatically calculated gestures.If it is disabled, the robot will move only where you annotate it withanimations.
+        """DEPRECATED since 1.18: use setBodyLanguageMode instead.Enable or disable the automatic body talk on the speech.If it is enabled, anywhere you have not annotate your text with animation,the pepper_waiter will fill the gap with automatically calculated gestures.If it is disabled, the pepper_waiter will move only where you annotate it withanimations.
 
         :param bool enable: The boolean value: true to enable, false to disable.
         """

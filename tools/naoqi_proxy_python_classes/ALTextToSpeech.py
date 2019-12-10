@@ -169,7 +169,7 @@ class ALTextToSpeech(object):
         return self.proxy.sayToFileAndPlay(pStringToSay)
 
     def setLanguage(self, pLanguage):
-        """Changes the language used by the Text-to-Speech engine. It automatically changes the voice used since each of them is related to a unique language. If you want that change to take effect automatically after reboot of your robot, refer to the robot web page (setting page).
+        """Changes the language used by the Text-to-Speech engine. It automatically changes the voice used since each of them is related to a unique language. If you want that change to take effect automatically after reboot of your pepper_waiter, refer to the pepper_waiter web page (setting page).
 
         :param str pLanguage: Language name. Must belong to the languages available in TTS (can be obtained with the getAvailableLanguages method).  It should be an identifier std::string.
         """
@@ -180,8 +180,8 @@ class ALTextToSpeech(object):
     def setLanguageDefaultVoice(self, Language, Voice):
         """Sets a voice as the default voice for the corresponding language
 
-        :param str Language: The language among those available on your robot as a String
-        :param str Voice: The voice among those available on your robot as a String
+        :param str Language: The language among those available on your pepper_waiter as a String
+        :param str Voice: The voice among those available on your pepper_waiter as a String
         """
         if not self.proxy:
             self.proxy = self.session.service("ALTextToSpeech")

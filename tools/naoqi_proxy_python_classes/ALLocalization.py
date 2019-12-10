@@ -56,7 +56,7 @@ class ALLocalization(object):
         return self.proxy.getMessageFromErrorCode(arg1)
 
     def getRobotOrientation(self):
-        """Get the robot orientation.
+        """Get the pepper_waiter orientation.
 
         :returns AL::ALValue: 
         """
@@ -65,7 +65,7 @@ class ALLocalization(object):
         return self.proxy.getRobotOrientation()
 
     def getRobotOrientation2(self, arg1):
-        """Get the robot orientation.
+        """Get the pepper_waiter orientation.
 
         :param bool arg1: arg
         :returns AL::ALValue: 
@@ -75,7 +75,7 @@ class ALLocalization(object):
         return self.proxy.getRobotOrientation(arg1)
 
     def getRobotPosition(self):
-        """Get the robot position in world navigation.
+        """Get the pepper_waiter position in world navigation.
 
         :returns std::vector<float>: 
         """
@@ -84,7 +84,7 @@ class ALLocalization(object):
         return self.proxy.getRobotPosition()
 
     def getRobotPosition2(self, arg1):
-        """Get the robot position in world navigation.
+        """Get the pepper_waiter position in world navigation.
 
         :param bool arg1: arg
         :returns std::vector<float>: 
@@ -94,7 +94,7 @@ class ALLocalization(object):
         return self.proxy.getRobotPosition(arg1)
 
     def goToHome(self):
-        """Go to the robot home.
+        """Go to the pepper_waiter home.
 
         :returns int: 
         """
@@ -122,7 +122,7 @@ class ALLocalization(object):
         return self.proxy.isDataAvailable()
 
     def isInCurrentHome(self):
-        """Is the robot in its home?
+        """Is the pepper_waiter in its home?
 
         :returns bool: 
         """
@@ -153,7 +153,7 @@ class ALLocalization(object):
         return self.proxy.isRelocalizationRequired()
 
     def learnHome(self):
-        """Learn the robot home.
+        """Learn the pepper_waiter home.
 
         :returns int: 
         """
@@ -191,7 +191,7 @@ class ALLocalization(object):
         return self.proxy.save(pDirectory)
 
     def stopAll(self):
-        """Stop all robot movements.
+        """Stop all pepper_waiter movements.
         """
         if not self.proxy:
             self.proxy = self.session.service("ALLocalization")

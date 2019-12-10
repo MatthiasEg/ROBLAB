@@ -6,14 +6,14 @@ import const
 import numpy as np
 import scipy.misc
 from person_amount_estimator import PersonAmountEstimator
-from robot.body_movement_wrapper import BodyMovementWrapper
-from robot.position_movement_wrapper import PositionMovementWrapper
-from robot.sensing_wrapper import SensingWrapper
-from robot.speech_wrapper import SpeechWrapper
-from robot.table_goal_position_state import GoalTableFound, MultipleTableGoalsFound, GoalTableNotFound
-from robot.table_search_state import TableFound, TableOccupied, TableNotFound, TableStateError
-from robot.tablet_wrapper import TabletWrapper
-from robot.sound_wrapper import SoundWrapper
+from pepper_waiter.body_movement_wrapper import BodyMovementWrapper
+from pepper_waiter.position_movement_wrapper import PositionMovementWrapper
+from pepper_waiter.sensing_wrapper import SensingWrapper
+from pepper_waiter.speech_wrapper import SpeechWrapper
+from pepper_waiter.table_goal_position_state import GoalTableFound, MultipleTableGoalsFound, GoalTableNotFound
+from pepper_waiter.table_search_state import TableFound, TableOccupied, TableNotFound, TableStateError
+from pepper_waiter.tablet_wrapper import TabletWrapper
+from pepper_waiter.sound_wrapper import SoundWrapper
 
 
 class Behavior(object):
@@ -406,8 +406,8 @@ class Behavior(object):
         self.__vocabularies = data["vocabularies"]
 
     def __create_map(self, radius):
-        # Wake up robot
-        # Wake up robot
+        # Wake up pepper_waiter
+        # Wake up pepper_waiter
         self.__robot.ALMotion.wakeUp()  # Explore the environement, in a radius of 2 m.
         error_code = self.__sensing_wrapper.explore(radius)
         if error_code != 0:
@@ -423,7 +423,7 @@ class Behavior(object):
             0., 0., 0.])
         # Stop localization
         self.__sensing_wrapper.stop_localization()
-        # Retrieve and display the map built by the robot
+        # Retrieve and display the map built by the pepper_waiter
         result_map = self.__sensing_wrapper.get_metrical_map()
         map_width = result_map[1]
         map_height = result_map[2]

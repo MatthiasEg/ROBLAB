@@ -16,9 +16,9 @@ class ALVisionRecognition(object):
         self.proxy = self.session.service("ALVisionRecognition")
 
     def changeDatabase(self, databasePath, databaseName):
-        """By default the database has the name "database" and is on the robot in /home/nao/naoqi/share/naoqi/vision/visionrecognition/current/ folder. This bound method allows to choose both another name and another folder for the database.
+        """By default the database has the name "database" and is on the pepper_waiter in /home/nao/naoqi/share/naoqi/vision/visionrecognition/current/ folder. This bound method allows to choose both another name and another folder for the database.
 
-        :param str databasePath: Absolute path of the database on the robot, or "" to set default path.
+        :param str databasePath: Absolute path of the database on the pepper_waiter, or "" to set default path.
         :param str databaseName: Name of the database (without extension), or "" to set default database name.
         :returns bool: True if the operation succeded, false otherwise.
         """

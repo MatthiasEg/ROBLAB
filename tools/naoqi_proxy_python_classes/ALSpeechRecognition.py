@@ -334,7 +334,7 @@ class ALSpeechRecognition(object):
         return self.proxy.setContextParam(contextName, paramName, value)
 
     def setLanguage(self, languageName):
-        """Sets the language used by the speech recognition engine. The list of the available languages can be collected through the getAvailableLanguages method. If you want to set a language as the default language (loading automatically at module launch), please refer to the web page of the robot.
+        """Sets the language used by the speech recognition engine. The list of the available languages can be collected through the getAvailableLanguages method. If you want to set a language as the default language (loading automatically at module launch), please refer to the web page of the pepper_waiter.
 
         :param str languageName: Name of the language in English.
         """

@@ -74,7 +74,7 @@ class ALMotion(object):
     def areResourcesAvailable(self, resourceNames):
         """Returns true if all the desired resources are available. Only motion API's' blocking call takes resources.
 
-        :param std::vector<std::string> resourceNames: A vector of resource names such as joints. Use getBodyNames("Body") to have the list of the available joint for your robot.
+        :param std::vector<std::string> resourceNames: A vector of resource names such as joints. Use getBodyNames("Body") to have the list of the available joint for your pepper_waiter.
         :returns bool: True if the resources are available
         """
         if not self.proxy:
@@ -317,7 +317,7 @@ class ALMotion(object):
         return self.proxy.getMoveConfig(config)
 
     def getNextRobotPosition(self):
-        """Gets the World Absolute next Robot Position. In fact in the walk algorithm some foot futur foot step are incompressible due to preview control, so this function give the next robot position which is incompressible. If the robot doesn't walk this function is equivalent to getRobotPosition(false)
+        """Gets the World Absolute next Robot Position. In fact in the walk algorithm some foot futur foot step are incompressible due to preview control, so this function give the next pepper_waiter position which is incompressible. If the pepper_waiter doesn't walk this function is equivalent to getRobotPosition(false)
 
         :returns std::vector<float>: A vector containing the World Absolute next Robot position.(Absolute Position X, Absolute Position Y, Absolute Angle Z)
         """
@@ -337,7 +337,7 @@ class ALMotion(object):
     def getPosition(self, name, space, useSensorValues):
         """Gets a Position relative to the FRAME. Axis definition: the x axis is positive toward Nao's front, the y from right to left and the z is vertical. The angle convention of Position6D is Rot_z(wz).Rot_y(wy).Rot_x(wx).
 
-        :param str name: Name of the item. Could be: Head, LArm, RArm, LLeg, RLeg, Torso, CameraTop, CameraBottom, MicroFront, MicroRear, MicroLeft, MicroRight, Accelerometer, Gyrometer, Laser, LFsrFR, LFsrFL, LFsrRR, LFsrRL, RFsrFR, RFsrFL, RFsrRR, RFsrRL, USSensor1, USSensor2, USSensor3, USSensor4. Use getSensorNames for the list of sensors supported on your robot.
+        :param str name: Name of the item. Could be: Head, LArm, RArm, LLeg, RLeg, Torso, CameraTop, CameraBottom, MicroFront, MicroRear, MicroLeft, MicroRight, Accelerometer, Gyrometer, Laser, LFsrFR, LFsrFL, LFsrRR, LFsrRL, RFsrFR, RFsrFL, RFsrRR, RFsrRL, USSensor1, USSensor2, USSensor3, USSensor4. Use getSensorNames for the list of sensors supported on your pepper_waiter.
         :param int space: Task frame {FRAME_TORSO = 0, FRAME_WORLD = 1, FRAME_ROBOT = 2}.
         :param bool useSensorValues: If true, the sensor values will be used to determine the position.
         :returns std::vector<float>: Vector containing the Position6D using meters and radians (x, y, z, wx, wy, wz)
@@ -356,9 +356,9 @@ class ALMotion(object):
         return self.proxy.getPushRecoveryEnabled()
 
     def getRobotConfig(self):
-        """Get the robot configuration.
+        """Get the pepper_waiter configuration.
 
-        :returns AL::ALValue: ALValue arrays containing the robot parameter names and the robot parameter values.
+        :returns AL::ALValue: ALValue arrays containing the pepper_waiter parameter names and the pepper_waiter parameter values.
         """
         if not self.proxy:
             self.proxy = self.session.service("ALMotion")
@@ -384,7 +384,7 @@ class ALMotion(object):
         return self.proxy.getRobotVelocity()
 
     def getSensorNames(self):
-        """Gets the list of sensors supported on your robot.
+        """Gets the list of sensors supported on your pepper_waiter.
 
         :returns std::vector<std::string>: Vector of sensor names
         """
@@ -452,7 +452,7 @@ class ALMotion(object):
     def getTransform(self, name, space, useSensorValues):
         """Gets an Homogenous Transform relative to the FRAME. Axis definition: the x axis is positive toward Nao's front, the y from right to left and the z is vertical.
 
-        :param str name: Name of the item. Could be: any joint or chain or sensor (Head, LArm, RArm, LLeg, RLeg, Torso, HeadYaw, ..., CameraTop, CameraBottom, MicroFront, MicroRear, MicroLeft, MicroRight, Accelerometer, Gyrometer, Laser, LFsrFR, LFsrFL, LFsrRR, LFsrRL, RFsrFR, RFsrFL, RFsrRR, RFsrRL, USSensor1, USSensor2, USSensor3, USSensor4. Use getSensorNames for the list of sensors supported on your robot.
+        :param str name: Name of the item. Could be: any joint or chain or sensor (Head, LArm, RArm, LLeg, RLeg, Torso, HeadYaw, ..., CameraTop, CameraBottom, MicroFront, MicroRear, MicroLeft, MicroRight, Accelerometer, Gyrometer, Laser, LFsrFR, LFsrFL, LFsrRR, LFsrRL, RFsrFR, RFsrFL, RFsrRR, RFsrRL, USSensor1, USSensor2, USSensor3, USSensor4. Use getSensorNames for the list of sensors supported on your pepper_waiter.
         :param int space: Task frame {FRAME_TORSO = 0, FRAME_WORLD = 1, FRAME_ROBOT = 2}.
         :param bool useSensorValues: If true, the sensor values will be used to determine the position.
         :returns std::vector<float>: Vector of 16 floats corresponding to the values of the matrix, line by line.
@@ -488,7 +488,7 @@ class ALMotion(object):
         return self.proxy.killAll()
 
     def killMove(self):
-        """Emergency Stop on Move task: This method will end the move task brutally, without attempting to return to a balanced state. The robot could easily fall.
+        """Emergency Stop on Move task: This method will end the move task brutally, without attempting to return to a balanced state. The pepper_waiter could easily fall.
         """
         if not self.proxy:
             self.proxy = self.session.service("ALMotion")
@@ -505,7 +505,7 @@ class ALMotion(object):
         return self.proxy.killTask(motionTaskID)
 
     def killTasksUsingResources(self, resourceNames):
-        """Kills all tasks that use any of the resources given. Only motion API's' blocking call takes resources and can be killed. Use getBodyNames("Body") to have the list of the available joint for your robot.
+        """Kills all tasks that use any of the resources given. Only motion API's' blocking call takes resources and can be killed. Use getBodyNames("Body") to have the list of the available joint for your pepper_waiter.
 
         :param std::vector<std::string> resourceNames: A vector of resource joint names
         """
@@ -521,7 +521,7 @@ class ALMotion(object):
         return self.proxy.killWalk()
 
     def move(self, x, y, theta):
-        """Makes the robot move at the given velocity. This is a non-blocking call.
+        """Makes the pepper_waiter move at the given velocity. This is a non-blocking call.
 
         :param float x: The velocity along x axis [m.s-1].
         :param float y: The velocity along y axis [m.s-1].
@@ -532,7 +532,7 @@ class ALMotion(object):
         return self.proxy.move(x, y, theta)
 
     def move2(self, x, y, theta, moveConfig):
-        """Makes the robot move at the given velocity. This is a non-blocking call.
+        """Makes the pepper_waiter move at the given velocity. This is a non-blocking call.
 
         :param float x: The velocity along x axis [m.s-1].
         :param float y: The velocity along y axis [m.s-1].
@@ -544,7 +544,7 @@ class ALMotion(object):
         return self.proxy.move(x, y, theta, moveConfig)
 
     def moveInit(self):
-        """Initialize the move process. Check the robot pose and take a right posture. This is blocking called.
+        """Initialize the move process. Check the pepper_waiter pose and take a right posture. This is blocking called.
         """
         if not self.proxy:
             self.proxy = self.session.service("ALMotion")
@@ -560,7 +560,7 @@ class ALMotion(object):
         return self.proxy.moveIsActive()
 
     def moveTo(self, x, y, theta):
-        """Makes the robot move at the given position. This is a non-blocking call.
+        """Makes the pepper_waiter move at the given position. This is a non-blocking call.
 
         :param float x: The position along x axis [m].
         :param float y: The position along y axis [m].
@@ -571,7 +571,7 @@ class ALMotion(object):
         return self.proxy.moveTo(x, y, theta)
 
     def moveTo2(self, x, y, theta, time):
-        """Makes the robot move at the given position in fixed time. This is a non-blocking call.
+        """Makes the pepper_waiter move at the given position in fixed time. This is a non-blocking call.
 
         :param float x: The position along x axis [m].
         :param float y: The position along y axis [m].
@@ -583,7 +583,7 @@ class ALMotion(object):
         return self.proxy.moveTo(x, y, theta, time)
 
     def moveTo3(self, x, y, theta, moveConfig):
-        """Makes the robot move at the given position. This is a non-blocking call.
+        """Makes the pepper_waiter move at the given position. This is a non-blocking call.
 
         :param float x: The position along x axis [m].
         :param float y: The position along y axis [m].
@@ -595,7 +595,7 @@ class ALMotion(object):
         return self.proxy.moveTo(x, y, theta, moveConfig)
 
     def moveTo4(self, x, y, theta, time, moveConfig):
-        """Makes the robot move at the given position in fixed time. This is a non-blocking call.
+        """Makes the pepper_waiter move at the given position in fixed time. This is a non-blocking call.
 
         :param float x: The position along x axis [m].
         :param float y: The position along y axis [m].
@@ -608,7 +608,7 @@ class ALMotion(object):
         return self.proxy.moveTo(x, y, theta, time, moveConfig)
 
     def moveTo5(self, controlPoint):
-        """Makes the robot move to the given relative positions. This is a blocking call.
+        """Makes the pepper_waiter move to the given relative positions. This is a blocking call.
 
         :param AL::ALValue controlPoint: An ALValue with the control points in FRAME_ROBOT. Each control point is relative to the previous one. [[x1, y1, theta1], ..., [xN, yN, thetaN]
         """
@@ -617,7 +617,7 @@ class ALMotion(object):
         return self.proxy.moveTo(controlPoint)
 
     def moveTo6(self, controlPoint, moveConfig):
-        """Makes the robot move to the given relative positions. This is a blocking call.
+        """Makes the pepper_waiter move to the given relative positions. This is a blocking call.
 
         :param AL::ALValue controlPoint: An ALValue with all the control points in FRAME_ROBOT. Each control point is relative to the previous one. [[x1, y1, theta1], ..., [xN, yN, thetaN]
         :param AL::ALValue moveConfig: An ALValue with custom move configuration.
@@ -627,7 +627,7 @@ class ALMotion(object):
         return self.proxy.moveTo(controlPoint, moveConfig)
 
     def moveToward(self, x, y, theta):
-        """Makes the robot move at the given normalized velocity. This is a non-blocking call.
+        """Makes the pepper_waiter move at the given normalized velocity. This is a non-blocking call.
 
         :param float x: The normalized velocity along x axis (between -1 and 1).
         :param float y: The normalized velocity along y axis (between -1 and 1).
@@ -638,7 +638,7 @@ class ALMotion(object):
         return self.proxy.moveToward(x, y, theta)
 
     def moveToward2(self, x, y, theta, moveConfig):
-        """Makes the robot move at the given normalized velocity. This is a non-blocking call.
+        """Makes the pepper_waiter move at the given normalized velocity. This is a non-blocking call.
 
         :param float x: The normalized velocity along x axis (between -1 and 1).
         :param float y: The normalized velocity along y axis (between -1 and 1).
@@ -709,14 +709,14 @@ class ALMotion(object):
         return self.proxy.positionInterpolations(effectorNames, taskSpaceForAllPaths, paths, axisMasks, relativeTimes)
 
     def rest(self):
-        """The robot will rest: go to a relax and safe position and set Motor OFF
+        """The pepper_waiter will rest: go to a relax and safe position and set Motor OFF
         """
         if not self.proxy:
             self.proxy = self.session.service("ALMotion")
         return self.proxy.rest()
 
     def rest2(self, arg1):
-        """The robot will rest: go to a relax and safe position on the chain and set Motor OFF
+        """The pepper_waiter will rest: go to a relax and safe position on the chain and set Motor OFF
 
         :param str arg1: arg
         """
@@ -725,9 +725,9 @@ class ALMotion(object):
         return self.proxy.rest(arg1)
 
     def robotIsWakeUp(self):
-        """return true if the robot is already wakeUp
+        """return true if the pepper_waiter is already wakeUp
 
-        :returns bool: True if the robot is already wakeUp.
+        :returns bool: True if the pepper_waiter is already wakeUp.
         """
         if not self.proxy:
             self.proxy = self.session.service("ALMotion")
@@ -775,7 +775,7 @@ class ALMotion(object):
         return self.proxy.setBreathEnabled(pChain, pIsEnabled)
 
     def setCollisionProtectionEnabled(self, pChainName, pEnable):
-        """Enable Anticollision protection of the arms of the robot. Use api isCollision to know if a chain is in collision and can be disactivated.
+        """Enable Anticollision protection of the arms of the pepper_waiter. Use api isCollision to know if a chain is in collision and can be disactivated.
 
         :param str pChainName: The chain name {"Arms", "LArm" or "RArm"}.
         :param bool pEnable: Activate or disactivate the anticollision of the desired Chain.
@@ -804,7 +804,7 @@ class ALMotion(object):
         return self.proxy.setEnableNotifications(enable)
 
     def setExternalCollisionProtectionEnabled(self, pName, pEnable):
-        """Enable Anticollision protection of the arms and base move  of the robot with external environment.
+        """Enable Anticollision protection of the arms and base move  of the pepper_waiter with external environment.
 
         :param str pName: The name {"All", "Move", "Arms", "LArm" or "RArm"}.
         :param bool pEnable: Activate or disactivate the anticollision of the desired name.
@@ -814,7 +814,7 @@ class ALMotion(object):
         return self.proxy.setExternalCollisionProtectionEnabled(pName, pEnable)
 
     def setFallManagerEnabled(self, pEnable):
-        """Enable The fall manager protection for the robot. When a fall is detected the robot adopt a joint configuration to protect himself and cut the stiffness. . An memory event called "robotHasFallen" is generated when the fallManager have been activated.
+        """Enable The fall manager protection for the pepper_waiter. When a fall is detected the pepper_waiter adopt a joint configuration to protect himself and cut the stiffness. . An memory event called "robotHasFallen" is generated when the fallManager have been activated.
 
         :param bool pEnable: Activate or disactivate the smart stiffness.
         """
@@ -911,7 +911,7 @@ class ALMotion(object):
         return self.proxy.setPositions(names, spaces, positions, fractionMaxSpeed, axisMask)
 
     def setPushRecoveryEnabled(self, pEnable):
-        """Enable The push recovery protection for the robot.
+        """Enable The push recovery protection for the pepper_waiter.
 
         :param bool pEnable: Enable the push recovery.
         """
@@ -1112,7 +1112,7 @@ class ALMotion(object):
         return self.proxy.waitUntilWalkIsFinished()
 
     def wakeUp(self):
-        """The robot will wake up: set Motor ON and go to initial position if needed
+        """The pepper_waiter will wake up: set Motor ON and go to initial position if needed
         """
         if not self.proxy:
             self.proxy = self.session.service("ALMotion")
@@ -1177,7 +1177,7 @@ class ALMotion(object):
         return self.proxy.walkTo(controlPoint, feetGaitConfig)
 
     def wbEnable(self, isEnabled):
-        """UserFriendly Whole Body API: enable Whole Body Balancer. It's a Generalized Inverse Kinematics which deals with cartesian control, balance, redundancy and task priority. The main goal is to generate and stabilized consistent motions without precomputed trajectories and adapt nao's behaviour to the situation. The generalized inverse kinematic problem takes in account equality constraints (keep foot fix), inequality constraints (joint limits, balance, ...) and quadratic minimization (cartesian / articular desired trajectories). We solve each step a quadratic programming on the robot.
+        """UserFriendly Whole Body API: enable Whole Body Balancer. It's a Generalized Inverse Kinematics which deals with cartesian control, balance, redundancy and task priority. The main goal is to generate and stabilized consistent motions without precomputed trajectories and adapt nao's behaviour to the situation. The generalized inverse kinematic problem takes in account equality constraints (keep foot fix), inequality constraints (joint limits, balance, ...) and quadratic minimization (cartesian / articular desired trajectories). We solve each step a quadratic programming on the pepper_waiter.
 
         :param bool isEnabled: Active / Disactive Whole Body Balancer.
         """

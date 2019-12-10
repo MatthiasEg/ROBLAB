@@ -100,7 +100,7 @@ class ALAutonomousLife(object):
         return self.proxy.getLifeTime()
 
     def getRobotOffsetFromFloor(self):
-        """Get the vertical offset (in meters) of the base of the robot with respect to the floor
+        """Get the vertical offset (in meters) of the base of the pepper_waiter with respect to the floor
 
         :returns float: Current vertical offset (in meters)
         """
@@ -182,7 +182,7 @@ class ALAutonomousLife(object):
         return self.proxy.setLaunchpadPluginEnabled(plugin_name, enabled)
 
     def setRobotOffsetFromFloor(self, offset):
-        """Set the vertical offset (in meters) of the base of the robot with respect to the floor
+        """Set the vertical offset (in meters) of the base of the pepper_waiter with respect to the floor
 
         :param float offset: The new vertical offset (in meters)
         """

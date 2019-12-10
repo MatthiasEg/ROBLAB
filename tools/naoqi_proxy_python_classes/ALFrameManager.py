@@ -169,7 +169,7 @@ class ALFrameManager(object):
         return self.proxy.newBehaviorFromChoregraphe()
 
     def newBehaviorFromFile(self, xmlFilePath, behName):
-        """Creates a new behavior, from a box found in an xml file stored in the robot.
+        """Creates a new behavior, from a box found in an xml file stored in the pepper_waiter.
 
         :param str xmlFilePath: Path to Xml file, ex : "/home/youhou/mybehavior.xar".
         :param str behName: 
@@ -180,7 +180,7 @@ class ALFrameManager(object):
         return self.proxy.newBehaviorFromFile(xmlFilePath, behName)
 
     def createBehavior(self, packageDir, behaviorPath, behName):
-        """Creates a new behavior, from a box found in an xml file stored in the robot.
+        """Creates a new behavior, from a box found in an xml file stored in the pepper_waiter.
 
         :param str packageDir: Path to package directory, ex : "/path/to/appsName"
         :param str behaviorPath: Relative path to the behavior inside the package ex : "behavior_1/behavior.xar"

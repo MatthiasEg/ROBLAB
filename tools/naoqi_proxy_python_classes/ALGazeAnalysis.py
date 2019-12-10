@@ -90,7 +90,7 @@ class ALGazeAnalysis(object):
         return self.proxy.getSubscribersInfo()
 
     def getTolerance(self):
-        """Gets the tolerance used to decide whether or not a person is looking at the robot after face analysis.
+        """Gets the tolerance used to decide whether or not a person is looking at the pepper_waiter after face analysis.
 
         :returns float: Current value of the tolerance.
         """
@@ -153,7 +153,7 @@ class ALGazeAnalysis(object):
         return self.proxy.setFaceAnalysisEnabled(status)
 
     def setTolerance(self, tolerance):
-        """Sets the tolerance (between 0 and 1) for deciding whether or not a person is looking at the robot after face analysis. This tolerance is used only when face analysis is enabled.
+        """Sets the tolerance (between 0 and 1) for deciding whether or not a person is looking at the pepper_waiter after face analysis. This tolerance is used only when face analysis is enabled.
 
         :param float tolerance: New value of the tolerance (between 0 and 1).
         """

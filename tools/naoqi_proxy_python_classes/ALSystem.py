@@ -63,7 +63,7 @@ class ALSystem(object):
         return self.proxy.previousSystemVersion()
 
     def reboot(self):
-        """Reboot robot
+        """Reboot pepper_waiter
         """
         if not self.proxy:
             self.proxy = self.session.service("ALSystem")
@@ -72,7 +72,7 @@ class ALSystem(object):
     def robotIcon(self):
         """Robot icon
 
-        :returns AL::ALValue: icon of the robot
+        :returns AL::ALValue: icon of the pepper_waiter
         """
         if not self.proxy:
             self.proxy = self.session.service("ALSystem")
@@ -81,7 +81,7 @@ class ALSystem(object):
     def robotName(self):
         """System hostname
 
-        :returns str: name of the robot
+        :returns str: name of the pepper_waiter
         """
         if not self.proxy:
             self.proxy = self.session.service("ALSystem")
@@ -108,7 +108,7 @@ class ALSystem(object):
         return self.proxy.setTimezone(timezone)
 
     def shutdown(self):
-        """Shutdown robot
+        """Shutdown pepper_waiter
         """
         if not self.proxy:
             self.proxy = self.session.service("ALSystem")

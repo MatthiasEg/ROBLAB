@@ -16,9 +16,9 @@ class ALRobotPose(object):
         self.proxy = self.session.service("ALRobotPose")
 
     def getActualPoseAndTime(self):
-        """Get the actual robot pose and the time since this pose was activate.
+        """Get the actual pepper_waiter pose and the time since this pose was activate.
 
-        :returns AL::ALValue: A ALValue array of size 2. With first a string of the robot pose and  then a float with the time in second since this pose is activated.
+        :returns AL::ALValue: A ALValue array of size 2. With first a string of the pepper_waiter pose and  then a float with the time in second since this pose is activated.
         """
         if not self.proxy:
             self.proxy = self.session.service("ALRobotPose")

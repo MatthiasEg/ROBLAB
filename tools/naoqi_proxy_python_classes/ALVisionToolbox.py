@@ -68,7 +68,7 @@ class ALVisionToolbox(object):
         return self.proxy.setWhiteBalance(camera)
 
     def startVideoRecord(self, videoName):
-        """Start recording a video. The .avi video is stored on the robot in the \"/home/nao/.local/share/naoqi/vision\" folder. The record should be stopped by calling stopVideoRecord(). Resolution: 320*240, MJPG format, frame rate ~10-15 fps. Please note that only one record at a time can be made.
+        """Start recording a video. The .avi video is stored on the pepper_waiter in the \"/home/nao/.local/share/naoqi/vision\" folder. The record should be stopped by calling stopVideoRecord(). Resolution: 320*240, MJPG format, frame rate ~10-15 fps. Please note that only one record at a time can be made.
 
         :param str videoName: Name of the video file to be recorded.
         """
