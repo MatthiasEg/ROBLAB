@@ -6,8 +6,8 @@ from thread import start_new_thread
 
 import statistics as statistics
 
-from pepper_waiter.utilities.object_detection.camera import Camera
-from pepper_waiter.utilities.object_detection.file_transfer import FileTransfer
+from pepper_waiter.utilities.camera import Camera
+from pepper_waiter.utilities.file_transfer import FileTransfer
 
 # import face_recognition
 
