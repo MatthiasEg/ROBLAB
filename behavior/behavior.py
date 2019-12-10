@@ -10,8 +10,8 @@ from pepper_waiter.wrappers.body_movement_wrapper import BodyMovementWrapper
 from pepper_waiter.wrappers.position_movement_wrapper import PositionMovementWrapper
 from pepper_waiter.wrappers.sensing_wrapper import SensingWrapper
 from pepper_waiter.wrappers.speech_wrapper import SpeechWrapper
-from pepper_waiter.table_goal_position_state import GoalTableFound, MultipleTableGoalsFound, GoalTableNotFound
-from pepper_waiter.table_search_state import TableFound, TableOccupied, TableNotFound, TableStateError
+from pepper_waiter.utilities.table_goal_position_state import GoalTableFound, MultipleTableGoalsFound, GoalTableNotFound
+from pepper_waiter.utilities.table_search_state import TableFound, TableOccupied, TableNotFound, TableStateError
 from pepper_waiter.wrappers.tablet_wrapper import TabletWrapper
 from pepper_waiter.wrappers.sound_wrapper import SoundWrapper
 
