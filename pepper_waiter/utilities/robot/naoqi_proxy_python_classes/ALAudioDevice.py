@@ -188,7 +188,7 @@ class ALAudioDevice(object):
         return self.proxy.muteAudioOut(arg1)
 
     def openAudioInputs(self):
-        """Opens the audio device for capture. If you closed the audio inputs with the closeAudioInputs method, you must call this method to be able to access to the sound data of the nao's microphones.
+        """Opens the audio device for capture. If you closed the audio inputs with the closeAudioInputs method, you must call this method to be able to access to the sound face_detection_data of the nao's microphones.
         """
         if not self.proxy:
             self.proxy = self.session.service("ALAudioDevice")
@@ -258,9 +258,9 @@ class ALAudioDevice(object):
         """Set AudioDevice Client preferences. This function is deprecated, the use of the alternate 4 arguments setClientPreferences() is now prefered.
 
         :param str name: name of the client
-        :param int sampleRate: sample rate of the microphones data sent to the processSound or processSoundRemote functions - must be 16000 or 48000
-        :param AL::ALValue channelsVector: ALValue containing a vector of int indicating which microphones data will be send to the processSound or processSoundRemote functions
-        :param int deinterleaved: indicates if the microphones data sent to the processSound or processSoundRemote functions are interleaved or not - 0 : interleaved - 1 : deinterleaved
+        :param int sampleRate: sample rate of the microphones face_detection_data sent to the processSound or processSoundRemote functions - must be 16000 or 48000
+        :param AL::ALValue channelsVector: ALValue containing a vector of int indicating which microphones face_detection_data will be send to the processSound or processSoundRemote functions
+        :param int deinterleaved: indicates if the microphones face_detection_data sent to the processSound or processSoundRemote functions are interleaved or not - 0 : interleaved - 1 : deinterleaved
         :param int timeStamp: parameter indicating if audio timestamps are sent to the processSound or processSoundRemote functions - 0 : no - 1 : yes
         """
         if not self.proxy:
@@ -271,9 +271,9 @@ class ALAudioDevice(object):
         """Set AudioDevice Client preferences
 
         :param str name: name of the client
-        :param int sampleRate: sample rate of the microphones data sent to the process function - must be 16000 or 48000
-        :param int channelsConfiguration: An int (defined in ALSoundExtractor) indicating which microphones data will be send to the process function. ALLCHANNELS, LEFTCHANNEL, RIGHTCHANNEL, FRONTCHANNEL, REARCHANNEL are the configuration currently supported.
-        :param int deinterleaved: indicates if the microphones data sent to the process function are interleaved or not - 0 : interleaved - 1 : deinterleaved
+        :param int sampleRate: sample rate of the microphones face_detection_data sent to the process function - must be 16000 or 48000
+        :param int channelsConfiguration: An int (defined in ALSoundExtractor) indicating which microphones face_detection_data will be send to the process function. ALLCHANNELS, LEFTCHANNEL, RIGHTCHANNEL, FRONTCHANNEL, REARCHANNEL are the configuration currently supported.
+        :param int deinterleaved: indicates if the microphones face_detection_data sent to the process function are interleaved or not - 0 : interleaved - 1 : deinterleaved
         """
         if not self.proxy:
             self.proxy = self.session.service("ALAudioDevice")
@@ -298,7 +298,7 @@ class ALAudioDevice(object):
         return self.proxy.setDefaultOutput(index)
 
     def setFileAsInput(self, pFileName):
-        """This method allows to send sound samples contained in a sound file at the input of ALAudioDevice, instead of the nao's microphones sound data. The sound file must be a .wav file containing 16bits / 4 channels / interleaved samples. Once the file has been read, microphones sound data will again taken as input
+        """This method allows to send sound samples contained in a sound file at the input of ALAudioDevice, instead of the nao's microphones sound face_detection_data. The sound file must be a .wav file containing 16bits / 4 channels / interleaved samples. Once the file has been read, microphones sound face_detection_data will again taken as input
 
         :param str pFileName: Name of the input file.
         """

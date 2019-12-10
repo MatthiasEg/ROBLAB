@@ -16,10 +16,10 @@ class ALChoregrapheRecorder(object):
         self.proxy = self.session.service("ALChoregrapheRecorder")
 
     def dataChanged(self, dataName, data, message):
-        """Called by ALMemory when subcription data is updated.
+        """Called by ALMemory when subcription face_detection_data is updated.
 
-        :param str dataName: Name of the subscribed data.
-        :param AL::ALValue data: Value of the the subscribed data
+        :param str dataName: Name of the subscribed face_detection_data.
+        :param AL::ALValue face_detection_data: Value of the the subscribed face_detection_data
         :param str message: The message give when subscribing.
         """
         if not self.proxy:
@@ -27,7 +27,7 @@ class ALChoregrapheRecorder(object):
         return self.proxy.dataChanged(dataName, data, message)
 
     def motionRecorderStopped(self):
-        """Triggers recording stop and data importation
+        """Triggers recording stop and face_detection_data importation
         """
         if not self.proxy:
             self.proxy = self.session.service("ALChoregrapheRecorder")

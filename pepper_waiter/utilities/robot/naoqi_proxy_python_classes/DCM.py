@@ -78,7 +78,7 @@ class DCM(object):
     def set(self, commands):
         """Call this function to send a timed-command list to an actuator
 
-        :param AL::ALValue commands: AL::ALValue with all data
+        :param AL::ALValue commands: AL::ALValue with all face_detection_data
         """
         if not self.proxy:
             self.proxy = self.session.service("DCM")
@@ -87,7 +87,7 @@ class DCM(object):
     def setAlias(self, commands):
         """Call this function to send timed-command list to an alias (list of actuators)
 
-        :param AL::ALValue commands: AL::ALValue with all data
+        :param AL::ALValue commands: AL::ALValue with all face_detection_data
         """
         if not self.proxy:
             self.proxy = self.session.service("DCM")

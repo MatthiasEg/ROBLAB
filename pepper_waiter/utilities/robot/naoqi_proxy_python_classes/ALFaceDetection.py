@@ -169,7 +169,7 @@ class ALFaceDetection(object):
     def importOldDatabase(self, policy):
         """Imports the content of an old face reco DB
 
-        :param str policy: Merging policy if an imported entry has the same name as an existing one. It can be either: "overwrite" to replace the existing entry by the imported one, "merge" to merge data from both entries (if they don't relate to the same person, face recognition may fail), "keep" to keep the existing entry and skip the imported one.
+        :param str policy: Merging policy if an imported entry has the same name as an existing one. It can be either: "overwrite" to replace the existing entry by the imported one, "merge" to merge face_detection_data from both entries (if they don't relate to the same person, face recognition may fail), "keep" to keep the existing entry and skip the imported one.
         :returns bool: True if the import succeeded, false otherwise.
         """
         if not self.proxy:

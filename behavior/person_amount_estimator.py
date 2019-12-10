@@ -77,7 +77,7 @@ class PersonAmountEstimator:
 
         # return len(faces)
         # Create the haar cascade
-        face_cascade = cv2.CascadeClassifier("data/haarcascade_frontalface_default.xml")
+        face_cascade = cv2.CascadeClassifier("face_detection_data/haarcascade_frontalface_default.xml")
         image = cv2.imread(picture_path)
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 

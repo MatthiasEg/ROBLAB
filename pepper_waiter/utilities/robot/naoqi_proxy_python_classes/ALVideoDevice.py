@@ -209,7 +209,7 @@ class ALVideoDevice(object):
         return self.proxy.getColorSpaces(name)
 
     def getDirectRawImageLocal(self, name):
-        """Retrieves the latest image from the video source and returns a pointer to the locked ALImage, with data array pointing directly to raw data. There is no format conversion and no copy of the raw buffer. Warning: When image is not necessary anymore, a call to releaseDirectRawImage() is requested. Warning: When using this mode for several vision module, if they need raw data for more than 25ms check that you have strictly less modules in this mode than the amount of kernel buffers!! Warning: Release all kernel buffers before any action requesting a modification in camera running mode (e.g. resolution, switch between cameras).
+        """Retrieves the latest image from the video source and returns a pointer to the locked ALImage, with face_detection_data array pointing directly to raw face_detection_data. There is no format conversion and no copy of the raw buffer. Warning: When image is not necessary anymore, a call to releaseDirectRawImage() is requested. Warning: When using this mode for several vision module, if they need raw face_detection_data for more than 25ms check that you have strictly less modules in this mode than the amount of kernel buffers!! Warning: Release all kernel buffers before any action requesting a modification in camera running mode (e.g. resolution, switch between cameras).
 
         :param str name: Name of the subscribing vision module Warning, image pointer is valid only for C++ dynamic library.
         """
@@ -218,9 +218,9 @@ class ALVideoDevice(object):
         return self.proxy.getDirectRawImageLocal(name)
 
     def getDirectRawImageRemote(self, name):
-        """Fills an ALValue with data coming directly from raw buffer (no format conversion).
+        """Fills an ALValue with face_detection_data coming directly from raw buffer (no format conversion).
 
-        :param str name: Name of the subscribing vision module     [0] : width;     [1] : height;     [2] : number of layers;     [3] : ColorSpace;     [4] : time stamp (highest 32 bits);     [5] : time stamp (lowest 32 bits);     [6] : array of size height * width * nblayers containing image data;     [7] : cameraID;     [8] : left angle;     [9] : top angle;     [10] : right angle;     [11] : bottom angle;
+        :param str name: Name of the subscribing vision module     [0] : width;     [1] : height;     [2] : number of layers;     [3] : ColorSpace;     [4] : time stamp (highest 32 bits);     [5] : time stamp (lowest 32 bits);     [6] : array of size height * width * nblayers containing image face_detection_data;     [7] : cameraID;     [8] : left angle;     [9] : top angle;     [10] : right angle;     [11] : bottom angle;
         :returns AL::ALValue: Array containing image informations :
         """
         if not self.proxy:
@@ -228,7 +228,7 @@ class ALVideoDevice(object):
         return self.proxy.getDirectRawImageRemote(name)
 
     def getDirectRawImagesLocal(self, name):
-        """Retrieves the latest image from the video source and returns a pointer to the locked ALImage, with data array pointing directly to raw data. There is no format conversion and no copy of the raw buffer. Warning: When image is not necessary anymore, a call to releaseDirectRawImage() is requested. Warning: When using this mode for several vision module, if they need raw data for more than 25ms check that you have strictly less modules in this mode than the amount of kernel buffers!! Warning: Release all kernel buffers before any action requesting a modification in camera running mode (e.g. resolution, switch between cameras).
+        """Retrieves the latest image from the video source and returns a pointer to the locked ALImage, with face_detection_data array pointing directly to raw face_detection_data. There is no format conversion and no copy of the raw buffer. Warning: When image is not necessary anymore, a call to releaseDirectRawImage() is requested. Warning: When using this mode for several vision module, if they need raw face_detection_data for more than 25ms check that you have strictly less modules in this mode than the amount of kernel buffers!! Warning: Release all kernel buffers before any action requesting a modification in camera running mode (e.g. resolution, switch between cameras).
 
         :param str name: Name of the subscribing vision module Warning, image pointer is valid only for C++ dynamic library.
         :returns AL::ALValue: Array of pointer to the locked image buffer, NULL if error.
@@ -238,9 +238,9 @@ class ALVideoDevice(object):
         return self.proxy.getDirectRawImagesLocal(name)
 
     def getDirectRawImagesRemote(self, name):
-        """Fills an ALValue with data coming directly from raw buffer (no format conversion).
+        """Fills an ALValue with face_detection_data coming directly from raw buffer (no format conversion).
 
-        :param str name: Name of the subscribing vision module     [0] : width;     [1] : height;     [2] : number of layers;     [3] : ColorSpace;     [4] : time stamp (highest 32 bits);     [5] : time stamp (lowest 32 bits);     [6] : array of size height * width * nblayers containing image data;     [7] : cameraID;     [8] : left angle;     [9] : top angle;     [10] : right angle;     [11] : bottom angle;
+        :param str name: Name of the subscribing vision module     [0] : width;     [1] : height;     [2] : number of layers;     [3] : ColorSpace;     [4] : time stamp (highest 32 bits);     [5] : time stamp (lowest 32 bits);     [6] : array of size height * width * nblayers containing image face_detection_data;     [7] : cameraID;     [8] : left angle;     [9] : top angle;     [10] : right angle;     [11] : bottom angle;
         :returns AL::ALValue: Array containing image informations :
         """
         if not self.proxy:
@@ -382,7 +382,7 @@ class ALVideoDevice(object):
     def getImageRemote(self, name):
         """Applies transformations to the last image from video source and fills pFrameOut.
 
-        :param str name: Name of the subscribing vision module     [0] : width;     [1] : height;     [2] : number of layers;     [3] : ColorSpace;     [4] : time stamp (highest 32 bits);     [5] : time stamp (lowest 32 bits);     [6] : array of size height * width * nblayers containing image data;     [7] : cameraID;     [8] : left angle;     [9] : top angle;     [10] : right angle;     [11] : bottom angle;
+        :param str name: Name of the subscribing vision module     [0] : width;     [1] : height;     [2] : number of layers;     [3] : ColorSpace;     [4] : time stamp (highest 32 bits);     [5] : time stamp (lowest 32 bits);     [6] : array of size height * width * nblayers containing image face_detection_data;     [7] : cameraID;     [8] : left angle;     [9] : top angle;     [10] : right angle;     [11] : bottom angle;
         :returns AL::ALValue: Array containing image informations :
         """
         if not self.proxy:
@@ -413,7 +413,7 @@ class ALVideoDevice(object):
     def getImagesRemote(self, name):
         """Applies transformations to the last image from video source and fills pFrameOut.
 
-        :param str name: Name of the subscribing vision module     [0] : width;     [1] : height;     [2] : number of layers;     [3] : ColorSpace;     [4] : time stamp (highest 32 bits);     [5] : time stamp (lowest 32 bits);     [6] : array of size height * width * nblayers containing image data;     [7] : cameraID;     [8] : left angle;     [9] : top angle;     [10] : right angle;     [11] : bottom angle;
+        :param str name: Name of the subscribing vision module     [0] : width;     [1] : height;     [2] : number of layers;     [3] : ColorSpace;     [4] : time stamp (highest 32 bits);     [5] : time stamp (lowest 32 bits);     [6] : array of size height * width * nblayers containing image face_detection_data;     [7] : cameraID;     [8] : left angle;     [9] : top angle;     [10] : right angle;     [11] : bottom angle;
         :returns AL::ALValue: Array containing image informations :
         """
         if not self.proxy:

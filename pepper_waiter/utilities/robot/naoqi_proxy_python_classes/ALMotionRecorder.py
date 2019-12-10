@@ -16,10 +16,10 @@ class ALMotionRecorder(object):
         self.proxy = self.session.service("ALMotionRecorder")
 
     def dataChanged(self, dataName, data, message):
-        """Called by ALMemory when subcription data is updated. INTERNAL
+        """Called by ALMemory when subcription face_detection_data is updated. INTERNAL
 
-        :param str dataName: Name of the subscribed data.
-        :param AL::ALValue data: Value of the the subscribed data
+        :param str dataName: Name of the subscribed face_detection_data.
+        :param AL::ALValue face_detection_data: Value of the the subscribed face_detection_data
         :param str message: The message give when subscribing.
         """
         if not self.proxy:
@@ -55,16 +55,16 @@ class ALMotionRecorder(object):
         :param bool extensionAllowed: set to true to ignore nbPoses and keep recording new poses as long as record is not manually stopped
         :param float timeStep: Time in seconds to wait between two poses
         :param std::vector<std::string> jointsToReplay: Names of joints that must be replayed
-        :param AL::ALValue replayData: An ALValue holding data for replayed joints. It holds two ALValues. The first one is an ALValue where each line corresponds to a joint, and column elements are times of control points The second one is also an ALValue where each line corresponds to a joint, but column elements are arrays containing [float angle, Handle1, Handle2] elements, where Handle is [int InterpolationType, float dAngle, float dTime] describing the handle offsets relative to the angle and time of the point. The first bezier param describes the handle that controls the curve preceding the point, the second describes the curve following the point.
+        :param AL::ALValue replayData: An ALValue holding face_detection_data for replayed joints. It holds two ALValues. The first one is an ALValue where each line corresponds to a joint, and column elements are times of control points The second one is also an ALValue where each line corresponds to a joint, but column elements are arrays containing [float angle, Handle1, Handle2] elements, where Handle is [int InterpolationType, float dAngle, float dTime] describing the handle offsets relative to the angle and time of the point. The first bezier param describes the handle that controls the curve preceding the point, the second describes the curve following the point.
         """
         if not self.proxy:
             self.proxy = self.session.service("ALMotionRecorder")
         return self.proxy.startPeriodicRecording(jointsToRecord, nbPoses, extensionAllowed, timeStep, jointsToReplay, replayData)
 
     def stopAndGetRecording(self):
-        """Stop recording the motion and return data
+        """Stop recording the motion and return face_detection_data
 
-        :returns AL::ALValue: Returns the recorded data as an ALValue: [[JointName1,[pos1, pos2, ...]], [JointName2,[pos1, pos2, ...]], ...]
+        :returns AL::ALValue: Returns the recorded face_detection_data as an ALValue: [[JointName1,[pos1, pos2, ...]], [JointName2,[pos1, pos2, ...]], ...]
         """
         if not self.proxy:
             self.proxy = self.session.service("ALMotionRecorder")

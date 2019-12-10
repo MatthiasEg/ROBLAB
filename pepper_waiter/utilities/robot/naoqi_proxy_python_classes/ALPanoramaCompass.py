@@ -74,7 +74,7 @@ class ALPanoramaCompass(object):
         return self.proxy.getFrame(id, arg2)
 
     def isDataAvailable(self):
-        """Returns true if there is some panorama data
+        """Returns true if there is some panorama face_detection_data
 
         :returns bool: 
         """
