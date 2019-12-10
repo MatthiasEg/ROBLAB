@@ -1,7 +1,13 @@
+from pepper_waiter.utilities.goal_coordinate import GoalCoordinate
+
+
 class TableFound:
 
-    def __init__(self, goal_location):
-        self.goal_location = goal_location
+    def __init__(self, coordinate):
+        if isinstance(coordinate, GoalCoordinate):
+            self.coordinate = coordinate
+        else:
+            raise ValueError("Coordinate not valid! [GoalCoordinatesFound]")
 
 
 class TableOccupied:

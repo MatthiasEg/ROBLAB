@@ -1,16 +1,28 @@
-class GoalTableFound:
-
-    def __init__(self, goal_location):
-        self.goal_location = goal_location
+from pepper_waiter.utilities.goal_coordinate import GoalCoordinate
 
 
-class MultipleTableGoalsFound:
+class GoalCoordinatesFoundState:
 
-    def __init__(self, previous_goal_location=None):
-        self.previous_goal_location = previous_goal_location
+    def __init__(self, coordinates):
+        if isinstance(coordinates, GoalCoordinate):
+            self.coordinate = coordinates
+        else:
+            raise ValueError("Coordinate not valid! [GoalCoordinatesFound]")
 
 
-class GoalTableNotFound:
+class MultipleGoalCoordinatesFoundState:
 
-    def __init__(self, previous_goal_location=None):
-        self.previous_goal_location = previous_goal_location
+    def __init__(self, previous_coordinate=None):
+        if previous_coordinate is not None:
+            if not isinstance(previous_coordinate, GoalCoordinate):
+                raise ValueError("Coordinate not valid! [MultipleGoalCoordinatesFound]")
+        self.previous_coordinate = previous_coordinate
+
+
+class GoalCoordinatesNotFoundState:
+
+    def __init__(self, previous_coordinate=None):
+        if previous_coordinate is not None:
+            if not isinstance(previous_coordinate, GoalCoordinate):
+                raise ValueError("Coordinate not valid! [GoalCoordinatesNotFound]")
+        self.previous_coordinate = previous_coordinate
