@@ -6,14 +6,14 @@ import const
 import numpy as np
 import scipy.misc
 from person_amount_estimator import PersonAmountEstimator
-from pepper_waiter.body_movement_wrapper import BodyMovementWrapper
-from pepper_waiter.position_movement_wrapper import PositionMovementWrapper
-from pepper_waiter.sensing_wrapper import SensingWrapper
-from pepper_waiter.speech_wrapper import SpeechWrapper
+from pepper_waiter.wrappers.body_movement_wrapper import BodyMovementWrapper
+from pepper_waiter.wrappers.position_movement_wrapper import PositionMovementWrapper
+from pepper_waiter.wrappers.sensing_wrapper import SensingWrapper
+from pepper_waiter.wrappers.speech_wrapper import SpeechWrapper
 from pepper_waiter.table_goal_position_state import GoalTableFound, MultipleTableGoalsFound, GoalTableNotFound
 from pepper_waiter.table_search_state import TableFound, TableOccupied, TableNotFound, TableStateError
-from pepper_waiter.tablet_wrapper import TabletWrapper
-from pepper_waiter.sound_wrapper import SoundWrapper
+from pepper_waiter.wrappers.tablet_wrapper import TabletWrapper
+from pepper_waiter.wrappers.sound_wrapper import SoundWrapper
 
 
 class Behavior(object):
