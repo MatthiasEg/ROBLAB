@@ -16,6 +16,12 @@ To execute the behavior, execute main.py
 
 Behavior can be customized by values in const.py
 
+## How to start
+- Download YOLO Model from https://pjreddie.com/media/files/yolov3.weights
+- Put it in the folder robot/object_detection/yolo-coco
+- Configure values in const.py
+- Run main.py
+
 ## Team
 * Matthias Egli
 * Patrick Lädrach
