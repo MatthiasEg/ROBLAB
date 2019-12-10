@@ -13,7 +13,6 @@ class ObjectDetector:
         file_path = os.path.dirname(os.path.abspath(__file__))
         labels_path = file_path + "/yolo-coco/coco.names"
         self.__LABELS = open(labels_path).read().strip().split("\n")
-
         np.random.seed(42)
         self.__COLORS = np.random.randint(0, 255, size=(len(self.__LABELS), 3), dtype="uint8")
 
@@ -35,7 +34,6 @@ class ObjectDetector:
         frame = cv2.imread(image_path)
         (H, W) = frame.shape[:2]
 
-        # TODO[mario]: Check params
         blob = cv2.dnn.blobFromImage(frame, 1 / 255.0, (416, 416), swapRB=True, crop=False)
         self.__net.setInput(blob)
         layer_outputs = self.__net.forward(self.__ln)
@@ -71,9 +69,6 @@ class ObjectDetector:
                                 detected_objects.append(
                                     self.__build_object_position_info(i, frame, boxes, classIDs, confidences))
 
-        # cv2.imshow("Object Detection", frame)
-        # cv2.waitKey(1)
-
         return detected_objects
 
     def __build_object_position_info(self, i, frame, boxes, classIDs, confidences):
@@ -82,7 +77,6 @@ class ObjectDetector:
         (cX, cY) = (boxes[i][4], boxes[i][5])
 
         color = [int(c) for c in self.__COLORS[classIDs[i]]]
-        # color = [int(c) for c in self.__COLORS[i]]
         cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
         text = "{}: {:.4f}".format(self.__LABELS[classIDs[i]], confidences[i])
         cv2.putText(frame, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
@@ -105,68 +99,57 @@ class ObjectDetector:
         cv_image = cv2.imread(image_path)
 
         blob_params = self.__build_blob_detector_params()
+        # limits for red cups used
         hsv_red_lower = (166, 155, 100)
         hsv_red_upper = (180, 255, 255)
 
-        return self.__get_keypoints(cv_image, hsv_red_lower, hsv_red_upper, blob_params)
+        return self.__get_key_points(cv_image, hsv_red_lower, hsv_red_upper, blob_params)
 
     @staticmethod
     def __build_blob_detector_params():
         params = cv2.SimpleBlobDetector_Params()
-        # Change thresholds
         params.minThreshold = 100
         params.maxThreshold = 5000
-
         params.filterByConvexity = True
         params.minConvexity = 0.87
-
         return params
 
-    def __get_keypoints(self, cv_image, hsv_red_lower, hsv_red_upper, blob_params):
+    def __get_key_points(self, cv_image, hsv_red_lower, hsv_red_upper, blob_params):
         (rows, cols, channels) = cv_image.shape
-        cup_points = []
+        cup_key_points = []
         if cols > 60 and rows > 60:
             # --- Detect blobs
-            keypoints = self.__blob_detect(cv_image, hsv_red_lower, hsv_red_upper, blob_params)
-            for i, key_point in enumerate(keypoints):
-                # --- Find x and y position in camera adimensional frame
-                # x, y = self.__get_blob_relative_position(cv_image, key_point)
-                cup_point = dict()
-                cup_point["x"] = key_point.pt[0]
-                cup_point["y"] = key_point.pt[1]
-                cup_point["size"] = key_point.size
-                cup_points.append(cup_point)
-        return cup_points
+            key_points = self.__blob_detect(cv_image, hsv_red_lower, hsv_red_upper, blob_params)
+            for i, key_point in enumerate(key_points):
+                cup_keypoint = dict()
+                cup_keypoint["x"] = key_point.pt[0]
+                cup_keypoint["y"] = key_point.pt[1]
+                cup_keypoint["size"] = key_point.size
+                cup_key_points.append(cup_keypoint)
+        return cup_key_points
 
-    def __blob_detect(self, image,  # -- The frame (cv standard)
-                      hsv_min,  # -- minimum threshold of the hsv filter [h_min, s_min, v_min]
-                      hsv_max,  # -- maximum threshold of the hsv filter [h_max, s_max, v_max]
+    def __blob_detect(self, image,
+                      hsv_min,
+                      hsv_max,
                       blob_params):
-        # - Convert image from BGR to HSV
         hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-        # - Apply HSV threshold
         mask = cv2.inRange(hsv, hsv_min, hsv_max)
         mask = cv2.dilate(mask, None, iterations=2)
         mask = cv2.erode(mask, None, iterations=2)
 
-        # - Apply blob detection
         detector = cv2.SimpleBlobDetector_create(blob_params)
-        # Reverse the mask: blobs are black on white
         reversemask = 255 - mask
         keypoints = detector.detect(reversemask)
 
-        self.__draw_keypoints(image, keypoints)
-
+        self.__draw_key_points(image, keypoints)
         return keypoints
 
     @staticmethod
-    def __draw_keypoints(image,  # -- Input image
-                         keypoints,  # -- CV keypoints
-                         line_color=(0, 0, 255),  # -- line's color (b,g,r)
-                         ):
+    def __draw_key_points(image,  # -- Input image
+                          keypoints,  # -- CV keypoints
+                          line_color=(0, 0, 255),  # -- line's color (b,g,r)
+                          ):
 
-        # -- Draw detected blobs as red circles.
-        # -- cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS ensures the size of the circle corresponds to the size of blob
         im_with_keypoints = cv2.drawKeypoints(image, keypoints, np.array([]), line_color,
                                               cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
         cv2.imshow("Red Cups", im_with_keypoints)
