@@ -5,7 +5,7 @@ import time
 import const
 import numpy as np
 import scipy.misc
-from person_amount_estimator import PersonAmountEstimator
+from pepper_waiter.utilities.person_amount_estimator import PersonAmountEstimator
 from pepper_waiter.wrappers.body_movement_wrapper import BodyMovementWrapper
 from pepper_waiter.wrappers.position_movement_wrapper import PositionMovementWrapper
 from pepper_waiter.wrappers.sensing_wrapper import SensingWrapper
