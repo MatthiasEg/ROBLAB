@@ -3,7 +3,7 @@ from pandas import Series
 import const
 from robot.object_detection.camera import Camera
 from robot.object_detection.file_transfer import FileTransfer
-from robot.object_detection.object_detection import ObjectDetection
+from robot.object_detection.object_detection import ObjectDetector
 from robot.table_goal_position_state import GoalTableNotFound, GoalTableFound, MultipleTableGoalsFound
 
 
@@ -16,7 +16,7 @@ class SensingWrapper:
         self.__camera.configure_camera(self.__camera.cameras["top"], self.__camera.resolutions["640x480"],
                                        self.__camera.formats["jpg"])
         self.__file_transfer = FileTransfer(const.robot)
-        self.__detection = ObjectDetection()
+        self.__detection = ObjectDetector()
         self.__frontSonarMemoryPath = "Device/SubDeviceList/Platform/Front/Sonar/Sensor/Value"
         self.__backSonarMemoryPath = "Device/SubDeviceList/Platform/Back/Sonar/Sensor/Value"
         self.start_sonar_sensors()

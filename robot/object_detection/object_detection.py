@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 
 
-class ObjectDetection:
+class ObjectDetector:
 
     def __init__(self):
         self.__load_yolo()
