@@ -1,5 +1,5 @@
-from robot.PepperConfiguration import PepperConfiguration
-from robot.Robot import Robot
+from pepper_waiter.utilities.robot.PepperConfiguration import PepperConfiguration
+from pepper_waiter.utilities.robot.Robot import Robot
 
 config = PepperConfiguration("Amber")
 robot = Robot(config)
