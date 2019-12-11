@@ -39,9 +39,10 @@ class Navigator:
                         return TableFound()
                 else:
                     self.__speech_wrapper.say(self.__sentences["moreTimeToSearch"])
-                    if not self.__retry_to_locate_table(goal_state.previous_goal_location,
-                                                        self.__coordinate_calculator.get_table_coordinate_state(
-                                                            self.__amount_of_persons)):
+                    table_coord_func = self.__coordinate_calculator.get_table_coordinate_state
+                    if not self.__retry_to_locate_table(goal_state.previous_coordinate,
+                                                        table_coord_func,
+                                                        self.__amount_of_persons):
                         if self.__amount_of_persons < const.max_persons:
                             self.__amount_of_persons += 1
                         else:
@@ -71,20 +72,23 @@ class Navigator:
     def navigate_to_table(self):
         if self.__amount_of_persons is 0:
             raise ValueError("Amount of persons cannot be 0")
-        self.__do_navigation(self.__coordinate_calculator.get_table_coordinate_state(self.__amount_of_persons))
+        table_coord_func = self.__coordinate_calculator.get_table_coordinate_state
+        self.__do_navigation(table_coord_func, self.__amount_of_persons)
 
     def navigate_to_waiting_area(self):
-        self.__do_navigation(self.__coordinate_calculator.get_waiting_area_coordinates())
+        waiting_area_coord_func = self.__coordinate_calculator.get_waiting_area_coordinates
+        self.__do_navigation(waiting_area_coord_func)
 
-    def __do_navigation(self, goal_state_func):
+    def __do_navigation(self, goal_state_func, *args):
         self.__prepare_to_move()
-        not_found_tries = 0
+
         try:
+            not_found_tries = 0
             while not self.__navigation_interrupted:
                 time.sleep(.5)
                 distance_meters = self.__sensing_wrapper.get_sonar_distance("Front")
                 if float(distance_meters) >= 1.8:
-                    not_found_tries = self.__move_by_goal_state(goal_state_func, not_found_tries)
+                    not_found_tries = self.__move_by_goal_state(not_found_tries, goal_state_func, *args)
                 else:
                     if float(distance_meters) >= 0.8:
                         self.__position_movement_wrapper.move(0.5, 0, 0)
@@ -97,28 +101,29 @@ class Navigator:
             self.__navigation_interrupted = True
             print(ex)
 
-    def __move_by_goal_state(self, goal_state_func, not_found_tries):
-        goal_state = goal_state_func
+    def __move_by_goal_state(self, not_found_tries, goal_state_func, *args):
+        goal_state = goal_state_func(*args)
         if isinstance(goal_state, GoalCoordinatesFoundState):
             goal_location = goal_state.coordinate
             self.__move_towards_goal_location(goal_location)
+            return 0
         else:
             if not_found_tries < 4:
                 return not_found_tries + 1
             else:
                 self.__position_movement_wrapper.stop_movement()
                 self.__body_movement_wrapper.initial_position()
-                if not self.__retry_to_locate_table(goal_state.previous_coordinate, goal_state_func):
+                if not self.__retry_to_locate_table(goal_state.previous_coordinate, goal_state_func, *args):
                     self.__navigation_interrupted = True
                 return 0
 
-    def __move_towards_goal_location(self, goal_center):
-        pixels_to_move_x = (640 / 2) - goal_center[0]
+    def __move_towards_goal_location(self, goal_coordinate):
+        pixels_to_move_x = (640 / 2) - goal_coordinate.x
         degrees_to_move_x = int(round(pixels_to_move_x / 15.0))
-        print("table goal position: %s, move_x: %s" % (goal_center, degrees_to_move_x))
+        print("table goal position: %s, move_x: %s" % (goal_coordinate, degrees_to_move_x))
         self.__position_movement_wrapper.move(0.5, 0, degrees_to_move_x)
 
-    def __retry_to_locate_table(self, previous_coordinate, goal_state_func):
+    def __retry_to_locate_table(self, previous_coordinate, goal_state_func, *args):
         if previous_coordinate is not None:
             if not isinstance(previous_coordinate, GoalCoordinate):
                 raise ValueError("Coordinate not valid! [__retry_to_locate_table]")
@@ -127,15 +132,16 @@ class Navigator:
         self.__prepare_to_move()
 
         direction_multiplier = 1  # left
-        if previous_coordinate.x > (640 / 2):
-            direction_multiplier = -1  # right
+        if previous_coordinate is not None:
+            if previous_coordinate.x > (640 / 2):
+                direction_multiplier = -1  # right
 
-        degrees_per_step = 20
+        degrees_per_step = 30
         max_turns = int(round(360 / degrees_per_step))
         number_of_turns = 0
 
         while number_of_turns < max_turns:
-            goal_state = goal_state_func
+            goal_state = goal_state_func(*args)
             if not isinstance(goal_state, GoalCoordinatesFoundState):
                 self.__position_movement_wrapper.move_to(0, 0, degrees_per_step * direction_multiplier)
                 time.sleep(.5)
