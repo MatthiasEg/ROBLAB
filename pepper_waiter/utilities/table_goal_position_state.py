@@ -3,9 +3,9 @@ from pepper_waiter.utilities.goal_coordinate import GoalCoordinate
 
 class GoalCoordinatesFoundState:
 
-    def __init__(self, coordinates):
-        if isinstance(coordinates, GoalCoordinate):
-            self.coordinate = coordinates
+    def __init__(self, coordinate):
+        if isinstance(coordinate, GoalCoordinate):
+            self.coordinate = coordinate
         else:
             raise ValueError("Coordinate not valid! [GoalCoordinatesFound]")
 
