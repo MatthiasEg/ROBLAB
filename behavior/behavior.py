@@ -3,14 +3,12 @@ import os
 import time
 
 import const
-import numpy as np
-import scipy.misc
+from pepper_waiter.utilities.navigation.navigator import Navigator
 from pepper_waiter.utilities.person_amount_estimator import PersonAmountEstimator
 from pepper_waiter.wrappers.body_movement_wrapper import BodyMovementWrapper
 from pepper_waiter.wrappers.position_movement_wrapper import PositionMovementWrapper
 from pepper_waiter.wrappers.sensing_wrapper import SensingWrapper
 from pepper_waiter.wrappers.speech_wrapper import SpeechWrapper
-from pepper_waiter.utilities.table_goal_position_state import GoalTableFound, MultipleTableGoalsFound, GoalTableNotFound
 from pepper_waiter.utilities.table_search_state import TableFound, TableOccupied, TableNotFound, TableStateError
 from pepper_waiter.wrappers.tablet_wrapper import TabletWrapper
 from pepper_waiter.wrappers.sound_wrapper import SoundWrapper
@@ -23,6 +21,25 @@ class Behavior(object):
         self.__initialize_wrappers()
         self.__load_locales()
         self.__init_behavior_state()
+        self.__navigator = Navigator(self.body_movement_wrapper,
+                                     self.__position_movement_wrapper,
+                                     self.__sensing_wrapper,
+                                     self.__speech_wrapper,
+                                     self.__sentences)
+
+    def __initialize_wrappers(self):
+        self.body_movement_wrapper = BodyMovementWrapper()
+        self.__position_movement_wrapper = PositionMovementWrapper()
+        self.__sensing_wrapper = SensingWrapper()
+        self.__speech_wrapper = SpeechWrapper()
+        self.__tablet_wrapper = TabletWrapper()
+        self.sound_wrapper = SoundWrapper()
+
+    def __load_locales(self):
+        with open(os.path.join(os.getcwd(), const.path_to_locale_file), 'r') as f:
+            data = json.load(f)
+        self.__sentences = data["sentences"]
+        self.__vocabularies = data["vocabularies"]
 
     def __init_behavior_state(self):
         self.__person_amount_estimator = PersonAmountEstimator()
@@ -37,55 +54,21 @@ class Behavior(object):
         self.__recognized_words_certainty = 0
         self.__counter_no_user_interaction = 0
 
-    def __initialize_wrappers(self):
-        self.body_movement_wrapper = BodyMovementWrapper()
-        self.__position_movement_wrapper = PositionMovementWrapper()
-        self.__sensing_wrapper = SensingWrapper()
-        self.__speech_wrapper = SpeechWrapper()
-        self.__tablet_wrapper = TabletWrapper()
-        self.sound_wrapper = SoundWrapper()
-
     def start_behavior(self):
         while True:
             print("starting")
             self.body_movement_wrapper.initial_position()
             self.__setup_customer_reception()
             self.__check_person_amount()
+
             self.__speech_wrapper.say(self.__sentences["searchTable"])
             self.__position_movement_wrapper.move_to(0, 0, 180)
             self.sound_wrapper.start_playing_sound(const.path_to_waiting_music)
-            while True:
-                search_state = self.__search_table()
-                if isinstance(search_state, TableFound):
-                    self.sound_wrapper.stop_all()
-                    self.__ask_to_follow()
-                    self.sound_wrapper.start_playing_sound(const.path_to_waiting_music)
-                    self.__go_to_table(search_state.goal_location)
-                    time.sleep(3)
-                    self.__position_movement_wrapper.move_to(0, 0, 180)
-                    self.body_movement_wrapper.set_head_up(30)
-                    self.body_movement_wrapper.set_head_left(0)
-                    self.body_movement_wrapper.enable_autonomous_life(True)
-                    time.sleep(.5)
-                    self.sound_wrapper.stop_all()
-                    self.__assign_table()
-                    time.sleep(2)
-                    self.body_movement_wrapper.enable_autonomous_life(False)
-                    break
-                else:
-                    if self.__person_amount < const.max_persons:
-                        self.__person_amount += 1
-                        continue
-                    else:
-                        if isinstance(search_state, TableOccupied):
-                            self.__say_table_occupied()
-                        elif isinstance(search_state, TableNotFound):
-                            self.__speech_wrapper.animated_say(self.__sentences["noTablesForAmount"])
-                        elif isinstance(search_state, TableStateError):
-                            self.__speech_wrapper.animated_say(self.__sentences["error"])
-                        break
+
+            self.__try_find_table()
+
             self.__init_behavior_state()
-            self._go_home_by_cup()
+            self.__navigator.navigate_to_waiting_area()
 
     def __setup_customer_reception(self):
         if not self.__sensing_wrapper.is_face_detection_enabled():
@@ -232,165 +215,45 @@ class Behavior(object):
                 self.__person_amount_correct = True
                 self.__waiting_for_an_answer = False
 
-    def __search_table(self):
-        self.body_movement_wrapper.enable_autonomous_life(False)
-        self.body_movement_wrapper.set_head_down(0)
-        self.body_movement_wrapper.set_head_right(0)
-        time.sleep(3)
+    def __try_find_table(self):
+        search_state = self.__navigator.search_table(self.__person_amount)
+        if isinstance(search_state, TableFound):
+            self.sound_wrapper.stop_all()
+            self.__ask_to_follow()
+            self.sound_wrapper.start_playing_sound(const.path_to_waiting_music)
 
-        try:
-            while True:
-                goal_state = self.__sensing_wrapper.get_red_cups_center_position(self.__person_amount)
-                if isinstance(goal_state, GoalTableFound):
-                    goal_location = goal_state.goal_location
-                    detected_persons = self.__sensing_wrapper.get_object_positions("person")
-                    table_occupied = self.__is_table_occupied(detected_persons, goal_location)
-                    if table_occupied:
-                        return TableOccupied()
-                    else:
-                        return TableFound(goal_location)
-                else:
-                    self.__speech_wrapper.say(self.__sentences["moreTimeToSearch"])
-                    if goal_state is not None:
-                        if not self.__search_for_correct_table(goal_state.previous_goal_location):
-                            return TableNotFound()
-                    else:
-                        if not self.__search_for_correct_table(None):
-                            return TableNotFound()
+            try:
+                self.__navigator.navigate_to_table()
 
-        except Exception, e:
-            print(e)
-            self.__position_movement_wrapper.stop_movement()
-            return TableStateError()
+                time.sleep(2)
 
-    @staticmethod
-    def __is_table_occupied(detected_persons, goal_center):
-        if len(detected_persons) > 0:
-            person_x_positions = map(lambda r: r["centerX"], detected_persons)
-            goal_x = goal_center[0]
-            range_min = goal_x - 100 if goal_x - 100 >= 0 else 0
-            range_max = goal_x + 100 if goal_x + 100 <= 640 else 640
+                self.body_movement_wrapper.set_head_up(30)
+                self.body_movement_wrapper.set_head_left(0)
+                self.__position_movement_wrapper.move_to(0, 0, 180)
+                self.sound_wrapper.stop_all()
 
-            for x_coord in person_x_positions:
-                if range_min <= x_coord <= range_max:
-                    return True
-        return False
+                self.__assign_table()
+            except ValueError, err:
+                self.__speech_wrapper.animated_say(self.__sentences["error"])
+                print("Error while navigating: %s" % err)
+        else:
+            if isinstance(search_state, TableOccupied):
+                self.__say_table_occupied()
+            elif isinstance(search_state, TableNotFound):
+                self.__speech_wrapper.animated_say(self.__sentences["noTablesForAmount"])
+            elif isinstance(search_state, TableStateError):
+                self.__speech_wrapper.animated_say(self.__sentences["error"])
 
     def __ask_to_follow(self):
         self.__speech_wrapper.animated_say(self.__sentences["askToFollow"])
 
-    def _go_home_by_cup(self):
-        self.body_movement_wrapper.set_head_left(0)
-        self.body_movement_wrapper.set_head_up(0)
-        self.body_movement_wrapper.set_hip_pitch(-5)
-        self.body_movement_wrapper.set_hip_roll(0)
-        time.sleep(3)
-        while True:
-            goal_state = self.__sensing_wrapper.get_starting_red_cup_position()
-            if isinstance(goal_state, GoalTableFound):
-                goal_location = goal_state.goal_location
-                self.__go_to_table(goal_location, True)
-                break
-            else:
-                if goal_state is not None:
-                    self.__search_for_correct_table(goal_state.previous_goal_location, True)
-                else:
-                    self.__search_for_correct_table(None, True)
-
-    def __go_to_table(self, goal_center, is_home=False):
-        self.body_movement_wrapper.set_head_left(0)
-        self.body_movement_wrapper.set_head_up(0)
-        self.body_movement_wrapper.set_hip_pitch(-5)
-        self.body_movement_wrapper.set_hip_roll(0)
-        not_found_tries = 0
-        # if goal_center is not None:
-        #     self.__move_towards_goal_location(goal_center)
-        while True:
-            time_movement_start = round(time.time() * 1000)
-            distance_meters = self.__sensing_wrapper.get_sonar_distance("Front")
-            if float(distance_meters) >= 1.8:
-                if float(distance_meters) >= 1.5:
-                    goal_state = self.__sensing_wrapper.get_red_cups_center_position(
-                        self.__person_amount) if not is_home \
-                        else self.__sensing_wrapper.get_starting_red_cup_position()
-                    if isinstance(goal_state, GoalTableFound):
-                        not_found_tries = 0
-                        goal_location = goal_state.goal_location
-                        now = round(time.time() * 1000)
-                        diff = now - time_movement_start
-                        if diff <= 1000:
-                            self.__move_towards_goal_location(goal_location)
-                        else:
-                            self.__position_movement_wrapper.move(0.5, 0, 0)
-                    elif isinstance(goal_state, MultipleTableGoalsFound) or isinstance(goal_state, GoalTableNotFound):
-                        if not_found_tries < 4:
-                            not_found_tries += 1
-                        else:
-                            self.__position_movement_wrapper.stop_movement()
-                            self.body_movement_wrapper.initial_position()
-
-                            if goal_state is not None:
-                                if self.__search_for_correct_table(goal_state.previous_goal_location):
-                                    continue
-                                else:
-                                    break
-                            else:
-                                if self.__search_for_correct_table(None):
-                                    continue
-                                else:
-                                    break
-                    else:
-                        self.__position_movement_wrapper.move(0.5, 0, 0)
-                else:
-                    self.__position_movement_wrapper.stop_movement()
-                    break
-            else:
-                if float(distance_meters) <= (1.0 if not is_home else 0.8):
-                    self.__position_movement_wrapper.collision_avoided = False
-                    self.__position_movement_wrapper.stop_movement()
-                    print("movement finished")
-                    break
-                else:
-                    self.__position_movement_wrapper.move(0.5, 0, 0)
-
-    def __move_towards_goal_location(self, goal_center):
-        pixels_to_move_x = (640 / 2) - goal_center[0]
-        degrees_to_move_x = int(round(pixels_to_move_x / 15.0))
-        print("table goal position: %s, move_x: %s" % (goal_center, degrees_to_move_x))
-        self.__position_movement_wrapper.move(0.5, 0, degrees_to_move_x)
-
-    def __search_for_correct_table(self, previous_goal_location, is_home=False):
-        direction_multiplier = -1  # left
-        if previous_goal_location is not None:
-            print(previous_goal_location)
-            # if previous_goal_location["x"] > (640 / 2):
-            #     direction_multiplier = -1  # right
-
-        degrees_per_step = 20
-        max_turns = int(round(360 / degrees_per_step))
-        number_of_turns = 0
-
-        self.__position_movement_wrapper.stop_movement()
-        self.body_movement_wrapper.set_head_down(0)
-
-        while number_of_turns < max_turns:
-            goal_state = self.__sensing_wrapper.get_red_cups_center_position(self.__person_amount) if not is_home else \
-                self.__sensing_wrapper.get_starting_red_cup_position()
-            if isinstance(goal_state, GoalTableNotFound) or isinstance(goal_state, MultipleTableGoalsFound):
-                self.__position_movement_wrapper.move_to(0, 0, degrees_per_step * direction_multiplier)
-                time.sleep(.5)
-                number_of_turns = number_of_turns + 1
-            else:
-                return True
-        return False
-
     def __assign_table(self):
+        self.body_movement_wrapper.enable_autonomous_life(True)
+        time.sleep(.5)
         self.__speech_wrapper.animated_say(self.__sentences["assignTable"])
         self.__wait_for_new_customers = True
-
-    def __return_to_waiting_zone(self):
-        print("returning home")
-        self.__position_movement_wrapper.go_to_home()
+        self.body_movement_wrapper.enable_autonomous_life(False)
+        time.sleep(2)
 
     def __say_table_occupied(self):
         self.body_movement_wrapper.enable_autonomous_life(True)
@@ -398,39 +261,3 @@ class Behavior(object):
         self.__speech_wrapper.animated_say(self.__sentences["noTableAvailable"])
         time.sleep(.5)
         self.__speech_wrapper.animated_say(self.__sentences["comeBackAnotherDay"])
-
-    def __load_locales(self):
-        with open(os.path.join(os.getcwd(), const.path_to_locale_file), 'r') as f:
-            data = json.load(f)
-        self.__sentences = data["sentences"]
-        self.__vocabularies = data["vocabularies"]
-
-    def __create_map(self, radius):
-        # Wake up pepper_waiter
-        # Wake up pepper_waiter
-        self.__robot.ALMotion.wakeUp()  # Explore the environement, in a radius of 2 m.
-        error_code = self.__sensing_wrapper.explore(radius)
-        if error_code != 0:
-            print "Exploration failed."
-            return
-        # Saves the exploration on disk
-        path = self.__sensing_wrapper.save_exploration_to_robot()
-        print "Exploration saved at path: \"" + path + "\""
-        # Start localization to navigate in map
-        self.__sensing_wrapper.start_localization()
-        # Come back to initial position
-        self.__position_movement_wrapper.navigate_to_coordinate_on_map([
-            0., 0., 0.])
-        # Stop localization
-        self.__sensing_wrapper.stop_localization()
-        # Retrieve and display the map built by the pepper_waiter
-        result_map = self.__sensing_wrapper.get_metrical_map()
-        map_width = result_map[1]
-        map_height = result_map[2]
-        img = np.array(result_map[4]).reshape(map_width, map_height)
-        img = (100 - img) * 2.55  # from 0..100 to 255..0
-        img = np.array(img, np.uint8)
-
-        # save image to project root
-
-        scipy.misc.imsave('mapMitRadius{}.jpg'.format(radius), img)
