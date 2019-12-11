@@ -1,15 +1,12 @@
-import cv2
 import time
-import const
-
 from thread import start_new_thread
 
+import cv2
 import statistics as statistics
 
+import const
 from pepper_waiter.utilities.camera import Camera
 from pepper_waiter.utilities.file_transfer import FileTransfer
-
-# import face_recognition
 
 
 class PersonAmountEstimator:
@@ -56,7 +53,8 @@ class PersonAmountEstimator:
                                        self.__camera.formats["jpg"])
         self.__file_transfer = FileTransfer(const.robot)
 
-        file_names = self.__camera.take_pictures(amount, "/home/nao/recordings/cameras/", 'people_recognized' + str(time.time()) + '.jpg')
+        file_names = self.__camera.take_pictures(amount, "/home/nao/recordings/cameras/",
+                                                 'people_recognized' + str(time.time()) + '.jpg')
         self.__taken_picture_paths_remote += file_names[0]
 
     def __get_remote_pictures(self):
@@ -91,3 +89,6 @@ class PersonAmountEstimator:
         )
 
         return len(faces)
+
+    def __del__(self):
+        self.__file_transfer.close()
