@@ -18,6 +18,7 @@ class Navigator:
         self.__sentences = sentences
         self.__amount_of_persons = 0
         self.__navigation_interrupted = False
+        self.navigation_successful = False
 
     def search_table(self, amount_of_persons):
         self.__amount_of_persons = amount_of_persons
@@ -40,16 +41,15 @@ class Navigator:
                 else:
                     self.__speech_wrapper.say(self.__sentences["moreTimeToSearch"])
                     table_coord_func = self.__coordinate_calculator.get_table_coordinate_state
-                    if not self.__retry_to_locate_table(goal_state.previous_coordinate,
-                                                        table_coord_func,
-                                                        self.__amount_of_persons):
+                    if self.__retry_to_locate_table(goal_state.previous_coordinate,
+                                                    table_coord_func,
+                                                    self.__amount_of_persons) is not True:
                         if self.__amount_of_persons < const.max_persons:
                             self.__amount_of_persons += 1
                         else:
                             self.__navigation_interrupted = True
                             self.__amount_of_persons = 0
                             return TableNotFound()
-
         except Exception, e:
             self.__position_movement_wrapper.stop_movement()
             self.__navigation_interrupted = True
@@ -80,12 +80,12 @@ class Navigator:
         self.__do_navigation(waiting_area_coord_func)
 
     def __do_navigation(self, goal_state_func, *args):
+        self.__navigation_interrupted = False
+        self.navigation_successful = False
         self.__prepare_to_move()
-
         try:
             not_found_tries = 0
             while not self.__navigation_interrupted:
-                time.sleep(.5)
                 distance_meters = self.__sensing_wrapper.get_sonar_distance("Front")
                 if float(distance_meters) >= 1.8:
                     not_found_tries = self.__move_by_goal_state(not_found_tries, goal_state_func, *args)
@@ -94,6 +94,7 @@ class Navigator:
                         self.__position_movement_wrapper.move(0.5, 0, 0)
                     else:
                         self.__position_movement_wrapper.stop_movement()
+                        self.navigation_successful = True
                         self.__navigation_interrupted = True
                         print("movement finished")
         except Exception, ex:
@@ -108,19 +109,20 @@ class Navigator:
             self.__move_towards_goal_location(goal_location)
             return 0
         else:
-            if not_found_tries < 4:
+            if not_found_tries < 6:
+                print("not found tries: %s" % not_found_tries)
                 return not_found_tries + 1
             else:
                 self.__position_movement_wrapper.stop_movement()
                 self.__body_movement_wrapper.initial_position()
-                if not self.__retry_to_locate_table(goal_state.previous_coordinate, goal_state_func, *args):
+                if self.__retry_to_locate_table(goal_state.previous_coordinate, goal_state_func, *args) is not True:
                     self.__navigation_interrupted = True
                 return 0
 
     def __move_towards_goal_location(self, goal_coordinate):
         pixels_to_move_x = (640 / 2) - goal_coordinate.x
         degrees_to_move_x = int(round(pixels_to_move_x / 15.0))
-        print("table goal position: %s, move_x: %s" % (goal_coordinate, degrees_to_move_x))
+        print("table goal position: %s, move_x: %s" % (goal_coordinate.x, degrees_to_move_x))
         self.__position_movement_wrapper.move(0.5, 0, degrees_to_move_x)
 
     def __retry_to_locate_table(self, previous_coordinate, goal_state_func, *args):
@@ -133,7 +135,8 @@ class Navigator:
 
         direction_multiplier = 1  # left
         if previous_coordinate is not None:
-            if previous_coordinate.x > (640 / 2):
+            print("previous goal x: %s" % previous_coordinate.x)
+            if previous_coordinate.x >= (640 / 2):
                 direction_multiplier = -1  # right
 
         degrees_per_step = 30

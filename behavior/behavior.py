@@ -56,19 +56,25 @@ class Behavior(object):
 
     def start_behavior(self):
         while True:
-            print("starting")
-            self.body_movement_wrapper.initial_position()
-            self.__setup_customer_reception()
-            self.__check_person_amount()
+            try:
+                print("starting")
+                self.body_movement_wrapper.initial_position()
+                self.__setup_customer_reception()
+                self.__check_person_amount()
 
-            self.__speech_wrapper.say(self.__sentences["searchTable"])
-            self.__position_movement_wrapper.move_to(0, 0, 180)
-            self.sound_wrapper.start_playing_sound(const.path_to_waiting_music)
+                self.__speech_wrapper.say(self.__sentences["searchTable"])
+                self.__position_movement_wrapper.move_to(0, 0, 180)
+                self.sound_wrapper.start_playing_sound(const.path_to_waiting_music)
 
-            self.__try_find_table()
+                self.__try_find_table()
 
-            self.__init_behavior_state()
-            self.__navigator.navigate_to_waiting_area()
+                self.__navigator.navigate_to_waiting_area()
+                self.__init_behavior_state()
+            except Exception, ex:
+                print("behaviour loop exception %s" % ex)
+                self.__speech_wrapper.animated_say(self.__sentences["error"])
+                self.__navigator.navigate_to_waiting_area()
+                self.__init_behavior_state()
 
     def __setup_customer_reception(self):
         if not self.__sensing_wrapper.is_face_detection_enabled():
@@ -224,15 +230,17 @@ class Behavior(object):
 
             try:
                 self.__navigator.navigate_to_table()
+                if self.__navigator.navigation_successful is True:
+                    time.sleep(2)
 
-                time.sleep(2)
+                    self.body_movement_wrapper.set_head_up(30)
+                    self.body_movement_wrapper.set_head_left(0)
+                    self.__position_movement_wrapper.move_to(0, 0, 180)
+                    self.sound_wrapper.stop_all()
 
-                self.body_movement_wrapper.set_head_up(30)
-                self.body_movement_wrapper.set_head_left(0)
-                self.__position_movement_wrapper.move_to(0, 0, 180)
-                self.sound_wrapper.stop_all()
-
-                self.__assign_table()
+                    self.__assign_table()
+                else:
+                    self.__speech_wrapper.animated_say(self.__sentences["navigationUnsuccessful"])
             except ValueError, err:
                 self.__speech_wrapper.animated_say(self.__sentences["error"])
                 print("Error while navigating: %s" % err)

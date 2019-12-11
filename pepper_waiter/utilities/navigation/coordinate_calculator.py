@@ -72,8 +72,20 @@ class CoordinateCalculator:
     def __get_state_for_key_point_size_match(self, key_point_sizes, cup_key_points):
         center_coordinate = self.__calculate_center_coordinate(key_point_sizes, cup_key_points)
         if center_coordinate is not None:
-            return GoalCoordinatesFoundState(GoalCoordinate(center_coordinate["x"], center_coordinate["y"]))
+            return self.__verify_coordinate_and_return(center_coordinate)
         return GoalCoordinatesNotFoundState(self.__previous_goal_coordinate)
+
+    def __verify_coordinate_and_return(self, coordinate):
+        goal_coordinate = GoalCoordinate(coordinate["x"], coordinate["y"])
+        if self.__previous_goal_coordinate is not None:
+            min_threshold = self.__previous_goal_coordinate.x - 40
+            max_threshold = self.__previous_goal_coordinate.x + 40
+            if min_threshold <= coordinate["x"] <= max_threshold:
+                self.__set_previous_goal_coordinate(goal_coordinate)
+                return GoalCoordinatesFoundState(goal_coordinate)
+            else:
+                return GoalCoordinatesNotFoundState(self.__previous_goal_coordinate)
+        return GoalCoordinatesFoundState(goal_coordinate)
 
     def __get_state_for_larger_key_point_size(self, cup_goal, key_point_sizes, cup_key_points):
         current_index = 0
@@ -132,15 +144,13 @@ class CoordinateCalculator:
         filtered_goal_coordinates = self.__get_filtered_coordinates(goal_coordinates, indexes_to_remove)
 
         if len(filtered_goal_coordinates) == 1:
-            goal_coordinate = GoalCoordinate(filtered_goal_coordinates[0]["x"], filtered_goal_coordinates[0]["y"])
-            self.__set_previous_goal_coordinate(goal_coordinate)
-            return GoalCoordinatesFoundState(goal_coordinate)
+            return self.__verify_coordinate_and_return(filtered_goal_coordinates[0])
 
         elif len(filtered_goal_coordinates) >= 1:
             if self.__previous_goal_coordinate is not None:
                 filtered_goal = self.__get_coordinates_closest_to_previous(filtered_goal_coordinates)
                 if filtered_goal is not None:
-                    return GoalCoordinatesFoundState(GoalCoordinate(filtered_goal["x"], filtered_goal["y"]))
+                    return self.__verify_coordinate_and_return(filtered_goal)
             return MultipleGoalCoordinatesFoundState(self.__previous_goal_coordinate)
 
         return GoalCoordinatesNotFoundState(self.__previous_goal_coordinate)
@@ -170,9 +180,10 @@ class CoordinateCalculator:
         self.__previous_goal_coordinate = coordinate
 
     def __get_coordinates_closest_to_previous(self, goal_coordinates):
-        min_threshold = self.__previous_goal_coordinate.x - 50
-        max_threshold = self.__previous_goal_coordinate.x + 50
+        min_threshold = self.__previous_goal_coordinate.x - 40
+        max_threshold = self.__previous_goal_coordinate.x + 40
         for _, goal in enumerate(goal_coordinates):
+            print("closest to previous x: %s" % goal.x)
             if min_threshold <= goal["x"] <= max_threshold:
                 return goal
         return None
