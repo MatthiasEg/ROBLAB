@@ -16,6 +16,7 @@ class PersonAmountEstimator:
         self.__picture_file_name = const.img_people_recognized
         self.__taken_picture_paths_local = []
         self.__taken_picture_paths_remote = []
+        self.__file_transfer = FileTransfer(const.robot)
 
     def start_estimation(self):
         print("start estimating")
@@ -51,7 +52,6 @@ class PersonAmountEstimator:
         self.__camera = Camera(const.robot)
         self.__camera.configure_camera(self.__camera.cameras["top"], self.__camera.resolutions["640x480"],
                                        self.__camera.formats["jpg"])
-        self.__file_transfer = FileTransfer(const.robot)
 
         file_names = self.__camera.take_pictures(amount, "/home/nao/recordings/cameras/",
                                                  'people_recognized' + str(time.time()) + '.jpg')
