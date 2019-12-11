@@ -45,6 +45,9 @@
         ],
         "askToFollow": "Danke für Ihre Geduld! Bitte folgen Sie mir zu Ihrem Tisch.",
         "assignTable": "Hier ist Ihr Tisch. Sie können sich bereits setzen. Ein menschlicher Mitarbeiter wird sie gleich bedienen. Geniessen Sie Ihren Aufenthalt!",
-        "error": "Leider ist etwas schiefgelaufen. Ich werde noch einmal neu starten."
+        "error": "Leider ist etwas schiefgelaufen. Ich werde noch einmal neu starten.",
+        "navigationUnsuccessful": [
+            "Leider kann ich den Tisch nicht finden. Ich muss noch einmal von vorne beginnen."
+        ]
     }
 }

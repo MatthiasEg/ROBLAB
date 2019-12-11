@@ -45,6 +45,9 @@
         ],
         "askToFollow": "Thank you for your patience. Please follow me to your table.",
         "assignTable": "This is your table. Please wait. A human employee will be serving you shortly. Enjoy your stay.",
-        "error": "Unfortunately, something went wrong. I'll try to restart."
+        "error": "Unfortunately, something went wrong. I'll try to restart.",
+        "navigationUnsuccessful": [
+            "Unfortunately, I'm not able to locate your table. I have to start over."
+        ]
     }
 }
