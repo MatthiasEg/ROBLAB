@@ -1,3 +1,4 @@
+import os
 import time
 from thread import start_new_thread
 
@@ -63,7 +64,7 @@ class PersonAmountEstimator:
         local_file_names = []
         for remote in self.__taken_picture_paths_remote:
             file_name = self.__picture_file_name + str(time.time()) + ".jpg"
-            local_project_path = const.path_to_pictures + file_name
+            local_project_path = os.path.join(os.getcwd(), const.path_to_pictures + file_name)
             local_file_names.append(local_project_path)
             self.__file_transfer.get(remote, local_project_path)
         self.__taken_picture_paths_local += local_file_names
@@ -75,7 +76,10 @@ class PersonAmountEstimator:
 
         # return len(faces)
         # Create the haar cascade
-        face_cascade = cv2.CascadeClassifier("face_detection_data/haarcascade_frontalface_default.xml")
+        path = "pepper_waiter/utilities/face_detection_data/haarcascade_frontalface_default.xml"
+        v = os.path.join(os.getcwd(),path)
+        print v
+        face_cascade = cv2.CascadeClassifier(os.path.join(os.getcwd(),path))
         image = cv2.imread(picture_path)
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
