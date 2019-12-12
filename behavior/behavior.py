@@ -55,6 +55,7 @@ class Behavior(object):
         self.__counter_no_user_interaction = 0
 
     def start_behavior(self):
+        self.sound_wrapper.stop_all()
         while True:
             try:
                 print("starting")
