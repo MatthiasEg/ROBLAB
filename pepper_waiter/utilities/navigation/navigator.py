@@ -133,11 +133,11 @@ class Navigator:
         self.__position_movement_wrapper.stop_movement()
         self.__prepare_to_move()
 
-        direction_multiplier = 1  # left
+        direction_multiplier = -1  # left
         if previous_coordinate is not None:
             print("previous goal x: %s" % previous_coordinate.x)
             if previous_coordinate.x >= (640 / 2):
-                direction_multiplier = -1  # right
+                direction_multiplier = 1  # right
 
         degrees_per_step = 30
         max_turns = int(round(360 / degrees_per_step))
