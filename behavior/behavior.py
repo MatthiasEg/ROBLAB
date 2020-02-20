@@ -230,7 +230,7 @@ class Behavior(object):
             self.sound_wrapper.start_playing_sound(const.path_to_waiting_music)
 
             try:
-                self.__navigator.navigate_to_table()
+                self.__navigator.navigate_to_table(self.__person_amount)
                 if self.__navigator.navigation_successful is True:
                     time.sleep(2)
 
