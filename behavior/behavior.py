@@ -55,7 +55,7 @@ class Behavior(object):
         self.__counter_no_user_interaction = 0
 
     def start_behavior(self):
-        self.sound_wrapper.stop_all()
+        # self.sound_wrapper.stop_all()
         while True:
             try:
                 print("starting")
@@ -252,6 +252,8 @@ class Behavior(object):
                 self.__speech_wrapper.animated_say(self.__sentences["noTablesForAmount"])
             elif isinstance(search_state, TableStateError):
                 self.__speech_wrapper.animated_say(self.__sentences["error"])
+            else:
+                self.__speech_wrapper.animated_say("Ficken! Das war nicht gut ich tubel.")
 
     def __ask_to_follow(self):
         self.__speech_wrapper.animated_say(self.__sentences["askToFollow"])

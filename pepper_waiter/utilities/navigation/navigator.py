@@ -69,15 +69,16 @@ class Navigator:
                     return True
         return False
 
-    def navigate_to_table(self):
-        if self.__amount_of_persons is 0:
-            raise ValueError("Amount of persons cannot be 0")
+    def navigate_to_table(self, person_amount):
+        self.__amount_of_persons = person_amount
         table_coord_func = self.__coordinate_calculator.get_table_coordinate_state
         self.__do_navigation(table_coord_func, self.__amount_of_persons)
+        self.__navigation_interrupted = False
 
     def navigate_to_waiting_area(self):
         waiting_area_coord_func = self.__coordinate_calculator.get_waiting_area_coordinates
         self.__do_navigation(waiting_area_coord_func)
+        self.__navigation_interrupted = False
 
     def __do_navigation(self, goal_state_func, *args):
         self.__navigation_interrupted = False

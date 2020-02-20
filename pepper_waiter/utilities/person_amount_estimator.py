@@ -77,9 +77,9 @@ class PersonAmountEstimator:
         # return len(faces)
         # Create the haar cascade
         path = "pepper_waiter/utilities/face_detection_data/haarcascade_frontalface_default.xml"
-        v = os.path.join(os.getcwd(),path)
+        v = os.path.join(os.getcwd(), path)
         print v
-        face_cascade = cv2.CascadeClassifier(os.path.join(os.getcwd(),path))
+        face_cascade = cv2.CascadeClassifier(os.path.join(os.getcwd(), path))
         image = cv2.imread(picture_path)
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
